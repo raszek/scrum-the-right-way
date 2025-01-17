@@ -1,0 +1,61 @@
+{% set url = path('app_project_issue_view_attachment', {
+    id: project.id,
+    issueCode: issue.code,
+    attachmentId: attachment.id
+}) %}
+
+{% set removeUrl = path('app_project_issue_remove_attachment', {
+    id: project.id,
+    issueCode: issue.code,
+    attachmentId: attachment.id
+}) %}
+
+<div class="col-lg-2 col-md-4 mt-3"
+     data-dropzone-target="item"
+     data-dropzone-item-id-param="{{ attachment.id }}"
+     data-dropzone-item-remove-url-param="{{ removeUrl }}"
+     data-action="click->dropzone#stopPropagation"
+>
+    <div class="strw-dropzone-item">
+        {% if attachment.canBeDisplayed %}
+            <img src="{{ url }}"
+                 data-lightbox-target="item"
+                 data-lightbox-extension-param="{{ attachment.file.extension }}"
+                 data-lightbox-id-param="{{ attachment.id }}"
+                 alt="{{ attachment.file.name }}"
+                 style="max-height: 10vh;"
+            >
+        {% else %}
+            <span class="strw-dropzone-icon">
+                <i class="bi bi-file-earmark"></i>
+            </span>
+            {{ attachment.file.name }}
+        {% endif %}
+
+        <div class="strw-dropzone-item-hover-content">
+            {% if attachment.canBeDisplayed %}
+                <button class="btn btn-info"
+                        data-action="lightbox#openGallery"
+                        data-lightbox-id-param="{{ attachment.id }}"
+                >
+                    <i class="bi bi-eye"></i>
+                </button>
+            {% else %}
+                <a href="{{ url }}"
+                   class="btn btn-info"
+                   target="_blank"
+                >
+                    <i class="bi bi-eye"></i>
+                </a>
+            {% endif %}
+            {% if is_granted('REMOVE_ATTACHMENT', project) %}
+                <button class="btn btn-danger"
+                        data-action="confirm-dialog#open"
+                        data-confirm-dialog-url-param="{{ attachment.id }}"
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>

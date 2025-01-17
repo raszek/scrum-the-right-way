@@ -1,0 +1,16 @@
+<h1>{{ issue.code }}</h1>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('app_project_kanban', {id: project.id}) }}">Project home</a></li>
+        {% if previousSite == 'backlog' %}
+            <li class="breadcrumb-item"><a href="{{ path('app_project_backlog', {id: project.id}) }}">Backlog</a></li>
+        {% elseif previousSite == 'kanban' %}
+            <li class="breadcrumb-item"><a href="{{ path('app_project_kanban', {id: project.id}) }}">Kanban</a></li>
+        {% else %}
+            <li class="breadcrumb-item"><a href="{{ path('app_project_issue_list', {id: project.id}) }}">Issues</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active" aria-current="page">{{ issue.code }}</li>
+    </ol>
+</nav>
+<hr>

@@ -1,0 +1,73 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = issue.code ~ ' description history' %}
+
+{% block content %}
+    <div class="row mt-3">
+        <div class="col-12">
+            <h1>{{ page_title }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_project_kanban', {id: project.id}) }}">Project home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_project_issue_list', {id: project.id}) }}">Issues</a></li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ path('app_project_issue_view', {id: project.id, issueCode: issue.code}) }}">{{ issue.code }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Description history
+                    </li>
+                </ol>
+            </nav>
+            <hr>
+        </div>
+    </div>
+    <div data-controller="description-history" class="row mt-3">
+        <div class="col-3">
+            {% if not pagination.items %}
+                <h2>No changes so far</h2>
+            {% endif %}
+            <ul  class="list-group">
+                {% for change in pagination.items %}
+                    <li class="list-group-item strw-clickable"
+                        data-description-history-target="change"
+                        data-description-history-index-param="{{ loop.index - 1 }}"
+                        data-action="click->description-history#change"
+                        data-description-history-url-param="{{ path('app_issue_description_history_view', {
+                            id: project.id,
+                            issueCode: issue.code,
+                            historyId: change.id
+                        }) }}"
+                    >
+                        {{ change.createdAt | date }}
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="d-flex mt-3">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+        </div>
+        <div class="col-9">
+            {% if pagination.items %}
+                <div class="card">
+                    <div class="card-header">
+                        Changes
+                    </div>
+                    <div class="card-body"
+                         style="min-height: 60vh;"
+                    >
+                        <div data-description-history-target="container"></div>
+
+                        <div data-description-history-target="loader"
+                             style="display: flex; justify-content: center;"
+                        >
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Issues' %}
+
+{% block content %}
+    {% include 'common/project_page_header.html.twig' %}
+
+    <div class="row mt-3">
+        <div class="col-12">
+            {{ form_start(searchForm) }}
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form_row(searchForm.createdAfter) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(searchForm.createdBefore) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(searchForm.updatedAfter) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(searchForm.updatedBefore) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(searchForm.title) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(searchForm.number) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(searchForm.column) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(searchForm.type) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(searchForm.createdBy) }}
+                </div>
+            </div>
+            <div class="d-flex mb-3">
+                <input type="submit" value="Search" class="btn btn-primary">
+                <a href="{{ path('app_project_issue_list', {id: project.id}) }}" class="btn btn-secondary ms-3">Reset</a>
+            </div>
+            {{ form_end(searchForm) }}
+        </div>
+        <div class="col-12">
+            {% include 'common/table.html.twig' %}
+        </div>
+    </div>
+{% endblock %}

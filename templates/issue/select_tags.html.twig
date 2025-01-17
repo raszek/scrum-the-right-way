@@ -1,0 +1,68 @@
+<div data-controller="select-tags"
+     data-select-tags-max-length-value="{{ tagInfo.maxLength }}"
+     data-select-tags-max-items-value="{{ tagInfo.maxItems }}"
+     data-select-tags-url-value="{{ path('app_project_issue_tags_set', {id: project.id, issueCode: issue.code}) }}"
+     data-select-tags-create-url-value="{{ path('app_project_create_tag', {id: project.id}) }}"
+     data-select-tags-issue-events-outlet="#issue-events"
+     class="card mb-3"
+>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        Tags
+        {% if is_granted('UPDATE_ISSUE_TAGS', project) %}
+            <div>
+                <button class="btn btn-primary"
+                        data-select-tags-target="editButton"
+                        data-action="select-tags#edit"
+                >
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-primary d-none"
+                        data-select-tags-target="saveButton"
+                        data-action="select-tags#save"
+                >
+                    <i class="bi bi-save"></i>
+                </button>
+            </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <span data-select-tags-target="emptyText"
+              class="{{ html_classes({ 'd-none': issue.tags is not empty }) }}"
+        >
+            No added tags
+        </span>
+        <div data-select-tags-target="list">
+            {% for tag in issue.tags %}
+                <span  data-controller="background-text"
+                       data-background-text-background-color-value="{{ tag.backgroundColor }}"
+                       class="strw-tag"
+                >
+                    {{ tag.name }}
+                </span>
+            {% endfor %}
+        </div>
+        <template data-select-tags-target="tagTemplate">
+            <span data-controller="background-text"
+                  class="strw-tag">
+            </span>
+        </template>
+        <div data-select-tags-target="selectContainer"
+             class="d-none"
+        >
+            <select data-select-tags-target="select"
+                    multiple
+                    name="tags[]"
+                    autocomplete="off"
+            >
+                {% for tag in projectTags %}
+                    <option value="{{ tag.name }}"
+                            data-background-color="{{ tag.backgroundColor }}"
+                            {% if tag.isSelected %}selected="selected"{% endif %}
+                    >
+                        {{ tag.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>

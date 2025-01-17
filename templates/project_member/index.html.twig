@@ -1,0 +1,105 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Project members' %}
+
+{% block content %}
+    {% include 'common/project_page_header.html.twig' %}
+
+    {% if is_granted('PROJECT_ADD_MEMBER', project) %}
+        {{ form_start(addProjectMemberForm) }}
+        <div class="row mt-3">
+            <div class="d-flex align-items-start">
+                <div class="w-25">
+                    {{ form_row(addProjectMemberForm.email, {
+                        label: false
+                    }) }}
+                </div>
+                <input type="submit" value="Add member" class="btn btn-primary ms-2">
+            </div>
+        </div>
+        {{ form_end(addProjectMemberForm) }}
+        <hr>
+    {% endif %}
+    {{ form_start(searchForm) }}
+    <div class="row mt-3">
+        <div class="d-flex align-items-start">
+            {{ form_row(searchForm.name, {
+                label: false,
+                attr: {
+                    placeholder: 'Search name'
+                }
+            }) }}
+            <input type="submit" value="Search" class="btn btn-primary ms-2">
+            <a href="{{ path('app_project_members', {id: project.id}) }}" class="btn btn-secondary ms-2">Reset</a>
+        </div>
+    </div>
+    {{ form_end(searchForm) }}
+    <div class="row mt-3">
+        <div data-controller="confirm-dialog" data-action="click->confirm-dialog#backdropClose" class="col-12">
+            <table id="project-member-table" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        {% for roleType in project.memberRoleTypes %}
+                            <th>{{ roleType.label }}</th>
+                        {% endfor %}
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody data-controller="project-member">
+                {% for projectMember in pagination.items %}
+                    <tr>
+                        <td>{{ projectMember.fullName }}</td>
+                        <td>{{ projectMember.email }}</td>
+                        {% for roleType in project.memberRoleTypes %}
+                            <td>
+                                <div class="form-check form-switch form-control-lg">
+                                    <input
+                                            data-project-member-add-url-param="{{ path('app_project_members_role_add', {
+                                                id: project.id,
+                                                projectMemberId: projectMember.id,
+                                                role: roleType.value
+                                            }) }}"
+                                            data-project-member-remove-url-param="{{ path('app_project_members_role_remove', {
+                                                id: project.id,
+                                                projectMemberId: projectMember.id,
+                                                role: roleType.value
+                                            }) }}"
+                                            data-action="project-member#toggleRole"
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            {{ projectMember.hasRole(roleType) ? 'checked' : '' }}
+                                            {{ loggedInMember.canToggleRole(projectMember, roleType) ? '' : 'disabled' }}
+                                </div>
+                            </td>
+                        {% endfor %}
+                        <td>
+                            <button data-action="confirm-dialog#open"
+                                    data-confirm-dialog-url-param="{{ path('app_project_member_remove', {
+                                        id: project.id,
+                                        projectMemberId: projectMember.id
+                                    }) }}"
+                                    class="btn btn-danger"
+                                    title="Remove"
+                                    {% if not is_granted('PROJECT_REMOVE_MEMBER', project) %}
+                                        disabled="disabled"
+                                    {% endif %}
+                            >
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% include 'common/confirm_dialog.html.twig' with {dialogText: 'Are you sure to remove this member from project?'} %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    </div>
+{% endblock %}

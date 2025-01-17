@@ -1,0 +1,29 @@
+<nav id="top-navbar" class="top-menu navbar navbar-dark navbar-expand-lg bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ path('app_home') }}">
+            <i class="iconoir-agile"></i>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            {% include 'menu/top_menu_links.html.twig' %}
+            <ul class="navbar-nav">
+                {% include 'user_notification/menu_link_latest.html.twig' %}
+                <li class="nav-item dropdown ms-2">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ app.user.fullname }}
+                        <i class="bi bi-person-circle ms-2"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <form action="/logout" method="post">
+                                <input class="dropdown-item" type="submit" value="Logout">
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

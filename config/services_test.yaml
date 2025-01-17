@@ -1,0 +1,4 @@
+services:
+    # Disable logger to avoid showing errors during tests
+    Psr\Log\NullLogger: ~
+    logger: '@Psr\Log\NullLogger'

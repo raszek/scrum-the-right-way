@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {{ render(path('app_menu', {currentPath: app.request.pathinfo})) }}
+
+    <div class="container-fluid">
+        {% include 'common/alert.html.twig' %}
+
+        {% block content %}{% endblock %}
+    </div>
+{% endblock %}

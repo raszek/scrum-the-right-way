@@ -1,0 +1,4 @@
+# config/packages/symfonycasts_sass.yaml
+symfonycasts_sass:
+  sass_options:
+    source_map: false

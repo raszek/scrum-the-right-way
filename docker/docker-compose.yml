@@ -1,0 +1,32 @@
+version: '2'
+services:
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - project-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: scrumtherightway
+      POSTGRES_DB: scrumtherightway
+    ports:
+      - 5432:5432
+  web:
+    build: .
+    volumes:
+      - ../:/var/www/html/scrum-right-way
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "1025"
+      - "8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+volumes:
+  project-data:

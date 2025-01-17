@@ -1,0 +1,77 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Backlog' %}
+
+{% block content %}
+    {% include 'common/project_page_header.html.twig' %}
+
+    <div class="row mb-3">
+        <div class="col-10">
+            <h2>Issues</h2>
+        </div>
+        {% if showMetric %}
+        <div class="col-2">
+            <h2>Priority</h2>
+        </div>
+        {% endif %}
+        <div class="col-10">
+            {% if is_granted('CREATE_ISSUE', project) %}
+                {{ form_start(form) }}
+
+                <div class="d-flex align-items-start">
+                    <div style="width: 74%;">
+                        {{ form_row(form.title, {
+                            label: false,
+                            row_class: 'mb-1',
+                            attr: {
+                                placeholder: 'Enter task name'
+                            }
+                        }) }}
+                    </div>
+                    <div style="width: 15%; margin-left: 1%;">
+                        {{ form_row(form.type, {
+                            label: false,
+                            row_class: 'mb-1',
+                        }) }}
+                    </div>
+                    <input type="submit" value="Create" class="btn btn-primary" style="width: 9%;margin-left: 1%;">
+                </div>
+                {{ form_end(form) }}
+            {% endif %}
+            <ul data-controller="column-sortable" data-sortable-animation-value="150" class="list-group">
+                {% if not pagination.items %}
+                    <li class="list-group-item">No issues</li>
+                {% endif %}
+                {% for item in pagination.items %}
+                    <li data-sortable-update-url="{{ path('app_project_issue_sort', {
+                        id: project.id,
+                        issueCode: item.code
+                    }) }}" class="list-group-item">
+                        <a href="/projects/{{ project.id }}/backlog/issues/{{ item.code }}">{{ item.prefixCodeTitle }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% if showMetric %}
+        <div class="col-2 backlog-metric d-flex flex-column justify-content-around">
+            <h3 class="text-white">Very high</h3>
+            <h3 class="text-white">High</h3>
+            <h3 class="text-white">Moderate</h3>
+            <h3 class="text-white">Low</h3>
+            <h3 class="text-dark">Very low</h3>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not showAll %}
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-start">
+            {{ knp_pagination_render(pagination) }}
+            <a href="{{ path('app_project_backlog', {
+                id: project.id,
+                showAll: '1'
+            }) }}" class="btn btn-primary">Show all</a>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

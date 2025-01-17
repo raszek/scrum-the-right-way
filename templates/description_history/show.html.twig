@@ -1,0 +1,28 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Changes from ' ~ (history.createdAt | date) %}
+
+{% block content %}
+    <div class="row mt-3">
+        <div class="col-12">
+            <h1>{{ page_title }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_project_kanban', {id: project.id}) }}">Project home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_project_issue_list', {id: project.id}) }}">Issues</a></li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ path('app_project_issue_view', {id: project.id, issueCode: issue.code}) }}">{{ issue.code }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <a href="{{ path('app_issue_description_history_list', {id: project.id, issueCode: issue.code}) }}">Description history</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ page_title }}
+                    </li>
+                </ol>
+            </nav>
+            <hr>
+        </div>
+    </div>
+    {% include 'description_history/view.html.twig' %}
+{% endblock %}

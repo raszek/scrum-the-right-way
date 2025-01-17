@@ -1,0 +1,39 @@
+<div class="col-lg-2 col-md-4 mt-3"
+     data-controller="dialog"
+     data-dropzone-target="item"
+     data-dropzone-item-id-param="{{ itemId }}"
+     data-action="click->dropzone#stopPropagation click->dialog#backdropClose"
+>
+    <div class="strw-dropzone-item">
+        <div class="text-danger d-flex flex-column align-items-center">
+            <span class="strw-dropzone-icon">
+                <i class="bi bi-file-earmark-break"></i>
+            </span>
+            {{ filename }}
+        </div>
+
+        <div class="strw-dropzone-item-hover-content">
+            <button class="btn btn-info"
+                    data-action="dialog#open"
+            >
+                <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-danger"
+                    data-action="dropzone#removeFile"
+                    data-dropzone-item-id-param="{{ itemId }}"
+            >
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+    <dialog class="rounded-3" data-dialog-target="dialog">
+        <div class="d-flex flex-column m-4">
+            <b>{{ mainError }}</b>
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </dialog>
+</div>

@@ -1,0 +1,33 @@
+<div class="d-flex flex-column"
+     data-controller="latest-notifications-inner"
+     data-latest-notifications-inner-url-value="{{ path('app_user_notification_mark_all_read') }}"
+     data-latest-notifications-inner-latest-notifications-outlet="#latest-notifications"
+>
+    {% if eventRecords %}
+    <div class="d-flex justify-content-end strw-clickable"
+         data-latest-notifications-inner-target="button"
+    >
+        <a class="mb-2"
+           data-action="latest-notifications-inner#markAllRead"
+        >
+            Mark all as read
+        </a>
+    </div>
+    {% endif %}
+    <div class="d-flex justify-content-center mb-2"
+         data-latest-notifications-inner-target="container"
+    >
+        {% if eventRecords %}
+            <ul class="list-group">
+                {% for eventRecord in eventRecords %}
+                    <li class="list-group-item">
+                        {{ eventRecord.content | raw }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <b>No unread notifications</b>
+        {% endif %}
+    </div>
+    <a href="{{ path('app_user_notification_list') }}" class="btn btn-primary">Show all</a>
+</div>

@@ -1,0 +1,101 @@
+<div class="card mb-3"
+     data-controller="issue-dependency confirm-dialog"
+     data-confirm-dialog-attribute-name-value="data-issue-dependency-id-param"
+     data-issue-dependency-fetch-url-value="{{ path('app_project_issue_list_dependencies', {
+         id: project.id,
+         issueCode: issue.code
+     }) }}"
+>
+    <div class="card-header">
+        Dependencies
+    </div>
+    <div class="card-body">
+        <p class="mb-0 {{ dependencies | length < 1 ? '' : 'd-none' }}"
+           data-issue-dependency-target="emptyText"
+        >
+            No dependencies
+        </p>
+        <div class="list-group"
+             data-issue-dependency-target="container"
+        >
+            {% for dependency in dependencies %}
+                <li class="list-group-item d-flex justify-content-between align-items-center"
+                    data-issue-dependency-target="item"
+                    data-issue-dependency-id-param="{{ dependency.dependency.code }}"
+                    data-issue-dependency-remove-url-param="{{ path('app_project_issue_remove_issue_dependency', {
+                        id: project.id,
+                        issueCode: issue.code,
+                        dependencyCode: dependency.dependency.code
+                    }) }}"
+                >
+                    <a href="{{ path('app_project_issue_view', {
+                        id: project.id,
+                        issueCode: dependency.dependency.code
+                    }) }}"
+                       target="_blank"
+                    >
+                        {{ dependency.dependency.prefixCodeTitle }}
+                    </a>
+                    <button class="btn btn-danger"
+                            data-action="confirm-dialog#open"
+                            data-confirm-dialog-url-param="{{ dependency.dependency.code }}"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </li>
+            {% endfor %}
+        </div>
+        <button class="btn btn-primary mt-3"
+                data-action="issue-dependency#showForm"
+                data-issue-dependency-target="addButton"
+        >
+            Add dependency
+        </button>
+
+        <div data-issue-dependency-target="selectContainer"
+             class="d-none"
+        >
+            <div class="card">
+                <div class="card-body d-flex">
+                    <select data-issue-dependency-target="select"
+                            class="flex-fill"
+                    >
+                    </select>
+                    <button class="btn btn-danger ms-3"
+                            data-action="issue-dependency#hideForm"
+                    >
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <template data-issue-dependency-target="dependencyTemplate">
+            <li class="list-group-item d-flex justify-content-between align-items-center"
+                data-issue-dependency-target="item"
+            >
+                <a href="">
+                </a>
+                <button class="btn btn-danger"
+                        data-action="confirm-dialog#open"
+                        data-confirm-dialog-url-param=""
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+            </li>
+        </template>
+        <dialog class="rounded-3" data-confirm-dialog-target="dialog">
+            <div class="d-flex flex-column m-4">
+                <p>{{ dialogText ?? 'Are you sure to remove this dependency?' }}</p>
+                <div class="d-flex justify-content-end">
+                    <button data-action="confirm-dialog#close" class="btn btn-info">No</button>
+                    <form data-confirm-dialog-target="form"
+                          method="post"
+                          data-action="issue-dependency#removeDependency confirm-dialog#close"
+                    >
+                        <input type="submit" class="btn btn-danger ms-2" value="Yes">
+                    </form>
+                </div>
+            </div>
+        </dialog>
+    </div>
+</div>

@@ -1,0 +1,5 @@
+<ul>
+    {% for eventRecord in eventRecords %}
+        <li>{{ eventRecord.content | raw }} on <b>{{ eventRecord.createdAt | date }}</b></li>
+    {% endfor %}
+</ul>

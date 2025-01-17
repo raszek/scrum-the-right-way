@@ -1,0 +1,10 @@
+{# templates/emails/site/register.html.twig #}
+
+<h1>Welcome {{ user.email }}!</h1>
+
+<p>
+    <a href="{{ url('app_activate_account', {
+        'activationCode': user.activationCode,
+        'email': user.email
+    }) }}">Activate your account</a>
+</p>

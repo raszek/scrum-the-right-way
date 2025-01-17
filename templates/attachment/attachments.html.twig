@@ -1,0 +1,67 @@
+<div class="card mb-3"
+     data-controller="dropzone confirm-dialog"
+     data-confirm-dialog-attribute-name-value="data-dropzone-item-id-param"
+     data-dropzone-url-value="{{ path('app_project_issue_add_attachment', {
+         id: project.id,
+         issueCode: issue.code,
+     }) }}"
+     data-dropzone-can-upload-value="{{ is_granted('CREATE_ATTACHMENT', project) ? 'true' : 'false' }}"
+>
+    <div class="card-header">
+        Attachments
+    </div>
+    <div class="card-body m-2">
+        <div data-controller="lightbox"
+             data-dropzone-target="dropzone"
+             data-action="click->dropzone#showFilePicker"
+             class="row strw-dropzone-container"
+        >
+            <div data-dropzone-target="emptyMessage" class="justify-content-center align-items-center" style="display: none;">
+                {% if is_granted('CREATE_ATTACHMENT', project) %}
+                    Drop files to add attachments
+                {% else %}
+                    No attachments
+                {% endif %}
+            </div>
+            {% for attachment in attachments %}
+                {% include 'attachment/attachment.html.twig' %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="d-none">
+        <input type="file"
+               multiple
+               data-dropzone-target="fileInput"
+        >
+    </div>
+    <template data-dropzone-target="columnTemplate">
+        <div class="col-lg-2 col-md-4 mt-3">
+            <div class="strw-dropzone-item">
+                <div class="strw-dropzone-icon">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <dialog class="rounded-3" data-confirm-dialog-target="dialog">
+        <div class="d-flex flex-column m-4">
+            <p>Do you really want to remove attachment?</p>
+            <div class="d-flex justify-content-end">
+                <button data-action="confirm-dialog#close"
+                        class="btn btn-info"
+                >
+                    No
+                </button>
+                <button data-action="dropzone#removeFile confirm-dialog#close"
+                        data-dropzone-item-id-param=""
+                        data-confirm-dialog-target="form"
+                        class="btn btn-danger ms-2"
+                >
+                    Yes
+                </button>
+            </div>
+        </div>
+    </dialog>
+</div>

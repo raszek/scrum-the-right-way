@@ -1,0 +1,22 @@
+<div data-controller="textarea-update"
+     data-textarea-update-url-value="{{ path('app_project_issue_update_title', {id: project.id, issueCode: issue.code}) }}"
+     data-textarea-update-max-length-value="{{ titleMaxLength }}"#}
+     class="card mb-3"
+>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        Title
+        {% if is_granted('UPDATE_ISSUE_TITLE', project) %}
+            <button data-action="click->textarea-update#toggle"
+                    data-textarea-update-target="button"
+                    class="btn btn-primary"
+            >
+                <i class="bi bi-pencil"></i>
+            </button>
+        {% endif %}
+    </div>
+    <div data-textarea-update-target="text"
+         class="card-body strw-update-title"
+    >
+        {{ issue.title }}
+    </div>
+</div>

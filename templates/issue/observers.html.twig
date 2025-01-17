@@ -1,0 +1,54 @@
+<div class="card" >
+    <div class="card-header">
+        Observers
+    </div>
+    <div id="observer"
+         class="card-body"
+         data-controller="observer"
+         data-observer-member-id-value="{{ loggedInMember.id }}"
+         data-observer-member-full-name-value="{{ loggedInMember.fullName }}"
+         data-observer-observe-url-value="{{ path('app_project_issue_observe', {
+             id: project.id,
+             issueCode: issue.code
+         }) }}"
+         data-observer-unobserve-url-value="{{ path('app_project_issue_unobserve', {
+             id: project.id,
+             issueCode: issue.code
+         }) }}"
+    >
+        <button class="btn btn-primary w-100"
+                {% if isObservedByLoggedIn %}
+                    style="display: none;"
+                {% endif %}
+                data-observer-target="observeButton"
+                data-action="observer#observe"
+        >
+            Observe <i class="bi bi-eye"></i>
+        </button>
+        <button class="btn btn-primary w-100"
+                {% if not isObservedByLoggedIn %}
+                    style="display: none;"
+                {% endif %}
+                data-observer-target="unobserveButton"
+                data-action="observer#unobserve"
+        >
+            Unobserve <i class="bi bi-eye-slash"></i>
+        </button>
+        <hr>
+        <div class="justify-content-center mt-3"
+             data-observer-target="emptyText"
+             style="display: none;"
+        >
+            No observers
+        </div>
+        <ul data-observer-target="container">
+            {% for observer in observers %}
+                <li data-observer-target="item"
+                    data-observer-member-id-param="{{ observer.projectMember.id }}"
+                >
+                    {{ observer.fullName }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

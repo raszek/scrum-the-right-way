@@ -1,0 +1,31 @@
+{% extends 'layout/layout.html.twig' %}
+
+{% set page_title = 'Project list' %}
+
+{% block content %}
+    <div class="container-fluid">
+        {% include 'common/page_header.html.twig' %}
+
+        <div class="row">
+            <div class="col-12">
+                <a href="{{ path('app_project_create') }}" class="btn btn-primary">Create project</a>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            {% if not projects %}
+                <h1>No added projects so far</h1>
+            {% endif %}
+            {% for project in projects %}
+                <div class="col-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="{{ path('app_project_backlog', {'id': project.id}) }}">{{ project.name }}</a></h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ project.type.label }}</h6>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = thread.title %}
+
+{% block content %}
+    {% include 'common/project_page_header.html.twig' with {
+        links: [
+            {
+                url: path('app_project_thread_list', {id: project.id}),
+                label: 'Threads'
+            }
+        ]
+    } %}
+
+    <div class="row">
+        <div class="col-12 d-flex justify-content-end">
+            {% if thread.isOpen %}
+                <a href="{{ path('app_project_thread_close', {
+                    'id': project.id,
+                    'threadId': thread.id
+                }) }}" class="btn btn-primary">Close thread</a>
+            {% else %}
+                <a href="{{ path('app_project_thread_open', {
+                    'id': project.id,
+                    'threadId': thread.id
+                }) }}" class="btn btn-primary">Reopen thread</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+    {% for message in messages %}
+        <div id="{{ message.number }}" class="card mt-3">
+            <div class="card-header d-flex justify-content-between bg-primary text-white">
+                <span>
+                    [#{{ message.number }}] {{ message.createdBy.fullname }}
+                </span>
+                <span>
+                    {{ message.createdAt | date }}
+                </span>
+            </div>
+            <div data-controller="markdown" class="card-body">
+                {{ message.content | nl2br }}
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+    <div data-controller="editor" class="row mt-3 mb-3">
+        <div class="col-12">
+            {{ form_start(form, {
+                attr: {
+                    'data-action': 'editor#submitForm'
+                }
+            }) }}
+
+            {{ form_row(form.content, {
+                attr: {
+                    'data-editor-target': 'hidden'
+                }
+            }) }}
+
+            <div data-editor-target="container"></div>
+
+            <input type="submit" class="btn btn-primary mt-3" value="Add comment">
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'layout/layout.html.twig' %}
+
+{% set page_title = 'User notifications' %}
+
+{% block content %}
+    <div class="container-fluid">
+        {% include 'common/page_header.html.twig' %}
+
+        {% if not items %}
+            <h3>Empty</h3>
+            {% else %}
+                <div data-controller="user-notification"
+                     data-user-notification-mark-all-read-url-value="{{ path('app_user_notification_mark_all_read') }}"
+                >
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-outline-primary"
+                                data-action="user-notification#markAllAsRead"
+                        >
+                            Mark all as read
+                        </button>
+                    </div>
+                    <ul class="list-group mt-3">
+                        {% for item in items %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                data-user-notification-target="item"
+                                data-user-notification-is-read-param="{{ item.notification.isRead ? 'true' : 'false' }}"
+                            >
+                                <span>
+                                    {{ item.eventRecord.content | raw }} on <b>{{ item.eventRecord.createdAt | date }}</b>
+                                </span>
+                                <button class="btn btn-outline-primary"
+                                        data-user-notification-mark-read-url-param="{{ path('app_user_notification_mark_read', {id: item.notification.id}) }}"
+                                        data-user-notification-mark-unread-url-param="{{ path('app_user_notification_mark_unread', {id: item.notification.id}) }}"
+                                        data-action="user-notification#toggle"
+                                >
+                                    Mark as read
+                                </button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+        {% endif %}
+
+
+        <div class="d-flex mt-3">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    </div>
+{% endblock %}

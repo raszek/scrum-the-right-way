@@ -1,0 +1,22 @@
+<li class="nav-item"
+    id="latest-notifications"
+    data-controller="latest-notifications"
+    data-latest-notifications-target="button"
+    data-latest-notifications-fetch-url-value="{{ path('app_user_notification_latest') }}"
+    data-action="click->latest-notifications#ajaxShow"
+>
+    <button class="nav-link position-relative">
+        <i class="bi bi-bell"></i>
+        {% if unreadNotificationCount > 0 %}
+        <span data-latest-notifications-target="notificationCount" class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-info">
+            {{ unreadNotificationCount }}
+            <span class="visually-hidden">unread messages</span>
+        </span>
+        {% endif %}
+    </button>
+    <template data-latest-notifications-target="content">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </template>
+</li>

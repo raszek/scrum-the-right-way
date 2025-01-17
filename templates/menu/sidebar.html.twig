@@ -1,0 +1,10 @@
+<ul class="nav nav-pills flex-column mb-auto">
+    {% for link in links %}
+        <li class="nav-item">
+            <a href="{{ link.url }}" class="nav-link {{ link.isActive ? 'active' : '' }}" aria-current="page">
+                <i class="{{ link.icon }}" ></i>
+                {{ link.label }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>

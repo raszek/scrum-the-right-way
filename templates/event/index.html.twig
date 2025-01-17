@@ -1,0 +1,66 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Project activities' %}
+
+{% block content %}
+    {% include 'common/project_page_header.html.twig' %}
+
+
+    {{ form_start(searchForm) }}
+    <div class="row mt-3">
+        <div class="col-4">
+            {{ form_row(searchForm.name, {
+                label: false,
+                attr: {
+                    placeholder: 'Event name'
+                }
+            }) }}
+        </div>
+        <div class="col-4">
+            {{ form_row(searchForm.createdBy, {
+                label: false,
+                attr: {
+                    placeholder: 'Added by'
+                }
+            }) }}
+        </div>
+        <div class="col-2">
+            <input type="submit" value="Search" class="btn btn-primary">
+            <a href="{{ path('app_project_activities', {
+                id: project.id
+            }) }}" class="btn btn-secondary ms-3">Reset</a>
+        </div>
+    </div>
+    {{ form_end(searchForm) }}
+    <div class="row mt-3">
+        <div class="col-12">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if not events %}
+                    <tr>
+                        <td colspan="2" class="text-center">No records found</td>
+                    </tr>
+                {% endif %}
+                {% for event in events %}
+                    <tr>
+                        <td>{{ event.content | raw }}</td>
+                        <td>{{ event.createdAt | date }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    </div>
+{% endblock %}

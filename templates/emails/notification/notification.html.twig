@@ -1,0 +1,10 @@
+{# templates/emails/notification/notification.html.twig #}
+
+<h1>Welcome {{ user.email }}!</h1>
+
+<p>Here is what you missed</p>
+<ul>
+    {% for eventRecord in eventRecords %}
+        <li>{{ eventRecord.content | raw }} on <b>{{ eventRecord.createdAt | date }}</b></li>
+    {% endfor %}
+</ul>

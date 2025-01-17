@@ -1,0 +1,7 @@
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    {% for link in links %}
+        <li class="nav-item">
+            <a class="nav-link {{ link.isActive ? 'active' : '' }}" aria-current="page" href="{{ link.url }}">{{ link.label }}</a>
+        </li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,106 @@
+<div data-controller="issue-threads confirm-dialog"
+     data-issue-threads-issue-events-outlet="#issue-events"
+     data-confirm-dialog-attribute-name-value="data-issue-threads-id-param"
+     data-issue-threads-fetch-url-value="{{ path('app_project_issue_list_thread_messages', {
+         id: project.id,
+         issueCode: issue.code
+     }) }}"
+     class="card mb-3"
+>
+    <div class="card-header">
+        Threads
+    </div>
+    <div class="card-body">
+        <p data-issue-threads-target="emptyText"
+           class="mb-0 {{ messages | length < 1 ? '' : 'd-none' }}"
+        >
+            No threads
+        </p>
+        <ul data-issue-threads-target="container"
+            class="list-group"
+        >
+            {% for message in messages %}
+                <li data-issue-threads-target="item"
+                    data-issue-threads-id-param="{{ message.id }}"
+                    data-issue-threads-remove-url-param="{{ path('app_project_issue_remove_thread_message', {
+                        id: project.id,
+                        issueCode: issue.code,
+                        messageId: message.id
+                    }) }}"
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                >
+                    <a href="{{ path('app_project_thread_messages', {
+                           id: project.id,
+                           threadId: message.thread.id,
+                           slug: message.thread.slug,
+                       }) }}#{{ message.number }}"
+                       target="_blank"
+                    >
+                       {{ message.issueTitle }}
+                    </a>
+                    <button class="btn btn-danger"
+                            data-action="confirm-dialog#open"
+                            data-confirm-dialog-url-param="{{ message.id }}"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+        <template data-issue-threads-target="messageTemplate">
+            <li class="list-group-item d-flex justify-content-between align-items-center"
+                data-issue-threads-target="item"
+                data-issue-threads-id-param=""
+                data-issue-threads-remove-url-param=""
+            >
+                <a href="">
+                </a>
+                <button class="btn btn-danger"
+                        data-action="confirm-dialog#open"
+                        data-confirm-dialog-url-param=""
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+            </li>
+        </template>
+        <dialog class="rounded-3" data-confirm-dialog-target="dialog">
+            <div class="d-flex flex-column m-4">
+                <p>{{ dialogText ?? 'Are you sure to remove this issue thread message?' }}</p>
+                <div class="d-flex justify-content-end">
+                    <button data-action="confirm-dialog#close" class="btn btn-info">No</button>
+                    <form data-confirm-dialog-target="form"
+                          method="post"
+                          data-action="issue-threads#removeThreadMessage confirm-dialog#close"
+                    >
+                        <input type="submit" class="btn btn-danger ms-2" value="Yes">
+                    </form>
+                </div>
+            </div>
+        </dialog>
+        <div>
+            {% if is_granted('ISSUE_ADD_THREAD_MESSAGE', project) %}
+            <button class="btn btn-primary mt-3"
+                    data-issue-threads-target="addButton"
+                    data-action="issue-threads#showForm"
+            >
+                Add thread
+            </button>
+            {% endif %}
+            <div data-issue-threads-target="selectContainer"
+                 class="d-none"
+            >
+                <div class="card">
+                    <div class="card-body d-flex">
+                        <select data-issue-threads-target="select" class="flex-fill">
+                        </select>
+                        <button class="btn btn-danger ms-3"
+                                data-action="issue-threads#cancel"
+                        >
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
