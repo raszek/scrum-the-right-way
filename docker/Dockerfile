@@ -7,7 +7,8 @@ RUN apt-get install -y \
     libxml2-dev \
     wget \
     libzip-dev \
-    unzip
+    unzip \
+    vim
 
 # Installing Node
 SHELL ["/bin/bash", "--login", "-i", "-c"]
@@ -31,4 +32,7 @@ EXPOSE 8000
 
 ADD ./start.sh /start.sh
 RUN chmod +x /start.sh
+
+RUN chmod 777 /var/www/html/scrum-right-way/upload
+
 ENTRYPOINT ["bash", "/start.sh"]
