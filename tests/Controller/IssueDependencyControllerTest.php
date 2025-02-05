@@ -221,7 +221,10 @@ class IssueDependencyControllerTest extends WebTestCase
         $this->assertEquals([
             [
                 'value' => 'SCP-5',
-                'text' => 'issue five #5'
+                'text' => '[#5] issue five',
+                'url' => sprintf('/projects/%s/issues/SCP-5', $project->getId()),
+                'addUrl' => sprintf('/projects/%s/issues/SCP-12/dependencies/SCP-5/add', $project->getId()),
+                'removeUrl' => sprintf('/projects/%s/issues/SCP-12/dependencies/SCP-5/remove', $project->getId()),
             ]
         ], $result);
     }
