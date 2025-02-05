@@ -36,21 +36,25 @@
                     >
                         {{ dependency.dependency.prefixCodeTitle }}
                     </a>
+                    {% if is_granted('ISSUE_REMOVE_DEPENDENCY') %}
                     <button class="btn btn-danger"
                             data-action="confirm-dialog#open"
                             data-confirm-dialog-url-param="{{ dependency.dependency.code }}"
                     >
                         <i class="bi bi-trash"></i>
                     </button>
+                    {% endif %}
                 </li>
             {% endfor %}
         </div>
-        <button class="btn btn-primary mt-3"
-                data-action="issue-dependency#showForm"
-                data-issue-dependency-target="addButton"
-        >
-            Add dependency
-        </button>
+        {% if is_granted('ISSUE_ADD_DEPENDENCY') %}
+            <button class="btn btn-primary mt-3"
+                    data-action="issue-dependency#showForm"
+                    data-issue-dependency-target="addButton"
+            >
+                Add dependency
+            </button>
+        {% endif %}
 
         <div data-issue-dependency-target="selectContainer"
              class="d-none"
