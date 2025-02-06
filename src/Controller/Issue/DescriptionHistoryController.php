@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Issue;
 
 use App\Entity\Issue\DescriptionHistory;
 use App\Entity\Issue\Issue;

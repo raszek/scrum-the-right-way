@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Issue;
 
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectMember;

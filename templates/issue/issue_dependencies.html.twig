@@ -36,7 +36,7 @@
                     >
                         {{ dependency.dependency.prefixCodeTitle }}
                     </a>
-                    {% if is_granted('ISSUE_REMOVE_DEPENDENCY') %}
+                    {% if is_granted('ISSUE_REMOVE_DEPENDENCY', project) %}
                     <button class="btn btn-danger"
                             data-action="confirm-dialog#open"
                             data-confirm-dialog-url-param="{{ dependency.dependency.code }}"
@@ -47,7 +47,7 @@
                 </li>
             {% endfor %}
         </div>
-        {% if is_granted('ISSUE_ADD_DEPENDENCY') %}
+        {% if is_granted('ISSUE_ADD_DEPENDENCY', project) %}
             <button class="btn btn-primary mt-3"
                     data-action="issue-dependency#showForm"
                     data-issue-dependency-target="addButton"

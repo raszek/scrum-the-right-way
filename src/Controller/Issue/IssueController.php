@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Issue;
 
 use App\Entity\Issue\Issue;
 use App\Entity\Project\Project;
@@ -16,6 +16,7 @@ use App\Repository\Project\ProjectMemberRepository;
 use App\Repository\Project\ProjectTagRepository;
 use App\Security\Voter\IssueVoter;
 use App\Service\Issue\ProjectIssueEditorFactory;
+use App\Service\Issue\Session\IssueSessionSettings;
 use App\Service\Issue\StoryPointService;
 use App\Table\Issue\IssueTable;
 use App\Table\QueryParams;
@@ -35,7 +36,8 @@ class IssueController extends CommonIssueController
         private readonly ProjectMemberRepository $projectMemberRepository,
         private readonly StoryPointService $storyPointService,
         private readonly AttachmentRepository $attachmentRepository,
-        private readonly IssueThreadMessageRepository $issueThreadMessageRepository
+        private readonly IssueThreadMessageRepository $issueThreadMessageRepository,
+        private readonly IssueSessionSettings $issueSessionSettings,
     ) {
         parent::__construct($this->issueRepository);
     }
@@ -153,7 +155,8 @@ class IssueController extends CommonIssueController
             ],
             'projectTags' => $projectTagRepository->selectedTags($project, $issue),
             'messages' => $this->issueThreadMessageRepository->getIssueMessages($issue),
-            'dependencies' => $dependencies
+            'dependencies' => $dependencies,
+            'isActivitiesVisible' => $this->issueSessionSettings->isActivitiesVisible(),
         ]);
     }
 

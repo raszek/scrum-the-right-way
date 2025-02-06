@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Issue;
 
+use App\Controller\Controller;
 use App\Entity\Issue\Issue;
 use App\Entity\Project\Project;
 use App\Repository\Issue\IssueRepository;

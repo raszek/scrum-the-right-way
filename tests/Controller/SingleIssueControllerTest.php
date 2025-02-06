@@ -13,7 +13,6 @@ use App\Factory\Project\ProjectTagFactory;
 use App\Factory\UserFactory;
 use App\Repository\Event\EventRepository;
 use App\Repository\Issue\IssueRepository;
-use App\Repository\Project\ProjectTagRepository;
 use App\Repository\User\UserNotificationRepository;
 use Zenstruck\Foundry\Test\Factories;
 
@@ -341,7 +340,6 @@ class SingleIssueControllerTest extends WebTestCase
         $this->assertNull($updatedIssue->getAssignee());
     }
 
-
     /** @test */
     public function analytic_can_set_issue_tags()
     {
@@ -425,8 +423,4 @@ class SingleIssueControllerTest extends WebTestCase
         return $this->getService(UserNotificationRepository::class);
     }
 
-    private function projectTagRepository(): ProjectTagRepository
-    {
-        return $this->getService(ProjectTagRepository::class);
-    }
 }
