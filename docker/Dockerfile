@@ -33,6 +33,4 @@ EXPOSE 8000
 ADD ./start.sh /start.sh
 RUN chmod +x /start.sh
 
-RUN chmod 777 /var/www/html/scrum-right-way/upload
-
 ENTRYPOINT ["bash", "/start.sh"]
