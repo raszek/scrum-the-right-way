@@ -156,7 +156,7 @@ class IssueController extends CommonIssueController
             'projectTags' => $projectTagRepository->selectedTags($project, $issue),
             'messages' => $this->issueThreadMessageRepository->getIssueMessages($issue),
             'dependencies' => $dependencies,
-            'isActivitiesVisible' => $this->issueSessionSettings->isActivitiesVisible(),
+            'isActivitiesVisible' => $this->issueSessionSettings->isActivitiesVisible() ? 'true' : 'false',
         ]);
     }
 

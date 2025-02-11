@@ -20,7 +20,7 @@ class UserSettingsController extends Controller
     ) {
     }
 
-    #[Route('/activities-visible')]
+    #[Route('/activities-visible', 'app_user_settings_activities_visible')]
     #[IsGranted('ROLE_USER')]
     public function setIssueActivitiesVisible(Request $request): Response
     {

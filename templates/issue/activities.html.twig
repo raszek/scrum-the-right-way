@@ -1,8 +1,12 @@
-<div class="card" data-controller="toggle">
+<div class="card"
+     data-controller="toggle-events"
+     data-toggle-events-url-value="{{ path('app_user_settings_activities_visible') }}"
+     data-toggle-events-is-visible-value="{{ isActivitiesVisible }}"
+>
     <div class="card-header d-flex justify-content-between align-items-center">
         Activities
-        <button data-toggle-target="button"
-                data-action="toggle#toggle"
+        <button data-toggle-events-target="button"
+                data-action="toggle-events#toggle"
                 class="btn btn-primary"
         >
             <i class="bi bi-eye"></i>
@@ -14,7 +18,7 @@
              issueCode: issue.code
          }) }}"
          id="issue-events"
-         data-toggle-target="item"
+         data-toggle-events-target="item"
          class="card-body d-none"
     >
         <div data-issue-events-target="container">

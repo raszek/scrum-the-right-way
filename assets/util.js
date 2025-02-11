@@ -93,6 +93,11 @@ export const get = async (url) => {
     }
 };
 
+/**
+ * @param {string} url
+ * @param {FormData | undefined} data
+ * @returns {Promise<string>}
+ */
 export const post = async (url, data = undefined) => {
     try {
         const result = await fetch(url, {
