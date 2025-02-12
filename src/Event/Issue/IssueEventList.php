@@ -2,7 +2,6 @@
 
 namespace App\Event\Issue;
 
-
 use App\Event\EventList;
 use App\Event\Issue\Renderer\AddIssueDependencyEventRenderer;
 use App\Event\Issue\Renderer\AddIssueThreadMessageEventRenderer;
@@ -34,6 +33,10 @@ class IssueEventList implements EventList
     const ADD_ISSUE_DEPENDENCY = 'ADD_ISSUE_DEPENDENCY';
 
     const REMOVE_ISSUE_DEPENDENCY = 'REMOVE_ISSUE_DEPENDENCY';
+
+    const ADD_ISSUE_ATTACHMENT = 'ADD_ISSUE_ATTACHMENT';
+
+    const REMOVE_ISSUE_ATTACHMENT = 'REMOVE_ISSUE_ATTACHMENT';
 
     public static function rendererClasses(): array
     {

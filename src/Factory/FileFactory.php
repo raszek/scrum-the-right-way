@@ -49,12 +49,14 @@ final class FileFactory extends PersistentProxyObjectFactory
 
     protected function defaults(): array|callable
     {
+        $extension = self::faker()->randomElement(['jpg', 'jpeg', 'png', 'gif', 'docx', 'doc', 'pdf', 'xls', 'xlsx']);
+
         return [
             'createdAt' => DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'directory' => $this->generateDirectory(),
-            'extension' => self::faker()->text(255),
+            'extension' => $extension,
             'mime' => self::faker()->text(255),
-            'name' => self::faker()->text(255),
+            'name' => self::faker()->word().'.'.$extension,
             'size' => self::faker()->randomNumber(),
         ];
     }

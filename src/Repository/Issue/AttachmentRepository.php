@@ -4,6 +4,7 @@ namespace App\Repository\Issue;
 
 use App\Entity\Issue\Attachment;
 use App\Entity\Issue\Issue;
+use App\Helper\ArrayHelper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,7 +17,6 @@ class AttachmentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Attachment::class);
     }
-
 
     /**
      * @return Attachment[]
@@ -32,5 +32,15 @@ class AttachmentRepository extends ServiceEntityRepository
             ->setParameter('issue', $issue);
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function mappedAttachments(array $attachmentIds): array
+    {
+        $attachments = $this->findBy([
+            'id' => $attachmentIds
+        ]);
+
+        return ArrayHelper::indexByCallback($attachments, fn(Attachment $attachment) => $attachment->getId()->integerId());
+
     }
 }
