@@ -81,11 +81,11 @@ export default class extends Controller {
         const addUrl = option.getAttribute('data-add-url');
 
         await post(addUrl);
-        //
-        // this.renderEvents();
+
+        this.renderEvents();
     }
 
-    removeDependency(event) {
+    async removeDependency(event) {
         event.preventDefault();
 
         const item = this.findItem(String(event.params.id));
@@ -100,7 +100,9 @@ export default class extends Controller {
 
         this.renderEmptyText();
 
-        return post(removeUrl);
+        await post(removeUrl);
+
+        this.renderEvents();
     }
 
     findItem(dependencyId) {
@@ -132,5 +134,13 @@ export default class extends Controller {
     hideForm() {
         this.selectContainerTarget.classList.add('d-none');
         this.addButtonTarget.classList.remove('d-none');
+    }
+
+    renderEvents() {
+        if (!this.issueEventsOutlet) {
+            return;
+        }
+
+        this.issueEventsOutlet.render();
     }
 }
