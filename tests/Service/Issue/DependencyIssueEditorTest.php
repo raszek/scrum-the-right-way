@@ -3,10 +3,12 @@
 namespace App\Tests\Service\Issue;
 
 use App\Entity\Issue\Issue;
+use App\Entity\User\User;
 use App\Exception\Issue\CannotAddIssueDependencyException;
 use App\Factory\Issue\IssueDependencyFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Project\ProjectFactory;
+use App\Factory\UserFactory;
 use App\Service\Issue\DependencyIssueEditor;
 use App\Service\Issue\DependencyIssueEditorFactory;
 use App\Tests\KernelTestCase;
@@ -20,9 +22,11 @@ class DependencyIssueEditorTest extends KernelTestCase
     /** @test */
     public function issue_cannot_add_yourself_as_dependency()
     {
+        $user = UserFactory::createOne();
+
         $issue = IssueFactory::createOne();
 
-        $editor = $this->create($issue->_real());
+        $editor = $this->create($issue->_real(), $user->_real());
 
         $exception = null;
         try {
@@ -38,6 +42,8 @@ class DependencyIssueEditorTest extends KernelTestCase
     /** @test */
     public function issue_cannot_add_twice_same_dependency()
     {
+        $user = UserFactory::createOne();
+
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
@@ -57,7 +63,7 @@ class DependencyIssueEditorTest extends KernelTestCase
             'dependency' => $anotherIssue,
         ]);
 
-        $editor = $this->create($issue->_real());
+        $editor = $this->create($issue->_real(), $user->_real());
 
         $exception = null;
         try {
@@ -70,10 +76,10 @@ class DependencyIssueEditorTest extends KernelTestCase
         $this->assertEquals('Cannot add SCP-2 as dependency second time', $exception->getMessage());
     }
 
-    private function create(Issue $issue): DependencyIssueEditor
+    private function create(Issue $issue, User $user): DependencyIssueEditor
     {
         $factory = $this->getService(DependencyIssueEditorFactory::class);
 
-        return $factory->create($issue);
+        return $factory->create($issue, $user);
     }
 }

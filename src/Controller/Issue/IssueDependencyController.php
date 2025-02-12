@@ -36,7 +36,7 @@ class IssueDependencyController extends CommonIssueController
 
         $dependency = $this->findIssue($dependencyCode, $project);
 
-        $dependencyIssueEditor = $this->dependencyIssueEditorFactory->create($issue);
+        $dependencyIssueEditor = $this->dependencyIssueEditorFactory->create($issue, $this->getLoggedInUser());
 
         try {
             $dependencyIssueEditor->addDependency($dependency);
@@ -56,7 +56,7 @@ class IssueDependencyController extends CommonIssueController
 
         $dependency = $this->findIssue($dependencyCode, $project);
 
-        $dependencyIssueEditor = $this->dependencyIssueEditorFactory->create($issue);
+        $dependencyIssueEditor = $this->dependencyIssueEditorFactory->create($issue, $this->getLoggedInUser());
 
         try {
             $dependencyIssueEditor->removeDependency($dependency);

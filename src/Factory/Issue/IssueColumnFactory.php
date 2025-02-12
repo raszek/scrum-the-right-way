@@ -45,7 +45,7 @@ final class IssueColumnFactory extends PersistentProxyObjectFactory
 
     public static function backlogColumn(): IssueColumn
     {
-        return IssueColumnFactory::createOne([
+        return IssueColumnFactory::findOrCreate([
             'id' => IssueColumnEnum::Backlog->value,
             'label' => IssueColumnEnum::Backlog->label()
         ]);

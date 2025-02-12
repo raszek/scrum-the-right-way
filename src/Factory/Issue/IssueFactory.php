@@ -24,7 +24,7 @@ final class IssueFactory extends PersistentProxyObjectFactory
         return [
             'createdAt' => DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'createdBy' => UserFactory::new(),
-            'issueColumn' => IssueColumnFactory::new(),
+            'issueColumn' => IssueColumnFactory::backlogColumn(),
             'type' => IssueTypeFactory::issueType(),
             'number' => self::faker()->randomNumber(),
             'columnOrder' => self::faker()->randomNumber(),

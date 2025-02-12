@@ -4,8 +4,10 @@ namespace App\Event\Issue;
 
 
 use App\Event\EventList;
+use App\Event\Issue\Renderer\AddIssueDependencyEventRenderer;
 use App\Event\Issue\Renderer\AddIssueThreadMessageEventRenderer;
 use App\Event\Issue\Renderer\CreateIssueEventRenderer;
+use App\Event\Issue\Renderer\RemoveIssueDependencyEventRenderer;
 use App\Event\Issue\Renderer\RemoveIssueThreadMessageEventRenderer;
 use App\Event\Issue\Renderer\SetIssueAssigneeEventRenderer;
 use App\Event\Issue\Renderer\SetIssueDescriptionEventRenderer;
@@ -29,6 +31,10 @@ class IssueEventList implements EventList
 
     const REMOVE_ISSUE_THREAD_MESSAGE = 'REMOVE_ISSUE_THREAD_MESSAGE';
 
+    const ADD_ISSUE_DEPENDENCY = 'ADD_ISSUE_DEPENDENCY';
+
+    const REMOVE_ISSUE_DEPENDENCY = 'REMOVE_ISSUE_DEPENDENCY';
+
     public static function rendererClasses(): array
     {
         return [
@@ -39,6 +45,8 @@ class IssueEventList implements EventList
             self::SET_ISSUE_TAGS => SetIssueTagsEventRenderer::class,
             self::ADD_ISSUE_THREAD_MESSAGE => AddIssueThreadMessageEventRenderer::class,
             self::REMOVE_ISSUE_THREAD_MESSAGE => RemoveIssueThreadMessageEventRenderer::class,
+            self::ADD_ISSUE_DEPENDENCY => AddIssueDependencyEventRenderer::class,
+            self::REMOVE_ISSUE_DEPENDENCY => RemoveIssueDependencyEventRenderer::class,
         ];
     }
 
@@ -52,6 +60,8 @@ class IssueEventList implements EventList
             'Set tags' => self::SET_ISSUE_TAGS,
             'Add issue thread message' => self::ADD_ISSUE_THREAD_MESSAGE,
             'Remove issue thread message' => self::REMOVE_ISSUE_THREAD_MESSAGE,
+            'Add issue dependency' => self::ADD_ISSUE_DEPENDENCY,
+            'Remove issue dependency' => self::REMOVE_ISSUE_DEPENDENCY,
         ];
     }
 }

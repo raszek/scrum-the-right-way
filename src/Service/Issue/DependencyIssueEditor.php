@@ -4,8 +4,11 @@ namespace App\Service\Issue;
 
 use App\Entity\Issue\Issue;
 use App\Entity\Issue\IssueDependency;
+use App\Event\Issue\Event\AddIssueDependencyEvent;
+use App\Event\Issue\Event\RemoveIssueDependencyEvent;
 use App\Exception\Issue\CannotAddIssueDependencyException;
 use App\Exception\Issue\CannotRemoveIssueDependencyException;
+use App\Service\Event\EventPersister;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class DependencyIssueEditor
@@ -14,6 +17,7 @@ readonly class DependencyIssueEditor
     public function __construct(
         private Issue $issue,
         private EntityManagerInterface $entityManager,
+        private EventPersister $eventPersister,
     ) {
     }
 
@@ -36,6 +40,11 @@ readonly class DependencyIssueEditor
         $this->entityManager->persist($newDependency);
 
         $this->entityManager->flush();
+
+        $this->eventPersister->createIssueEvent(new AddIssueDependencyEvent(
+            issueId: $this->issue->getId(),
+            dependencyId: $dependency->getId()
+        ), $this->issue);
     }
 
     /**
@@ -63,6 +72,11 @@ readonly class DependencyIssueEditor
         $this->entityManager->remove($foundDependency);
 
         $this->entityManager->flush();
+
+        $this->eventPersister->createIssueEvent(new RemoveIssueDependencyEvent(
+            issueId: $this->issue->getId(),
+            dependencyId: $dependency->getId()
+        ), $this->issue);
     }
 
     private function guardAgainstInvalidDependency(Issue $dependency): void
