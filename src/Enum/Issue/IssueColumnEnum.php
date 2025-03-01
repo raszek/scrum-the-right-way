@@ -12,9 +12,11 @@ enum IssueColumnEnum: int
 
     case Test = 4;
 
-    case Tested = 5;
+    case InTests = 5;
 
     case Done = 6;
+
+    case Closed = 7;
 
     public function label(): string
     {
@@ -23,8 +25,9 @@ enum IssueColumnEnum: int
             IssueColumnEnum::ToDo => 'To do',
             IssueColumnEnum::InProgress => 'In progress',
             IssueColumnEnum::Test => 'Test',
-            IssueColumnEnum::Tested => 'Tested',
-            IssueColumnEnum::Done => 'Done'
+            IssueColumnEnum::InTests => 'In tests',
+            IssueColumnEnum::Done => 'Done',
+            IssueColumnEnum::Closed => 'Closed',
         };
     }
 

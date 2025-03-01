@@ -51,7 +51,7 @@ class IssueColumn
 
     public function isTested(): bool
     {
-        return $this->isColumn(IssueColumnEnum::Tested);
+        return $this->isColumn(IssueColumnEnum::InTests);
     }
 
     public function isColumn(IssueColumnEnum $issueColumnEnum): bool
