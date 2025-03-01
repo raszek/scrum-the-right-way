@@ -8,6 +8,7 @@ use App\Event\Issue\Event\AddIssueDependencyEvent;
 use App\Event\Issue\Event\RemoveIssueDependencyEvent;
 use App\Exception\Issue\CannotAddIssueDependencyException;
 use App\Exception\Issue\CannotRemoveIssueDependencyException;
+use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersister;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -18,6 +19,7 @@ readonly class DependencyIssueEditor
         private Issue $issue,
         private EntityManagerInterface $entityManager,
         private EventPersister $eventPersister,
+        private ClockInterface $clock
     ) {
     }
 
@@ -38,6 +40,8 @@ readonly class DependencyIssueEditor
         $this->issue->addIssueDependency($newDependency);
 
         $this->entityManager->persist($newDependency);
+
+        $this->issue->setUpdatedAt($this->clock->now());
 
         $this->entityManager->flush();
 
@@ -70,6 +74,8 @@ readonly class DependencyIssueEditor
         $this->issue->removeIssueDependency($foundDependency);
 
         $this->entityManager->remove($foundDependency);
+
+        $this->issue->setUpdatedAt($this->clock->now());
 
         $this->entityManager->flush();
 

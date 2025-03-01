@@ -7,6 +7,7 @@ use App\Entity\Issue\IssueObserver;
 use App\Entity\Project\ProjectMember;
 use App\Exception\Observer\CannotAddIssueObserverException;
 use App\Exception\Observer\CannotRemoveIssueObserverException;
+use App\Service\Common\ClockInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class IssueObserverEditor
@@ -14,7 +15,8 @@ readonly class IssueObserverEditor
 
     public function __construct(
         private Issue $issue,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private ClockInterface $clock
     ) {
     }
 
@@ -59,6 +61,8 @@ readonly class IssueObserverEditor
 
         $issue->removeObserver($existingIssueObserver);
 
+        $issue->setUpdatedAt($this->clock->now());
+
         $this->entityManager->remove($existingIssueObserver);
 
         $this->entityManager->flush();
@@ -72,6 +76,8 @@ readonly class IssueObserverEditor
         );
 
         $this->issue->addObserver($newIssueObserver);
+
+        $this->issue->setUpdatedAt($this->clock->now());
 
         $this->entityManager->persist($newIssueObserver);
 

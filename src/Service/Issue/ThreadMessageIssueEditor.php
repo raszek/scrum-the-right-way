@@ -9,6 +9,7 @@ use App\Event\Issue\Event\AddIssueThreadMessageEvent;
 use App\Event\Issue\Event\RemoveIssueThreadMessageEvent;
 use App\Exception\Issue\CannotAddIssueThreadMessageException;
 use App\Exception\Issue\CannotRemoveIssueThreadMessageException;
+use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersister;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -17,7 +18,8 @@ readonly class ThreadMessageIssueEditor
     public function __construct(
         private Issue $issue,
         private EntityManagerInterface $entityManager,
-        private EventPersister $eventPersister
+        private EventPersister $eventPersister,
+        private ClockInterface $clock
     ) {
     }
 
@@ -36,6 +38,8 @@ readonly class ThreadMessageIssueEditor
         );
 
         $this->entityManager->persist($issueMessage);
+
+        $this->issue->setUpdatedAt($this->clock->now());
 
         $this->eventPersister->createIssueEvent(new AddIssueThreadMessageEvent(
             issueId: $this->issue->getId(),
@@ -58,6 +62,8 @@ readonly class ThreadMessageIssueEditor
         $this->issue->removeMessage($foundIssueMessage);
 
         $this->entityManager->remove($foundIssueMessage);
+
+        $this->issue->setUpdatedAt($this->clock->now());
 
         $this->eventPersister->createIssueEvent(new RemoveIssueThreadMessageEvent(
             issueId: $this->issue->getId(),

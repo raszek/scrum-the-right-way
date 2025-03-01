@@ -4,6 +4,7 @@ namespace App\Service\Issue;
 
 use App\Entity\Issue\Issue;
 use App\Entity\User\User;
+use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersisterFactory;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -12,7 +13,8 @@ readonly class ThreadMessageIssueEditorFactory
 
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private EventPersisterFactory $eventPersisterFactory
+        private EventPersisterFactory $eventPersisterFactory,
+        private ClockInterface $clock
     ) {
     }
 
@@ -21,7 +23,8 @@ readonly class ThreadMessageIssueEditorFactory
         return new ThreadMessageIssueEditor(
             issue: $issue,
             entityManager: $this->entityManager,
-            eventPersister: $this->eventPersisterFactory->create($issue->getProject(), $user)
+            eventPersister: $this->eventPersisterFactory->create($issue->getProject(), $user),
+            clock: $this->clock
         );
     }
 }

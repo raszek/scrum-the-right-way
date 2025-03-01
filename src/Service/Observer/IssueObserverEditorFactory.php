@@ -3,13 +3,15 @@
 namespace App\Service\Observer;
 
 use App\Entity\Issue\Issue;
+use App\Service\Common\ClockInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class IssueObserverEditorFactory
 {
 
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private ClockInterface $clock
     ) {
     }
 
@@ -17,7 +19,8 @@ readonly class IssueObserverEditorFactory
     {
         return new IssueObserverEditor(
             issue: $issue,
-            entityManager: $this->entityManager
+            entityManager: $this->entityManager,
+            clock: $this->clock
         );
     }
 }
