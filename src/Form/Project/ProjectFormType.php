@@ -2,7 +2,6 @@
 
 namespace App\Form\Project;
 
-use App\Entity\Project\Project;
 use App\Entity\Project\ProjectType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -26,7 +25,7 @@ class ProjectFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Project::class,
+            'data_class' => ProjectForm::class,
         ]);
     }
 }

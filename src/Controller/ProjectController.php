@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Project\Project;
 use App\Form\Project\ProjectFormType;
 use App\Repository\Project\ProjectRepository;
-use App\Service\Project\ProjectEditorFactory;
+use App\Service\Project\ProjectService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,9 +18,8 @@ class ProjectController extends Controller
 {
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
         private readonly ProjectRepository $projectRepository,
-        private readonly ProjectEditorFactory $projectEditorFactory
+        private readonly ProjectService $projectService
     ) {
     }
 
@@ -42,13 +41,7 @@ class ProjectController extends Controller
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            /**
-             * @var Project $createdProject
-             */
-            $createdProject = $form->getData();
-            $this->entityManager->persist($createdProject);
-            $projectEditor = $this->projectEditorFactory->create($createdProject, $this->getLoggedInUser());
-            $projectEditor->addMember($this->getLoggedInUser());
+            $createdProject = $this->projectService->create($form->getData(), $this->getLoggedInUser());
 
             $this->addFlash('success', sprintf('Project "%s" successfully created.', $createdProject->getName()));
             return $this->redirectToRoute('app_project_list');

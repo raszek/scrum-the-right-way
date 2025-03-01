@@ -47,7 +47,20 @@
                         id: project.id,
                         issueCode: item.code
                     }) }}" class="list-group-item">
-                        <a href="/projects/{{ project.id }}/backlog/issues/{{ item.code }}">{{ item.prefixCodeTitle }}</a>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a style="width: 90%" href="/projects/{{ project.id }}/backlog/issues/{{ item.code }}">{{ item.prefixCodeTitle }}</a>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary"><i class="bi bi-eye"></i></button>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">Add to sprint</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </li>
                 {% endfor %}
             </ul>

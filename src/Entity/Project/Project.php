@@ -3,6 +3,7 @@
 namespace App\Entity\Project;
 
 use App\Doctrine\Sqid;
+use App\Entity\Sprint\Sprint;
 use App\Entity\User\User;
 use App\Enum\Project\ProjectRoleEnum;
 use App\Repository\Project\ProjectRepository;
@@ -45,9 +46,19 @@ class Project
     #[ORM\OneToMany(targetEntity: ProjectMember::class, mappedBy: 'project')]
     private Collection $members;
 
-    public function __construct()
-    {
+    #[ORM\OneToMany(targetEntity: Sprint::class, mappedBy: 'project')]
+    private Collection $sprints;
+
+    public function __construct(
+        string $name,
+        string $code,
+        ProjectType $type,
+    ) {
         $this->members = new ArrayCollection();
+        $this->sprints = new ArrayCollection();
+        $this->name = $name;
+        $this->code = $code;
+        $this->type = $type;
     }
 
     public function getId(): ?Sqid
@@ -68,11 +79,6 @@ class Project
     public function getType(): ?ProjectType
     {
         return $this->type;
-    }
-
-    public function setType(ProjectType $projectType): void
-    {
-        $this->type = $projectType;
     }
 
     public function isScrum(): bool
@@ -153,6 +159,14 @@ class Project
         }
 
         return false;
+    }
+
+    /**
+     * @return Collection<Sprint>
+     */
+    public function getSprints(): Collection
+    {
+        return $this->sprints;
     }
 
 }
