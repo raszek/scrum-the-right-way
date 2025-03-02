@@ -6,6 +6,7 @@ use App\Repository\Sprint\SprintGoalRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use RuntimeException;
 
 #[ORM\Entity(repositoryClass: SprintGoalRepository::class)]
 class SprintGoal
@@ -62,26 +63,18 @@ class SprintGoal
         return $this->sprintGoalIssues;
     }
 
-    public function addSprintGoalIssue(SprintGoalIssue $sprintGoalIssue): static
+    public function addSprintGoalIssue(SprintGoalIssue $sprintGoalIssue): void
     {
-        if (!$this->sprintGoalIssues->contains($sprintGoalIssue)) {
-            $this->sprintGoalIssues->add($sprintGoalIssue);
-            $sprintGoalIssue->setSprintGoal($this);
+        if ($this->sprintGoalIssues->contains($sprintGoalIssue)) {
+            throw new RuntimeException('Sprint goal issue is already added');
         }
 
-        return $this;
+        $this->sprintGoalIssues->add($sprintGoalIssue);
     }
 
-    public function removeSprintGoalIssue(SprintGoalIssue $sprintGoalIssue): static
+    public function removeSprintGoalIssue(SprintGoalIssue $sprintGoalIssue): void
     {
-        if ($this->sprintGoalIssues->removeElement($sprintGoalIssue)) {
-            // set the owning side to null (unless already changed)
-            if ($sprintGoalIssue->getSprintGoal() === $this) {
-                $sprintGoalIssue->setSprintGoal(null);
-            }
-        }
-
-        return $this;
+        $this->sprintGoalIssues->removeElement($sprintGoalIssue);
     }
 
     public function getSprint(): ?Sprint

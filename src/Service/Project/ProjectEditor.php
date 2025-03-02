@@ -57,7 +57,8 @@ readonly class ProjectEditor
 
         $sprint = new Sprint(
             number: $nextSprintNumber,
-            project: $this->project,
+            isCurrent: true,
+            project: $this->project
         );
 
         $sprintGoal = new SprintGoal(

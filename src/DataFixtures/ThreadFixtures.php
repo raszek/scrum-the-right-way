@@ -15,21 +15,16 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Faker\Factory;
-use Faker\Generator;
 use Random\RandomException;
 
 class ThreadFixtures extends Fixture implements DependentFixtureInterface
 {
-
-    private Generator $faker;
 
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly ThreadStatusRepository $threadStatusRepository,
         private readonly RandomService $randomService,
     ) {
-        $this->faker = Factory::create();
     }
 
     public function load(ObjectManager $manager): void

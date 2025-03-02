@@ -5,6 +5,7 @@ namespace App\Entity\Sprint;
 use App\Doctrine\Sqid;
 use App\Entity\Project\Project;
 use App\Repository\Sprint\SprintRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,10 +22,13 @@ class Sprint
     private ?int $number = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $startedAt = null;
+    private ?DateTimeImmutable $startedAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $endedAt = null;
+    private ?DateTimeImmutable $endedAt = null;
+
+    #[ORM\Column]
+    private bool $isCurrent;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -38,11 +42,13 @@ class Sprint
 
     public function __construct(
         int $number,
+        bool $isCurrent,
         Project $project,
     ) {
         $this->sprintGoals = new ArrayCollection();
         $this->number = $number;
         $this->project = $project;
+        $this->isCurrent = $isCurrent;
     }
 
     public function getId(): ?Sqid
@@ -55,24 +61,24 @@ class Sprint
         return $this->number;
     }
 
-    public function getStartedAt(): ?\DateTimeImmutable
+    public function getStartedAt(): ?DateTimeImmutable
     {
         return $this->startedAt;
     }
 
-    public function setStartedAt(?\DateTimeImmutable $startedAt): static
+    public function setStartedAt(?DateTimeImmutable $startedAt): static
     {
         $this->startedAt = $startedAt;
 
         return $this;
     }
 
-    public function getEndedAt(): ?\DateTimeImmutable
+    public function getEndedAt(): ?DateTimeImmutable
     {
         return $this->endedAt;
     }
 
-    public function setEndedAt(?\DateTimeImmutable $endedAt): static
+    public function setEndedAt(?DateTimeImmutable $endedAt): static
     {
         $this->endedAt = $endedAt;
 
@@ -119,5 +125,15 @@ class Sprint
         }
 
         return $this;
+    }
+
+    public function isCurrent(): bool
+    {
+        return $this->isCurrent;
+    }
+
+    public function setIsCurrent(bool $isCurrent): void
+    {
+        $this->isCurrent = $isCurrent;
     }
 }

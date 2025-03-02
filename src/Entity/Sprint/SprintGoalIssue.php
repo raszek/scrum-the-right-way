@@ -16,11 +16,19 @@ class SprintGoalIssue
 
     #[ORM\ManyToOne(inversedBy: 'sprintGoalIssues')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?SprintGoal $sprintGoal = null;
+    private ?SprintGoal $sprintGoal;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Issue $issue = null;
+    private ?Issue $issue;
+
+    public function __construct(
+        SprintGoal $sprintGoal,
+        Issue $issue,
+    ) {
+        $this->sprintGoal = $sprintGoal;
+        $this->issue = $issue;
+    }
 
     public function getId(): ?int
     {
@@ -32,22 +40,8 @@ class SprintGoalIssue
         return $this->sprintGoal;
     }
 
-    public function setSprintGoal(?SprintGoal $sprintGoal): static
-    {
-        $this->sprintGoal = $sprintGoal;
-
-        return $this;
-    }
-
     public function getIssue(): ?Issue
     {
         return $this->issue;
-    }
-
-    public function setIssue(?Issue $issue): static
-    {
-        $this->issue = $issue;
-
-        return $this;
     }
 }

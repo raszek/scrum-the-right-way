@@ -19,8 +19,16 @@ class IssueColumnRepository extends ServiceEntityRepository
 
     public function backlogColumn(): IssueColumn
     {
-        return $this->findOneBy([
-            'id' => IssueColumnEnum::Backlog->value
-        ]);
+        return $this->getReference(IssueColumnEnum::Backlog->value);
+    }
+
+    public function toDoColumn(): IssueColumn
+    {
+        return $this->getReference(IssueColumnEnum::ToDo->value);
+    }
+
+    private function getReference(int $id): IssueColumn
+    {
+        return $this->getEntityManager()->getReference(IssueColumn::class, $id);
     }
 }
