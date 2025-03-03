@@ -2,6 +2,7 @@
 
 namespace App\Entity\Issue;
 
+use App\Enum\Issue\IssueTypeEnum;
 use App\Repository\Issue\IssueTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,5 +32,10 @@ class IssueType
     public function getLabel(): ?string
     {
         return $this->label;
+    }
+
+    public function isFeature(): bool
+    {
+        return $this->getId() === IssueTypeEnum::Feature->value;
     }
 }

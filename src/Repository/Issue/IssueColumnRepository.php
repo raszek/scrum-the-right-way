@@ -28,6 +28,11 @@ class IssueColumnRepository extends ServiceEntityRepository
         return $this->getReference(IssueColumnEnum::ToDo->value);
     }
 
+    public function archivedColumn(): IssueColumn
+    {
+        return $this->getReference(IssueColumnEnum::Archived->value);
+    }
+
     private function getReference(int $id): IssueColumn
     {
         return $this->getEntityManager()->getReference(IssueColumn::class, $id);

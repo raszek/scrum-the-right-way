@@ -19,6 +19,8 @@ class SingleIssueVoter extends Voter
 
     public const UPDATE_ISSUE_DESCRIPTION = 'UPDATE_ISSUE_DESCRIPTION';
 
+    public const UPDATE_ISSUE_ARCHIVE = 'UPDATE_ISSUE_ARCHIVE';
+
     public const SORT_ISSUE = 'SORT_ISSUE';
 
     public const VIEW_ISSUE_EVENTS = 'VIEW_ISSUE_EVENTS';
@@ -32,7 +34,8 @@ class SingleIssueVoter extends Voter
             self::UPDATE_ISSUE_TITLE,
             self::UPDATE_ISSUE_DESCRIPTION,
             self::VIEW_ISSUE_EVENTS,
-            self::UPDATE_ISSUE_TAGS
+            self::UPDATE_ISSUE_TAGS,
+            self::UPDATE_ISSUE_ARCHIVE
         ];
 
         return in_array($attribute, $attributes) && $subject instanceof Project;
@@ -69,7 +72,8 @@ class SingleIssueVoter extends Voter
             self::UPDATE_ISSUE_TAGS,
             self::ASSIGNEE_SET,
             self::UPDATE_ISSUE_TITLE,
-            self::UPDATE_ISSUE_DESCRIPTION
+            self::UPDATE_ISSUE_DESCRIPTION,
+            self::UPDATE_ISSUE_ARCHIVE,
         ];
     }
 }

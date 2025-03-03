@@ -51,6 +51,14 @@ final class IssueColumnFactory extends PersistentProxyObjectFactory
         ]);
     }
 
+    public static function archivedColumn(): IssueColumn
+    {
+        return IssueColumnFactory::findOrCreate([
+            'id' => IssueColumnEnum::Archived->value,
+            'label' => IssueColumnEnum::Archived->label()
+        ]);
+    }
+
     protected function defaults(): array|callable
     {
         return [

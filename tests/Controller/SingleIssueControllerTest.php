@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Enum\Issue\IssueColumnEnum;
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
@@ -404,6 +405,62 @@ class SingleIssueControllerTest extends WebTestCase
         $this->assertEquals('sprint', $updatedIssue->getTags()->get(1)->getName());
     }
 
+    /** @test */
+    public function developer_can_archive_issue()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $backlogColumn = IssueColumnFactory::backlogColumn();
+
+        IssueColumnFactory::archivedColumn();
+
+        $issueType = IssueTypeFactory::issueType();
+
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $issueType,
+            'number' => 12,
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/issues/SCP-12/archive',
+            $project->getId(),
+        );
+
+        $client->request('POST', $uri);
+
+        $this->assertResponseStatusCodeSame(204);
+
+        $updatedIssue = $this->issueRepository()->findOneBy([
+            'id' => $issue->getId()
+        ]);
+
+        $this->assertNotNull($updatedIssue);
+        $this->assertEquals(IssueColumnEnum::Archived->value, $updatedIssue->getIssueColumn()->getId());
+    }
+
     private function issueRepository(): IssueRepository
     {
         return $this->getService(IssueRepository::class);
@@ -418,5 +475,4 @@ class SingleIssueControllerTest extends WebTestCase
     {
         return $this->getService(UserNotificationRepository::class);
     }
-
 }

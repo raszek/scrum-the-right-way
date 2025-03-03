@@ -437,4 +437,9 @@ class Issue
     {
         $this->parent = $parent;
     }
+
+    public function isFeature(): bool
+    {
+        return $this->getType()->isFeature();
+    }
 }

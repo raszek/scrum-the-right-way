@@ -13,6 +13,7 @@ use App\Exception\Issue\NoOrderSpaceException;
 use App\Exception\Issue\OutOfBoundPositionException;
 use App\Helper\JsonHelper;
 use App\Helper\StringHelper;
+use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersister;
@@ -26,6 +27,7 @@ readonly class IssueEditor
     public function __construct(
         private Issue $issue,
         private IssueRepository $issueRepository,
+        private IssueColumnRepository $issueColumnRepository,
         private EntityManagerInterface $entityManager,
         private ClockInterface $clock,
         private EventPersister $eventPersister
@@ -140,6 +142,12 @@ readonly class IssueEditor
         $this->eventPersister->createIssueEvent($event, $this->issue);
     }
 
+    public function archive(): void
+    {
+        $this->issue->setIssueColumn($this->issueColumnRepository->archivedColumn());
+
+        $this->entityManager->flush();
+    }
 
     /**
      * @param Issue[] $issues

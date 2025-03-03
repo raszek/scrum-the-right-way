@@ -181,6 +181,20 @@ class SingleIssueController extends CommonIssueController
         return new Response(status: 204);
     }
 
+    #[Route('/archive', 'app_project_issue_archive', methods: ['POST'])]
+    public function archive(Project $project, string $issueCode): Response
+    {
+        $this->denyAccessUnlessGranted(SingleIssueVoter::UPDATE_ISSUE_ARCHIVE, $project);
+
+        $issue = $this->findIssue($issueCode, $project);
+
+        $issueEditor = $this->issueEditorFactory->create($issue, $this->getLoggedInUser());
+
+        $issueEditor->archive();
+
+        return new Response(status: 204);
+    }
+
     private function findProjectMember(?string $projectMemberId, Project $project): ?ProjectMember
     {
         if (!$projectMemberId) {

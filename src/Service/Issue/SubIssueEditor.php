@@ -11,6 +11,7 @@ use App\Repository\Issue\IssueRepository;
 use App\Repository\Issue\IssueTypeRepository;
 use App\Service\Common\ClockInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 
 readonly class SubIssueEditor
 {
@@ -28,6 +29,10 @@ readonly class SubIssueEditor
 
     public function add(SubIssueForm $subIssueForm): void
     {
+        if (!$this->issue->isFeature()) {
+            throw new RuntimeException('Non feature issue cannot have sub issues.');
+        }
+
         $nextIssueNumber = $this->issueRepository->getNextIssueNumber($this->issue->getProject());
 
         $subIssueColumn = $this->getSubIssueColumn();
