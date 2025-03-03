@@ -38,12 +38,14 @@
                     >
                        {{ message.issueTitle }}
                     </a>
-                    <button class="btn btn-danger"
-                            data-action="confirm-dialog#open"
-                            data-confirm-dialog-url-param="{{ message.id }}"
-                    >
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    {% if is_granted('ISSUE_ADD_THREAD_MESSAGE') %}
+                        <button class="btn btn-danger"
+                                data-action="confirm-dialog#open"
+                                data-confirm-dialog-url-param="{{ message.id }}"
+                        >
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>
