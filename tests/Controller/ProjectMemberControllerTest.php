@@ -136,12 +136,12 @@ class ProjectMemberControllerTest extends WebTestCase
 
         $admin = UserFactory::createOne();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne();
 
         $projectAdminRole = ProjectRoleFactory::adminRole();
-        ProjectRoleFactory::analyticRole();
+        ProjectRoleFactory::developerRole();
 
         $projectAdminMember = ProjectMemberFactory::createOne([
             'user' => $admin,
@@ -153,8 +153,8 @@ class ProjectMemberControllerTest extends WebTestCase
             'role' => $projectAdminRole
         ]);
 
-        $analyticMember = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $developerMember = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
@@ -163,20 +163,20 @@ class ProjectMemberControllerTest extends WebTestCase
         $url = sprintf(
             '/projects/%s/members/%s/roles/%s/add',
             $project->getId(),
-            $analyticMember->getId(),
-            ProjectRoleEnum::Analytic->value
+            $developerMember->getId(),
+            ProjectRoleEnum::Developer->value
         );
 
         $client->request('POST', $url);
 
         $this->assertResponseStatusCodeSame(204);
 
-        $updatedAnalytic = $this->projectMemberRepository()->findOneBy([
-            'id' => $analyticMember->getId()
+        $updatedDeveloper = $this->projectMemberRepository()->findOneBy([
+            'id' => $developerMember->getId()
         ]);
 
-        $this->assertNotNull($updatedAnalytic);
-        $this->assertTrue($updatedAnalytic->isAnalytic());
+        $this->assertNotNull($updatedDeveloper);
+        $this->assertTrue($updatedDeveloper->isDeveloper());
     }
 
     /** @test */
@@ -191,7 +191,7 @@ class ProjectMemberControllerTest extends WebTestCase
 
         $project = ProjectFactory::createOne();
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         $adminRole = ProjectRoleFactory::adminRole();
 
@@ -200,7 +200,7 @@ class ProjectMemberControllerTest extends WebTestCase
             'project' => $project
         ]);
 
-        $analyticMember = ProjectMemberFactory::createOne([
+        $developerMember = ProjectMemberFactory::createOne([
             'user' => $analytic,
             'project' => $project
         ]);
@@ -211,8 +211,8 @@ class ProjectMemberControllerTest extends WebTestCase
         ]);
 
         ProjectMemberRoleFactory::createOne([
-            'role' => $analyticRole,
-            'projectMember' => $analyticMember
+            'role' => $developerRole,
+            'projectMember' => $developerMember
         ]);
 
         $this->loginAsUser($admin);
@@ -220,45 +220,45 @@ class ProjectMemberControllerTest extends WebTestCase
         $url = sprintf(
             '/projects/%s/members/%s/roles/%s/remove',
             $project->getId(),
-            $analyticMember->getId(),
-            ProjectRoleEnum::Analytic->value
+            $developerMember->getId(),
+            ProjectRoleEnum::Developer->value
         );
 
         $client->request('POST', $url);
 
         $this->assertResponseStatusCodeSame(204);
 
-        $updatedAnalytic = $this->projectMemberRepository()->findOneBy([
-            'id' => $analyticMember->getId()
+        $updatedDeveloper = $this->projectMemberRepository()->findOneBy([
+            'id' => $developerMember->getId()
         ]);
 
-        $this->assertNotNull($updatedAnalytic);
-        $this->assertFalse($updatedAnalytic->isAnalytic());
+        $this->assertNotNull($updatedDeveloper);
+        $this->assertFalse($updatedDeveloper->isDeveloper());
     }
 
     /** @test */
-    public function member_admin_can_remove_analytic_from_project()
+    public function member_admin_can_remove_developer_from_project()
     {
         $client = static::createClient();
         $client->followRedirects();
 
         $admin = UserFactory::createOne();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne();
 
         $adminRole = ProjectRoleFactory::adminRole();
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         $adminMember = ProjectMemberFactory::createOne([
             'user' => $admin,
             'project' => $project
         ]);
 
-        $analyticMember = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $developerMember = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
@@ -268,18 +268,18 @@ class ProjectMemberControllerTest extends WebTestCase
         ]);
 
         ProjectMemberRoleFactory::createOne([
-            'role' => $analyticRole,
-            'projectMember' => $analyticMember
+            'role' => $developerRole,
+            'projectMember' => $developerMember
         ]);
 
-        $removedMemberId = $analyticMember->getId();
+        $removedMemberId = $developerMember->getId();
 
         $this->loginAsUser($admin);
 
         $url = sprintf(
             '/projects/%s/members/%s/remove',
             $project->getId(),
-            $analyticMember->getId(),
+            $developerMember->getId(),
         );
 
         $client->request('POST', $url);

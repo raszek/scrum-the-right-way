@@ -46,6 +46,6 @@ class IssueDependencyVoter extends Voter
             return false;
         }
 
-        return $member->isWorker();
+        return $member->isDeveloper();
     }
 }

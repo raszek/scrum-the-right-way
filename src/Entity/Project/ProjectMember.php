@@ -118,23 +118,8 @@ class ProjectMember
         return $this->hasRole(ProjectRoleEnum::Admin);
     }
 
-    public function isAnalytic(): bool
-    {
-        return $this->hasRole(ProjectRoleEnum::Analytic);
-    }
-
     public function isDeveloper(): bool
     {
         return $this->hasRole(ProjectRoleEnum::Developer);
-    }
-
-    public function isTester(): bool
-    {
-        return $this->hasRole(ProjectRoleEnum::Tester);
-    }
-
-    public function isWorker(): bool
-    {
-        return $this->isAnalytic() || $this->isDeveloper() || $this->isTester();
     }
 }

@@ -29,12 +29,12 @@ class ProjectMemberEditorTest extends KernelTestCase
 
         $admin = UserFactory::createOne();
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         $projectMember = ProjectMemberFactory::createOne();
 
         ProjectMemberRoleFactory::createOne([
-            'role' => $analyticRole,
+            'role' => $developerRole,
             'projectMember' => $projectMember
         ]);
 
@@ -42,45 +42,13 @@ class ProjectMemberEditorTest extends KernelTestCase
 
         $errorMessage = null;
         try {
-            $editor->addRole(ProjectRoleEnum::Analytic);
+            $editor->addRole(ProjectRoleEnum::Developer);
         } catch (ProjectMemberCannotAddRoleException $e) {
             $errorMessage = $e->getMessage();
         }
 
         $this->assertNotNull($errorMessage);
-        $this->assertEquals('Project member already has role "Analytic"', $errorMessage);
-    }
-
-    /** @test */
-    public function cannot_add_role_scrum_master_in_kanban_project()
-    {
-        self::bootKernel();
-
-        $admin = UserFactory::createOne();
-
-        $project = ProjectFactory::new()
-            ->withKanbanType()
-            ->create();
-
-        $projectMember = ProjectMemberFactory::createOne([
-            'project' => $project
-        ]);
-
-        ProjectMemberRoleFactory::createOne([
-            'projectMember' => $projectMember
-        ]);
-
-        $editor = $this->create($projectMember, $admin);
-
-        $errorMessage = null;
-        try {
-            $editor->addRole(ProjectRoleEnum::ScrumMaster);
-        } catch (ProjectMemberCannotAddRoleException $e) {
-            $errorMessage = $e->getMessage();
-        }
-
-        $this->assertNotNull($errorMessage);
-        $this->assertEquals('Cannot add role "Scrum master" in kanban project', $errorMessage);
+        $this->assertEquals('Project member already has role "Developer"', $errorMessage);
     }
 
     private function create(ProjectMember $projectMember, User $user): ProjectMemberEditor

@@ -21,7 +21,7 @@ class SingleIssueControllerTest extends WebTestCase
     use Factories;
 
     /** @test */
-    public function project_analytic_can_edit_issue_title()
+    public function project_developer_can_edit_issue_title()
     {
         $client = static::createClient();
         $client->followRedirects();
@@ -32,16 +32,16 @@ class SingleIssueControllerTest extends WebTestCase
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
+        $memberDeveloper = ProjectMemberFactory::createOne([
             'user' => $user,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -72,7 +72,7 @@ class SingleIssueControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function project_analytic_can_edit_issue_description()
+    public function project_developer_can_edit_issue_description()
     {
         $client = static::createClient();
         $client->followRedirects();
@@ -83,16 +83,16 @@ class SingleIssueControllerTest extends WebTestCase
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
+        $memberDeveloper = ProjectMemberFactory::createOne([
             'user' => $user,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -128,7 +128,7 @@ class SingleIssueControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function analytic_can_assign_story_points_to_issue()
+    public function developer_can_assign_story_points_to_issue()
     {
         $client = static::createClient();
         $client->followRedirects();
@@ -139,16 +139,16 @@ class SingleIssueControllerTest extends WebTestCase
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
+        $memberDeveloper = ProjectMemberFactory::createOne([
             'user' => $user,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -179,25 +179,20 @@ class SingleIssueControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function analytic_can_set_issue_assignee_to_developer()
+    public function developer_can_set_issue_assignee_to_another_developer()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $developer = UserFactory::createOne([
+        $developer = UserFactory::createOne();
+
+        $anotherDeveloper = UserFactory::createOne([
             'firstName' => 'Samba',
             'lastName' => 'Bamba',
         ]);
 
-        $analytic = UserFactory::createOne();
-
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
-        ]);
-
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
-            'project' => $project
         ]);
 
         $memberDeveloper = ProjectMemberFactory::createOne([
@@ -205,17 +200,20 @@ class SingleIssueControllerTest extends WebTestCase
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $memberAnotherDeveloper = ProjectMemberFactory::createOne([
+            'user' => $anotherDeveloper,
+            'project' => $project
+        ]);
 
         $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberDeveloper,
+            'projectMember' => $memberAnotherDeveloper,
             'role' => $developerRole
         ]);
 
@@ -230,7 +228,7 @@ class SingleIssueControllerTest extends WebTestCase
             'number' => 12,
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/assignees',
@@ -238,7 +236,7 @@ class SingleIssueControllerTest extends WebTestCase
         );
 
         $client->request('POST', $uri, [
-            'projectMemberId' => $memberDeveloper->getId()
+            'projectMemberId' => $memberAnotherDeveloper->getId()
         ]);
 
         $this->assertResponseStatusCodeSame(204);
@@ -248,7 +246,7 @@ class SingleIssueControllerTest extends WebTestCase
         ]);
 
         $this->assertNotNull($updatedIssue->getAssignee());
-        $this->assertEquals($updatedIssue->getAssignee()->getId(), $memberDeveloper->getId());
+        $this->assertEquals($updatedIssue->getAssignee()->getId(), $memberAnotherDeveloper->getId());
 
         $this->assertEquals(1, $updatedIssue->getObservers()->count());
 
@@ -259,34 +257,29 @@ class SingleIssueControllerTest extends WebTestCase
         $this->assertCount(1, $events);
 
         $developerNotifications = $this->userNotificationRepository()->findBy([
-            'forUser' => $developer->getId(),
+            'forUser' => $anotherDeveloper->getId(),
         ]);
 
         $this->assertCount(1, $developerNotifications);
 
-        $analyticNotifications = $this->userNotificationRepository()->findBy([
-            'forUser' => $analytic->getId(),
+        $developerNotifications = $this->userNotificationRepository()->findBy([
+            'forUser' => $developer->getId(),
         ]);
-        $this->assertCount(0, $analyticNotifications);
+        $this->assertCount(0, $developerNotifications);
     }
 
     /** @test */
-    public function analytic_can_set_issue_assignee_to_none()
+    public function developer_can_set_issue_assignee_to_none()
     {
         $client = static::createClient();
         $client->followRedirects();
 
         $developer = UserFactory::createOne();
 
-        $analytic = UserFactory::createOne();
+        $anotherDeveloper = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
-        ]);
-
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
-            'project' => $project
         ]);
 
         $memberDeveloper = ProjectMemberFactory::createOne([
@@ -294,17 +287,20 @@ class SingleIssueControllerTest extends WebTestCase
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $memberAnotherDeveloper = ProjectMemberFactory::createOne([
+            'user' => $anotherDeveloper,
+            'project' => $project
+        ]);
 
         $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberDeveloper,
+            'projectMember' => $memberAnotherDeveloper,
             'role' => $developerRole
         ]);
 
@@ -320,7 +316,7 @@ class SingleIssueControllerTest extends WebTestCase
             'assignee' => $memberDeveloper
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/assignees',
@@ -341,27 +337,27 @@ class SingleIssueControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function analytic_can_set_issue_tags()
+    public function developer_can_set_issue_tags()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -385,7 +381,7 @@ class SingleIssueControllerTest extends WebTestCase
             'number' => 12,
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/tags',

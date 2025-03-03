@@ -17,27 +17,27 @@ class SubIssueControllerTest extends WebTestCase
 {
 
     /** @test */
-    public function analytic_can_create_sub_issues()
+    public function developer_can_create_sub_issues()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -53,7 +53,7 @@ class SubIssueControllerTest extends WebTestCase
             'number' => 12,
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/sub-issues',

@@ -15,30 +15,30 @@ class ProjectTagControllerTest extends WebTestCase
     use Factories;
 
     /** @test */
-    public function analytic_can_create_new_tag()
+    public function developer_can_create_new_tag()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/tags',

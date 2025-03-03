@@ -47,7 +47,7 @@ class IssueVoter extends Voter
         }
 
         return match (true) {
-            $attribute === self::CREATE_ISSUE => $foundMember->isAnalytic(),
+            $attribute === self::CREATE_ISSUE => $foundMember->isDeveloper(),
             default => true
         };
     }

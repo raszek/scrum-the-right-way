@@ -23,27 +23,27 @@ class IssueThreadMessageControllerTest extends WebTestCase
     use Factories;
 
     /** @test */
-    public function analytic_can_add_thread_message_to_issue()
+    public function developer_can_add_thread_message_to_issue()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -66,7 +66,7 @@ class IssueThreadMessageControllerTest extends WebTestCase
             'content' => 'Some content'
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/messages/%s/add',
@@ -90,27 +90,27 @@ class IssueThreadMessageControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function analytic_can_remove_thread_message_from_issue()
+    public function developer_can_remove_thread_message_from_issue()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -138,7 +138,7 @@ class IssueThreadMessageControllerTest extends WebTestCase
             'threadMessage' => $threadMessage,
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/messages/%s/remove',
@@ -158,27 +158,27 @@ class IssueThreadMessageControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function analytic_can_search_thread_message_by_thread_title()
+    public function developer_can_search_thread_message_by_thread_title()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -204,7 +204,7 @@ class IssueThreadMessageControllerTest extends WebTestCase
             'number' => 1
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/%s/messages?search=threadtitle',

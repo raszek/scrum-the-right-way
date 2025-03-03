@@ -19,8 +19,6 @@ class UserFixtures extends Fixture
 
     const TESTER_EMAIL = 'tester@example.com';
 
-    const SCRUM_MASTER_EMAIL = 'scrummaster@example.com';
-
     /**
      * @return string[]
      */
@@ -32,7 +30,6 @@ class UserFixtures extends Fixture
             self::ANALYTIC_EMAIL,
             self::DEVELOPER_EMAIL,
             self::TESTER_EMAIL,
-            self::SCRUM_MASTER_EMAIL
         ];
     }
 

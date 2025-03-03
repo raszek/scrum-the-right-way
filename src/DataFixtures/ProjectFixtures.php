@@ -84,15 +84,9 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
     {
         $user = $member->getUser();
 
-        if ($user->getEmail() === UserFixtures::SCRUM_MASTER_EMAIL && $member->getProject()->isScrum()) {
-            return $this->projectRoleRepository->scrumMasterRole();
-        }
-
         return match ($user->getEmail()) {
             UserFixtures::PROJECT_ADMIN_EMAIL => $this->projectRoleRepository->adminRole(),
-            UserFixtures::ANALYTIC_EMAIL => $this->projectRoleRepository->analyticRole(),
-            UserFixtures::DEVELOPER_EMAIL => $this->projectRoleRepository->developerRole(),
-            UserFixtures::TESTER_EMAIL => $this->projectRoleRepository->testerRole(),
+            UserFixtures::ANALYTIC_EMAIL, UserFixtures::TESTER_EMAIL, UserFixtures::DEVELOPER_EMAIL => $this->projectRoleRepository->developerRole(),
             default => null
         };
     }

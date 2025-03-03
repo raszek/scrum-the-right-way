@@ -44,13 +44,6 @@ readonly class ProjectMemberEditor
             ));
         }
 
-        if ($projectMember->getProject()->isKanban() && !ProjectRoleEnum::isKanbanRole($role)) {
-            throw new ProjectMemberCannotAddRoleException(sprintf(
-                'Cannot add role "%s" in kanban project',
-                $role->label()
-            ));
-        }
-
         $roleToAdd = $this->findRole($role->value);
 
         $projectMemberRole = new ProjectMemberRole(

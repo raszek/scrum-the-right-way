@@ -22,14 +22,6 @@ final class ProjectRoleFactory extends PersistentProxyObjectFactory
         }
     }
 
-    public static function analyticRole(): ProjectRole
-    {
-        return self::findOrCreate([
-            'id' => ProjectRoleEnum::Analytic->value,
-            'label' => ProjectRoleEnum::Analytic->label(),
-        ]);
-    }
-
     public static function developerRole(): ProjectRole
     {
         return self::findOrCreate([
@@ -64,7 +56,6 @@ final class ProjectRoleFactory extends PersistentProxyObjectFactory
      */
     protected function initialize(): static
     {
-        return $this
-        ;
+        return $this;
     }
 }

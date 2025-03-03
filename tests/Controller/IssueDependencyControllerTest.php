@@ -21,27 +21,27 @@ class IssueDependencyControllerTest extends WebTestCase
     use Factories;
 
     /** @test */
-    public function analytic_can_add_dependency_to_issue()
+    public function developer_can_add_dependency_to_issue()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -63,7 +63,7 @@ class IssueDependencyControllerTest extends WebTestCase
             'title' => 'Another issue title'
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/dependencies/SCP-5/add',
@@ -86,27 +86,27 @@ class IssueDependencyControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function analytic_can_remove_dependency_from_issue()
+    public function developer_can_remove_dependency_from_issue()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -133,7 +133,7 @@ class IssueDependencyControllerTest extends WebTestCase
             'dependency' => $anotherIssue
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/dependencies/SCP-5/remove',
@@ -152,27 +152,27 @@ class IssueDependencyControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function analytic_can_list_issue_dependencies()
+    public function developer_can_list_issue_dependencies()
     {
         $client = static::createClient();
         $client->followRedirects();
 
-        $analytic = UserFactory::createOne();
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
         ]);
 
-        $memberAnalytic = ProjectMemberFactory::createOne([
-            'user' => $analytic,
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberAnalytic,
-            'role' => $analyticRole
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -202,7 +202,7 @@ class IssueDependencyControllerTest extends WebTestCase
             'title' => 'issue seven'
         ]);
 
-        $this->loginAsUser($analytic);
+        $this->loginAsUser($developer);
 
         $uri = sprintf(
             '/projects/%s/issues/SCP-12/dependencies?%s',

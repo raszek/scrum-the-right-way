@@ -121,11 +121,7 @@ class Project
      */
     public function memberRoleTypes(): array
     {
-        if ($this->isScrum()) {
-            return ProjectRoleEnum::scrumRoles();
-        }
-
-        return ProjectRoleEnum::kanbanRoles();
+        return ProjectRoleEnum::cases();
     }
 
     public function findMember(User $searchedUser): ?ProjectMember

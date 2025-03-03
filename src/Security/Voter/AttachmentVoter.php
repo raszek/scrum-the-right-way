@@ -51,6 +51,6 @@ class AttachmentVoter extends Voter
             return true;
         }
 
-        return $member->isAnalytic() || $member->isDeveloper() || $member->isTester();
+        return $member->isDeveloper();
     }
 }

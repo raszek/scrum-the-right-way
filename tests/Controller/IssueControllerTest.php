@@ -79,7 +79,7 @@ class IssueControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function analytic_can_create_new_issues_on_backlog()
+    public function developer_can_create_new_issues_on_backlog()
     {
         $client = static::createClient();
         $client->followRedirects();
@@ -90,16 +90,16 @@ class IssueControllerTest extends WebTestCase
             'code' => 'SCP'
         ]);
 
-        $analyticMember = ProjectMemberFactory::createOne([
+        $developerMember = ProjectMemberFactory::createOne([
             'user' => $user,
             'project' => $project
         ]);
 
-        $analyticRole = ProjectRoleFactory::analyticRole();
+        $developerRole = ProjectRoleFactory::developerRole();
 
         ProjectMemberRoleFactory::createOne([
-            'projectMember' => $analyticMember,
-            'role' => $analyticRole
+            'projectMember' => $developerMember,
+            'role' => $developerRole
         ]);
 
         IssueColumnFactory::backlogColumn();
@@ -134,7 +134,7 @@ class IssueControllerTest extends WebTestCase
 
         $firstIssueObserver = $createdIssue->getObservers()->get(0);
         $this->assertNotNull($firstIssueObserver);
-        $this->assertEquals($analyticMember->getId(), $firstIssueObserver->getProjectMember()->getId());
+        $this->assertEquals($developerMember->getId(), $firstIssueObserver->getProjectMember()->getId());
     }
 
     /** @test */

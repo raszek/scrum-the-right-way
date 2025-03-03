@@ -109,7 +109,7 @@ class EventServiceTest extends KernelTestCase
 
         $eventData = new AddRoleEvent(
             $userWithAddedRole->getId(),
-            ProjectRoleEnum::Analytic->value
+            ProjectRoleEnum::Developer->value
         );
 
         $event = $eventPersister->create($eventData);
@@ -118,7 +118,7 @@ class EventServiceTest extends KernelTestCase
 
         $eventRecord = $eventService->getEventRecords([$event])[0];
 
-        $this->assertEquals('<b>Arlene Legros</b> has added role <b>Analytic</b> to user <b>Mary Nader</b>', $eventRecord->content);
+        $this->assertEquals('<b>Arlene Legros</b> has added role <b>Developer</b> to user <b>Mary Nader</b>', $eventRecord->content);
     }
 
     /** @test */

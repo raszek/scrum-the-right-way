@@ -40,6 +40,6 @@ class SubIssueVoter extends Voter
             return false;
         }
 
-        return $member->isAnalytic();
+        return $member->isDeveloper();
     }
 }

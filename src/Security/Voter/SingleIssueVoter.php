@@ -57,24 +57,17 @@ class SingleIssueVoter extends Voter
         }
 
         return match (true) {
-            in_array($attribute, $this->analyticAttributes()) => $member->isAnalytic(),
-            in_array($attribute, $this->workerAttributes()) => $member->isWorker(),
+            in_array($attribute, $this->developerAttributes()) => $member->isDeveloper(),
             default => true
         };
     }
 
-    private function workerAttributes(): array
+    private function developerAttributes(): array
     {
         return [
             self::STORY_POINTS_SET,
             self::UPDATE_ISSUE_TAGS,
-            self::ASSIGNEE_SET
-        ];
-    }
-
-    private function analyticAttributes(): array
-    {
-        return [
+            self::ASSIGNEE_SET,
             self::UPDATE_ISSUE_TITLE,
             self::UPDATE_ISSUE_DESCRIPTION
         ];

@@ -30,25 +30,4 @@ class ProjectRoleRepository extends ServiceEntityRepository
             'id' => ProjectRoleEnum::Developer->value
         ]);
     }
-
-    public function analyticRole(): ProjectRole
-    {
-        return $this->findOneBy([
-            'id' => ProjectRoleEnum::Analytic->value
-        ]);
-    }
-
-    public function testerRole(): ProjectRole
-    {
-        return $this->findOneBy([
-            'id' => ProjectRoleEnum::Tester->value
-        ]);
-    }
-
-    public function scrumMasterRole(): ProjectRole
-    {
-        return $this->findOneBy([
-            'id' => ProjectRoleEnum::ScrumMaster->value
-        ]);
-    }
 }
