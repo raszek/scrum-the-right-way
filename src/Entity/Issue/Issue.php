@@ -44,6 +44,12 @@ class Issue
     #[ORM\Column()]
     private int $columnOrder;
 
+    #[ORM\Column]
+    private DateTimeImmutable $createdAt;
+
+    #[ORM\Column]
+    private DateTimeImmutable $updatedAt;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private IssueColumn $issueColumn;
@@ -64,11 +70,9 @@ class Issue
     #[ORM\JoinColumn(nullable: true)]
     private ?ProjectMember $assignee = null;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
-    #[ORM\Column]
-    private DateTimeImmutable $updatedAt;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Issue $parent = null;
 
     /**
      * @var Collection<int, DescriptionHistory>
@@ -106,6 +110,12 @@ class Issue
     #[ORM\OneToMany(targetEntity: IssueDependency::class, mappedBy: 'issue')]
     private Collection $issueDependencies;
 
+    /**
+     * @var Collection<int, Issue>
+     */
+    #[ORM\OneToMany(targetEntity: Issue::class, mappedBy: 'parent')]
+    private Collection $subIssues;
+
     public function __construct(
         int               $number,
         string            $title,
@@ -132,6 +142,7 @@ class Issue
         $this->tags = new ArrayCollection();
         $this->issueThreadMessages = new ArrayCollection();
         $this->issueDependencies = new ArrayCollection();
+        $this->subIssues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -396,5 +407,34 @@ class Issue
     public function removeIssueDependency(IssueDependency $issueDependency): void
     {
         $this->issueDependencies->removeElement($issueDependency);
+    }
+
+    /**
+     * @return Collection<Issue>
+     */
+    public function getSubIssues(): Collection
+    {
+        return $this->subIssues;
+    }
+
+    public function getLastSubIssue(): ?Issue
+    {
+        $lastIssue = $this->subIssues->last();
+
+        if (!$lastIssue) {
+            return null;
+        }
+
+        return $lastIssue;
+    }
+
+    public function getParent(): ?Issue
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?Issue $parent): void
+    {
+        $this->parent = $parent;
     }
 }

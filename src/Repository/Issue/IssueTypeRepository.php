@@ -20,9 +20,12 @@ class IssueTypeRepository extends ServiceEntityRepository
 
     public function issueType(): IssueType
     {
-        return $this->findOneBy([
-            'id' => IssueTypeEnum::Issue->value
-        ]);
+        return $this->getReference(IssueTypeEnum::Issue->value);
+    }
+
+    public function subIssueType(): IssueType
+    {
+        return $this->getReference(IssueTypeEnum::SubIssue->value);
     }
 
     /**
@@ -38,5 +41,10 @@ class IssueTypeRepository extends ServiceEntityRepository
         $queryBuilder->setParameter('ids', $createTypeIds);
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    private function getReference(int $id): IssueType
+    {
+        return $this->getEntityManager()->getReference(IssueType::class, $id);
     }
 }

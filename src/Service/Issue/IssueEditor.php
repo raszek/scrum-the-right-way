@@ -39,7 +39,7 @@ readonly class IssueEditor
      */
     public function setPosition(int $position): void
     {
-        $query = $this->issueRepository->columnQuery($this->issue->getProject(), $this->issue->getIssueColumn());
+        $query = $this->issueRepository->orderedColumnQuery($this->issue->getProject(), $this->issue->getIssueColumn());
         $query->andWhere('issue.id <> :issueId');
         $query->setParameter('issueId', $this->issue->getId());
 

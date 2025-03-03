@@ -18,6 +18,8 @@ enum IssueColumnEnum: int
 
     case Closed = 7;
 
+    case Archived = 8;
+
     public function label(): string
     {
         return match ($this) {
@@ -28,6 +30,7 @@ enum IssueColumnEnum: int
             IssueColumnEnum::InTests => 'In tests',
             IssueColumnEnum::Done => 'Done',
             IssueColumnEnum::Closed => 'Closed',
+            IssueColumnEnum::Archived => 'Archived',
         };
     }
 

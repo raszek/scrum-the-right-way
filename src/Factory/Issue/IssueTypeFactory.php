@@ -26,11 +26,27 @@ final class IssueTypeFactory extends PersistentProxyObjectFactory
         }
     }
 
+    public static function featureType(): IssueType
+    {
+        return self::findOrCreate([
+            'id' => IssueTypeEnum::Feature->value,
+            'label' => IssueTypeEnum::Feature->label(),
+        ]);
+    }
+
     public static function issueType(): IssueType
     {
         return self::findOrCreate([
             'id' => IssueTypeEnum::Issue->value,
             'label' => IssueTypeEnum::Issue->label(),
+        ]);
+    }
+
+    public static function subIssueType(): IssueType
+    {
+        return self::findOrCreate([
+            'id' => IssueTypeEnum::SubIssue->value,
+            'label' => IssueTypeEnum::SubIssue->label(),
         ]);
     }
 

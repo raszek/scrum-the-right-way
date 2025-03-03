@@ -51,7 +51,7 @@ class IssueRepository extends ServiceEntityRepository
 
     public function backlogQuery(Project $project): QueryBuilder
     {
-        return $this->columnQuery($project, $this->issueColumnRepository->backlogColumn());
+        return $this->orderedColumnQuery($project, $this->issueColumnRepository->backlogColumn());
     }
 
     public function getNextIssueNumber(Project $project): int
@@ -70,14 +70,22 @@ class IssueRepository extends ServiceEntityRepository
         return $maxIssueIdInProject + 1;
     }
 
+    public function orderedColumnQuery(Project $project, IssueColumn $issueColumn): QueryBuilder
+    {
+        $columnQuery = $this->columnQuery($project, $issueColumn);
+
+        $columnQuery->orderBy('issue.columnOrder', 'ASC');
+
+        return $columnQuery;
+    }
+
     public function columnQuery(Project $project, IssueColumn $issueColumn): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('issue');
 
         $queryBuilder
             ->where('issue.project = :project')
-            ->andWhere('issue.issueColumn = :issueColumn')
-            ->orderBy('issue.columnOrder', 'ASC');
+            ->andWhere('issue.issueColumn = :issueColumn');
 
         $queryBuilder->setParameter('issueColumn', $issueColumn);
         $queryBuilder->sqidParameter('project', $project->getId());
@@ -101,6 +109,15 @@ class IssueRepository extends ServiceEntityRepository
         return $queryBuilder;
     }
 
+    public function getColumnLastOrder(Project $project, IssueColumn $issueColumn): int
+    {
+        $query = $this->columnQuery($project, $issueColumn);
+
+        $query->select('max(issue.columnOrder) as columnOrder');
+
+        return $query->getQuery()->getSingleScalarResult() ?? Issue::DEFAULT_ORDER_SPACE;
+    }
+
     /**
      * @param int[] $issueIds
      * @return array<int, Issue>
@@ -116,7 +133,7 @@ class IssueRepository extends ServiceEntityRepository
 
     public function reorderColumn(Project $project, IssueColumn $column): void
     {
-        $query = $this->columnQuery($project, $column)->getQuery();
+        $query = $this->orderedColumnQuery($project, $column)->getQuery();
 
         $batchSize = 20;
         $i = 1;

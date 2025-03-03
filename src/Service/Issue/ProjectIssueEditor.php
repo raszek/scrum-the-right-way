@@ -66,7 +66,7 @@ readonly class ProjectIssueEditor
 
     private function getNewIssueColumnOrder(IssueColumn $column): int
     {
-        $query = $this->issueRepository->columnQuery($this->project, $column);
+        $query = $this->issueRepository->orderedColumnQuery($this->project, $column);
 
         $query->setMaxResults(1);
 
