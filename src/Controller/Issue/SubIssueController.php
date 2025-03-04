@@ -37,9 +37,12 @@ class SubIssueController extends CommonIssueController
 
         $editor = $this->subIssueEditorFactory->create($issue, $this->getLoggedInUser());
 
-        $editor->add($form);
+        $createdSubIssue = $editor->add($form);
 
-        return new Response(status: 201);
+        return $this->render('issue/sub_issue.html.twig', [
+            'subIssue' => $createdSubIssue,
+            'project' => $project,
+        ], new Response(status: 201));
     }
 
 }

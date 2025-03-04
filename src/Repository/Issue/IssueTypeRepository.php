@@ -23,6 +23,11 @@ class IssueTypeRepository extends ServiceEntityRepository
         return $this->getReference(IssueTypeEnum::Issue->value);
     }
 
+    public function featureType(): IssueType
+    {
+        return $this->getReference(IssueTypeEnum::Feature->value);
+    }
+
     public function subIssueType(): IssueType
     {
         return $this->getReference(IssueTypeEnum::SubIssue->value);

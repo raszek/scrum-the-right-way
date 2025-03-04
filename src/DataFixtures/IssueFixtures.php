@@ -13,7 +13,6 @@ use App\Factory\Issue\IssueThreadMessageFactory;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueTypeRepository;
 use App\Repository\Project\ProjectRepository;
-use App\Repository\Project\ProjectTagRepository;
 use App\Service\Common\RandomService;
 use Carbon\CarbonImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -30,7 +29,6 @@ class IssueFixtures extends Fixture implements DependentFixtureInterface
         private readonly RandomService $randomService,
         private readonly IssueColumnRepository $issueColumnRepository,
         private readonly IssueTypeRepository $issueTypeRepository,
-        private readonly ProjectTagRepository $projectTagRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
@@ -48,39 +46,100 @@ class IssueFixtures extends Fixture implements DependentFixtureInterface
 
     private function loadProjectIssues(Project $project): void
     {
-        $projectMembers = $project->getMembers();
+        foreach (range(1, 75, 3) as $i) {
+            $this->createFeature($project, $i);
+        }
 
+        foreach (range(76, 150) as $i) {
+            $this->createIssue($project, $i);
+        }
+    }
+
+    private function createFeature(Project $project, int $i): void
+    {
         $backlogColumn = $this->issueColumnRepository->backlogColumn();
-        $issueType = $this->issueTypeRepository->issueType();
-        $projectTags = $this->projectTagRepository->findBy([
-            'project' => $project->getId(),
+        $featureType = $this->issueTypeRepository->featureType();
+        $subIssueType = $this->issueTypeRepository->subIssueType();
+
+        /**
+         * @var ProjectMember $randomProjectMember
+         */
+        $randomProjectMember = $this->randomService->randomElement($project->getMembers()->getValues());
+
+        $issue = IssueFactory::createOne([
+            'createdBy' => $randomProjectMember->getUser(),
+            'createdAt' => CarbonImmutable::create(2012, 12, 12, 12, 12)->addWeeks($i),
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'number' => $i,
+            'columnOrder' => $i * 1024,
+            'type' => $featureType,
         ]);
 
-        foreach (range(1, 150) as $i) {
-            /**
-             * @var ProjectMember $randomProjectMember
-             */
-            $randomProjectMember = $this->randomService->randomElement($projectMembers->getValues());
-
-            $issue = IssueFactory::createOne([
+        if ($this->randomService->randomBoolean()) {
+            IssueFactory::createOne([
                 'createdBy' => $randomProjectMember->getUser(),
                 'createdAt' => CarbonImmutable::create(2012, 12, 12, 12, 12)->addWeeks($i),
                 'project' => $project,
                 'issueColumn' => $backlogColumn,
-                'number' => $i,
-                'columnOrder' => $i * 1024,
-                'type' => $issueType
+                'number' => $i + 1,
+                'columnOrder' => ($i + 1) * 1024,
+                'type' => $subIssueType,
+                'parent' => $issue,
             ]);
-
-            IssueObserverFactory::createOne([
-                'projectMember' => $randomProjectMember,
-                'issue' => $issue,
-            ]);
-
-            $this->generateRandomThreadMessage($project, $issue);
-
-            $this->addTags($issue, $projectTags);
         }
+
+        if ($this->randomService->randomBoolean()) {
+            IssueFactory::createOne([
+                'createdBy' => $randomProjectMember->getUser(),
+                'createdAt' => CarbonImmutable::create(2012, 12, 12, 12, 12)->addWeeks($i),
+                'project' => $project,
+                'issueColumn' => $backlogColumn,
+                'number' => $i + 2,
+                'columnOrder' => ($i + 2) * 1024,
+                'type' => $subIssueType,
+                'parent' => $issue,
+            ]);
+        }
+
+        IssueObserverFactory::createOne([
+            'projectMember' => $randomProjectMember,
+            'issue' => $issue,
+        ]);
+
+        $this->generateRandomThreadMessage($project, $issue);
+
+        $this->addTags($issue, $project->getTags()->getValues());
+    }
+
+    private function createIssue(Project $project, int $i): void
+    {
+        $backlogColumn = $this->issueColumnRepository->backlogColumn();
+        $issueType = $this->issueTypeRepository->issueType();
+
+        /**
+         * @var ProjectMember $randomProjectMember
+         */
+        $randomProjectMember = $this->randomService->randomElement($project->getMembers()->getValues());
+
+        $issue = IssueFactory::createOne([
+            'createdBy' => $randomProjectMember->getUser(),
+            'createdAt' => CarbonImmutable::create(2012, 12, 12, 12, 12)->addWeeks($i),
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'number' => $i,
+            'columnOrder' => $i * 1024,
+            'type' => $issueType,
+        ]);
+
+        IssueObserverFactory::createOne([
+            'projectMember' => $randomProjectMember,
+            'issue' => $issue,
+        ]);
+
+        $this->generateRandomThreadMessage($project, $issue);
+
+        $this->addTags($issue, $project->getTags()->getValues());
     }
 
     private function generateRandomThreadMessage(Project $project, Issue $issue): void

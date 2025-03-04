@@ -1,22 +1,54 @@
-<div class="card mb-3">
+<div class="card mb-3"
+     data-controller="issue--sub-issue"
+     data-issue--sub-issue-add-url-value="{{ path('app_project_issue_add_sub_issue', {
+         id: project.id,
+         issueCode: issue.code
+     }) }}"
+>
     <div class="card-header">
         Sub issues
     </div>
     <div class="card-body">
-        <p class="mb-0 {{ subIssues | length < 1 ? '' : 'd-none' }}">
+        {% if is_granted('ADD_ISSUE_SUB_ISSUE', project) %}
+            <button class="btn btn-primary"
+                    data-action="issue--sub-issue#showForm"
+                    data-issue--sub-issue-target="button"
+            >
+                Add
+            </button>
+
+            <form data-issue--sub-issue-target="form"
+                  data-action="issue--sub-issue#addSubIssue"
+                  class="d-none d-flex mt-1"
+            >
+                <input type="text" name="title" class="form-control">
+                <button class="btn btn-danger ms-2"
+                        data-action="issue--sub-issue#hideForm"
+                        type="button"
+                >
+                    <i class="bi bi-x"></i>
+                </button>
+            </form>
+        {% endif %}
+        <p class="mt-2 {{ subIssues | length < 1 ? '' : 'd-none' }}">
             Empty
         </p>
-        <div class="list-group">
+        <div class="list-group mt-2"
+             data-issue--sub-issue-target="list"
+        >
             {% for subIssue in subIssues %}
-                <li>
-                    <a href="{{ path('app_project_issue_view', {
-                        id: project.id,
-                        issueCode: subIssue.code
-                    }) }}">
-                        {{ subIssue.prefixCodeTitle }}
-                    </a>
-                </li>
+                {% include 'issue/sub_issue.html.twig' with {
+                    subIssue: subIssue
+                } %}
             {% endfor %}
         </div>
+        <template data-issue--sub-issue-target="template">
+            <li class="list-group-item"
+                data-issue--sub-issue-target="item"
+                data-issue--sub-issue-code-param=""
+            >
+
+            </li>
+        </template>
     </div>
 </div>

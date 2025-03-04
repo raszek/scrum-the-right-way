@@ -1,0 +1,11 @@
+<li class="list-group-item"
+    data-issue--sub-issue-target="item"
+    data-issue--sub-issue-code-param="{{ subIssue.code }}"
+>
+    <a href="{{ path('app_project_issue_view', {
+        id: project.id,
+        issueCode: subIssue.code
+    }) }}">
+        {{ subIssue.prefixCodeTitle }}
+    </a>
+</li>

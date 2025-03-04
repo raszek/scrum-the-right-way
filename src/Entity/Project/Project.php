@@ -49,6 +49,9 @@ class Project
     #[ORM\OneToMany(targetEntity: Sprint::class, mappedBy: 'project')]
     private Collection $sprints;
 
+    #[ORM\OneToMany(targetEntity: ProjectTag::class, mappedBy: 'project')]
+    private Collection $tags;
+
     public function __construct(
         string $name,
         string $code,
@@ -163,6 +166,14 @@ class Project
     public function getSprints(): Collection
     {
         return $this->sprints;
+    }
+
+    /**
+     * @return Collection<ProjectTag>
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
     }
 
 }

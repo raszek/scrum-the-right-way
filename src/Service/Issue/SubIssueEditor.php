@@ -27,7 +27,7 @@ readonly class SubIssueEditor
     ) {
     }
 
-    public function add(SubIssueForm $subIssueForm): void
+    public function add(SubIssueForm $subIssueForm): Issue
     {
         if (!$this->issue->isFeature()) {
             throw new RuntimeException('Non feature issue cannot have sub issues.');
@@ -54,6 +54,8 @@ readonly class SubIssueEditor
         $this->entityManager->persist($subIssue);
 
         $this->entityManager->flush();
+
+        return $subIssue;
     }
 
     private function getSubIssueColumn(): IssueColumn
