@@ -8,6 +8,7 @@ use App\Entity\Issue\IssueDependency;
 use App\Entity\Issue\IssueType;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
+use App\Enum\Issue\IssueColumnEnum;
 use App\Form\Issue\IssueSearchForm;
 use App\Helper\ArrayHelper;
 use App\Repository\QueryBuilder\QueryBuilder;
@@ -23,7 +24,8 @@ class IssueRepository extends ServiceEntityRepository
 {
     public function __construct(
         ManagerRegistry $registry,
-        private readonly IssueColumnRepository $issueColumnRepository
+        private readonly IssueColumnRepository $issueColumnRepository,
+        private readonly IssueTypeRepository $issueTypeRepository,
     ) {
         parent::__construct($registry, Issue::class);
     }
@@ -51,7 +53,12 @@ class IssueRepository extends ServiceEntityRepository
 
     public function backlogQuery(Project $project): QueryBuilder
     {
-        return $this->orderedColumnQuery($project, $this->issueColumnRepository->backlogColumn());
+        $queryBuilder = $this->orderedColumnQuery($project, $this->issueColumnRepository->backlogColumn());
+
+        $queryBuilder->andWhere('issue.type <> :type');
+        $queryBuilder->setParameter('type', $this->issueTypeRepository->subIssueType());
+
+        return $queryBuilder;
     }
 
     public function getNextIssueNumber(Project $project): int
@@ -91,6 +98,26 @@ class IssueRepository extends ServiceEntityRepository
         $queryBuilder->sqidParameter('project', $project->getId());
 
         return $queryBuilder;
+    }
+
+    public function subIssues(Issue $issue): array
+    {
+        if (!$issue->hasEnabledSubIssues()) {
+            return [];
+        }
+
+        $queryBuilder = $this->createQueryBuilder('issue');
+
+        $queryBuilder
+            ->where('issue.project = :project')
+            ->andWhere('issue.parent = :parent')
+            ->andWhere('issue.issueColumn <> :column');
+
+        $queryBuilder->sqidParameter('project', $issue->getProject()->getId());
+        $queryBuilder->setParameter('parent', $issue->getId());
+        $queryBuilder->setParameter('column', IssueColumnEnum::Archived->value);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function issueQuery(Project $project, QueryParams $params): QueryBuilder

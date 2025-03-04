@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use RuntimeException;
 
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
 #[ORM\UniqueConstraint(columns: ['project_id', 'number'])]
@@ -124,7 +125,8 @@ class Issue
         IssueType         $type,
         Project           $project,
         User              $createdBy,
-        DateTimeImmutable $createdAt
+        DateTimeImmutable $createdAt,
+        ?Issue $parent = null,
     ) {
 
         $this->number = $number;
@@ -135,7 +137,8 @@ class Issue
         $this->createdBy = $createdBy;
         $this->createdAt = $createdAt;
         $this->updatedAt = $createdAt;
-        $this->type = $type;
+        $this->parent = $parent;
+        $this->setType($type);
         $this->descriptionHistories = new ArrayCollection();
         $this->attachments = new ArrayCollection();
         $this->issueObservers = new ArrayCollection();
@@ -301,9 +304,18 @@ class Issue
         return $this->columnOrder;
     }
 
-    public function getType(): ?IssueType
+    public function getType(): IssueType
     {
         return $this->type;
+    }
+
+    public function setType(IssueType $type): void
+    {
+        if ($type->isSubIssue() && $this->parent === null) {
+            throw new RuntimeException('Invalid sub issue type. Sub issue must have parent issue.');
+        }
+
+        $this->type = $type;
     }
 
     public function getStoryPoints(): ?int
@@ -433,13 +445,13 @@ class Issue
         return $this->parent;
     }
 
-    public function setParent(?Issue $parent): void
-    {
-        $this->parent = $parent;
-    }
-
     public function isFeature(): bool
     {
         return $this->getType()->isFeature();
+    }
+
+    public function hasEnabledSubIssues(): bool
+    {
+        return $this->isFeature();
     }
 }

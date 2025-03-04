@@ -4,7 +4,6 @@ namespace App\Controller\Issue;
 
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectMember;
-use App\Exception\Assignee\CannotSetAssigneeException;
 use App\Exception\Issue\CannotSetIssueTitleException;
 use App\Exception\Issue\CannotSetStoryPointsException;
 use App\Exception\Issue\OutOfBoundPositionException;
@@ -90,11 +89,7 @@ class SingleIssueController extends CommonIssueController
         $issue = $this->findIssue($issueCode, $project);
         $issueEditor = $this->issueAssigneeEditorFactory->create($issue, $this->getLoggedInUser());
 
-        try {
-            $issueEditor->setAssignee($this->findProjectMember($request->get('projectMemberId'), $project));
-        } catch (CannotSetAssigneeException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        }
+        $issueEditor->setAssignee($this->findProjectMember($request->get('projectMemberId'), $project));
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }

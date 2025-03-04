@@ -1,0 +1,22 @@
+<div class="card mb-3">
+    <div class="card-header">
+        Sub issues
+    </div>
+    <div class="card-body">
+        <p class="mb-0 {{ subIssues | length < 1 ? '' : 'd-none' }}">
+            Empty
+        </p>
+        <div class="list-group">
+            {% for subIssue in subIssues %}
+                <li>
+                    <a href="{{ path('app_project_issue_view', {
+                        id: project.id,
+                        issueCode: subIssue.code
+                    }) }}">
+                        {{ subIssue.prefixCodeTitle }}
+                    </a>
+                </li>
+            {% endfor %}
+        </div>
+    </div>
+</div>

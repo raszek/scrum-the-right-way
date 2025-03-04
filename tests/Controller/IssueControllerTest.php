@@ -62,7 +62,66 @@ class IssueControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function only_project_members_can_access_project_kanban()
+    public function only_features_and_issues_are_visible_on_backlog()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $user = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne();
+
+        ProjectMemberFactory::createOne([
+            'user' => $user,
+            'project' => $project
+        ]);
+
+        $backlogColumn = IssueColumnFactory::backlogColumn();
+
+        $featureType = IssueTypeFactory::featureType();
+
+        $issueType = IssueTypeFactory::issueType();
+
+        $subIssueType = IssueTypeFactory::subIssueType();
+
+        $feature = IssueFactory::createOne([
+            'title' => 'First issue',
+            'number' => 1,
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $featureType,
+        ]);
+
+        IssueFactory::createOne([
+            'title' => 'Sub issue',
+            'number' => 2,
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $subIssueType,
+            'parent' => $feature,
+        ]);
+
+        IssueFactory::createOne([
+            'title' => 'Second issue',
+            'number' => 3,
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $issueType,
+        ]);
+
+        $this->loginAsUser($user);
+
+        $this->goToPage('/projects/' . $project->getId() . '/backlog');
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseHasText('First issue');
+        $this->assertResponseHasText('Second issue');
+        $this->assertResponseHasNoText('Sub issue');
+    }
+
+    /** @test */
+    public function only_project_members_can_access_project_backlog()
     {
         $client = static::createClient();
         $client->followRedirects();
@@ -73,7 +132,7 @@ class IssueControllerTest extends WebTestCase
 
         $this->loginAsUser($user);
 
-        $this->goToPage('/projects/' . $project->getId() . '/kanban');
+        $this->goToPage('/projects/' . $project->getId() . '/backlog');
 
         $this->assertResponseStatusCodeSame(403);
     }
@@ -235,6 +294,65 @@ class IssueControllerTest extends WebTestCase
     }
 
     /** @test */
+    public function project_member_cannot_see_archived_sub_issues()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $user = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        ProjectMemberFactory::createOne([
+            'user' => $user,
+            'project' => $project
+        ]);
+
+        $backlogColumn = IssueColumnFactory::backlogColumn();
+
+        $archivedColumn = IssueColumnFactory::archivedColumn();
+
+        $featureType = IssueTypeFactory::featureType();
+
+        $subIssueType = IssueTypeFactory::subIssueType();
+
+        $feature = IssueFactory::createOne([
+            'title' => 'First task',
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $featureType,
+            'number' => 1,
+        ]);
+
+        IssueFactory::createOne([
+            'title' => 'Sub issue visible',
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $subIssueType,
+            'number' => 2,
+            'parent' => $feature
+        ]);
+
+        IssueFactory::createOne([
+            'title' => 'Sub issue archived',
+            'project' => $project,
+            'issueColumn' => $archivedColumn,
+            'type' => $subIssueType,
+            'number' => 3,
+            'parent' => $feature
+        ]);
+
+        $this->loginAsUser($user);
+
+        $this->goToPage('/projects/' . $project->getId() . '/issues/SCP-1');
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseHasText('Sub issue visible');
+        $this->assertResponseHasNoText('Sub issue archived');
+    }
 
     private function issueRepository(): IssueRepository
     {

@@ -10,6 +10,9 @@
                 <div class="col-md-9">
                     {% include 'issue/title.html.twig' %}
                     {% include 'issue/description.html.twig' %}
+                    {% if issue.hasEnabledSubIssues %}
+                        {% include 'issue/sub_issues.html.twig' %}
+                    {% endif %}
                     {% include 'attachment/attachments.html.twig' %}
                     {% include 'issue/issue_dependencies.html.twig' %}
                     {% include 'issue/issue_thread_messages.html.twig' %}

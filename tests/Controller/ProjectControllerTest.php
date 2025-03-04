@@ -102,7 +102,7 @@ class ProjectControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertResponseHasText('project one');
-        $this->assertResponseHasNotText('project two');
+        $this->assertResponseHasNoText('project two');
     }
 
     private function projectRepository(): ProjectRepository

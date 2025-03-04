@@ -90,7 +90,7 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         );
     }
 
-    public function assertResponseHasNotText(string $text): void
+    public function assertResponseHasNoText(string $text): void
     {
         $this->assertFalse(
             $this->doesResponseHasText($text),

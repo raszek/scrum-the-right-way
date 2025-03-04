@@ -136,6 +136,8 @@ class IssueController extends CommonIssueController
 
         $dependencies = $issueDependencyRepository->issueDependencies($issue);
 
+        $subIssues = $this->issueRepository->subIssues($issue);
+
         $loggedInMember = $project->member($this->getLoggedInUser());
 
         return $this->render('issue/view.html.twig', [
@@ -157,6 +159,7 @@ class IssueController extends CommonIssueController
             'messages' => $this->issueThreadMessageRepository->getIssueMessages($issue),
             'dependencies' => $dependencies,
             'isActivitiesVisible' => $this->issueSessionSettings->isActivitiesVisible() ? 'true' : 'false',
+            'subIssues' => $subIssues
         ]);
     }
 

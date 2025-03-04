@@ -66,7 +66,7 @@ class ProjectMemberControllerTest extends WebTestCase
 
         $this->assertResponseHasText('Adminfirstname Adminlastname');
         $this->assertResponseHasText('Analyticfirstname Analyticlastname');
-        $this->assertResponseHasNotText('Developerfirstname Developerlastname');
+        $this->assertResponseHasNoText('Developerfirstname Developerlastname');
     }
 
     /** @test */

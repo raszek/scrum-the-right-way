@@ -48,9 +48,8 @@ readonly class SubIssueEditor
             project: $this->issue->getProject(),
             createdBy: $this->user,
             createdAt: $this->clock->now(),
+            parent: $this->issue
         );
-
-        $subIssue->setParent($this->issue);
 
         $this->entityManager->persist($subIssue);
 

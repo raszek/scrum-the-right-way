@@ -38,4 +38,9 @@ class IssueType
     {
         return $this->getId() === IssueTypeEnum::Feature->value;
     }
+
+    public function isSubIssue(): bool
+    {
+        return $this->getId() === IssueTypeEnum::SubIssue->value;
+    }
 }
