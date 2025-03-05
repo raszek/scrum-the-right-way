@@ -99,6 +99,7 @@ class IssueControllerTest extends WebTestCase
             'issueColumn' => $backlogColumn,
             'type' => $subIssueType,
             'parent' => $feature,
+            'issueOrder' => 1
         ]);
 
         IssueFactory::createOne([
@@ -332,7 +333,8 @@ class IssueControllerTest extends WebTestCase
             'issueColumn' => $backlogColumn,
             'type' => $subIssueType,
             'number' => 2,
-            'parent' => $feature
+            'parent' => $feature,
+            'issueOrder' => 1
         ]);
 
         IssueFactory::createOne([
@@ -341,7 +343,8 @@ class IssueControllerTest extends WebTestCase
             'issueColumn' => $archivedColumn,
             'type' => $subIssueType,
             'number' => 3,
-            'parent' => $feature
+            'parent' => $feature,
+            'issueOrder' => 2
         ]);
 
         $this->loginAsUser($user);

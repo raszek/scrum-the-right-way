@@ -10,7 +10,6 @@ use App\Factory\Project\ProjectMemberFactory;
 use App\Factory\Project\ProjectMemberRoleFactory;
 use App\Factory\Project\ProjectRoleFactory;
 use App\Factory\UserFactory;
-use App\Helper\JsonHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Tests\Controller\WebTestCase;
 

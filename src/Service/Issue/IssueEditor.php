@@ -65,6 +65,7 @@ readonly class IssueEditor
 
         $this->entityManager->flush();
     }
+
     public function updateTitle(string $title): void
     {
         $unicodeTitle = new UnicodeString($title);
@@ -181,5 +182,4 @@ readonly class IssueEditor
 
         return ($firstOrder + $secondOrder) / 2;
     }
-
 }

@@ -16,6 +16,10 @@ export default class extends Controller {
         'item'
     ];
 
+    connect() {
+        this.resetForm();
+    }
+
     async addSubIssue(e) {
         e.preventDefault();
         const itemId = randomString(6);
@@ -31,14 +35,16 @@ export default class extends Controller {
 
         const item = this.findItem(itemId);
 
+        this.hideForm();
+
         try {
             item.outerHTML = await post(this.addUrlValue, formData);
         } catch (e) {
             item.textContent = 'Error';
         }
 
-        this.hideForm();
     }
+
 
     findItem(itemId) {
         for (const itemTarget of this.itemTargets) {
@@ -50,6 +56,9 @@ export default class extends Controller {
         return undefined;
     }
 
+    resetForm() {
+        this.formTarget.reset();
+    }
 
     showForm() {
         this.formTarget.classList.remove('d-none');
@@ -59,5 +68,6 @@ export default class extends Controller {
     hideForm() {
         this.formTarget.classList.add('d-none');
         this.buttonTarget.classList.remove('d-none');
+        this.resetForm();
     }
 }

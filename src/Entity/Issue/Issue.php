@@ -45,6 +45,9 @@ class Issue
     #[ORM\Column()]
     private int $columnOrder;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $issueOrder = null;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -127,6 +130,7 @@ class Issue
         User              $createdBy,
         DateTimeImmutable $createdAt,
         ?Issue $parent = null,
+        ?int $issueOrder = null
     ) {
 
         $this->number = $number;
@@ -139,6 +143,7 @@ class Issue
         $this->updatedAt = $createdAt;
         $this->parent = $parent;
         $this->setType($type);
+        $this->setIssueOrder($issueOrder);
         $this->descriptionHistories = new ArrayCollection();
         $this->attachments = new ArrayCollection();
         $this->issueObservers = new ArrayCollection();
@@ -450,8 +455,27 @@ class Issue
         return $this->getType()->isFeature();
     }
 
+    public function isSubIssue(): bool
+    {
+        return $this->getType()->isSubIssue();
+    }
+
     public function hasEnabledSubIssues(): bool
     {
         return $this->isFeature();
+    }
+
+    public function getIssueOrder(): ?int
+    {
+        return $this->issueOrder;
+    }
+
+    public function setIssueOrder(?int $issueOrder): void
+    {
+        if ($this->type->isSubIssue() && $issueOrder === null) {
+            throw new RuntimeException('Sub issues must have issue order.');
+        }
+
+        $this->issueOrder = $issueOrder;
     }
 }

@@ -48,7 +48,8 @@ readonly class SubIssueEditor
             project: $this->issue->getProject(),
             createdBy: $this->user,
             createdAt: $this->clock->now(),
-            parent: $this->issue
+            parent: $this->issue,
+            issueOrder: $this->getIssueOrder()
         );
 
         $this->entityManager->persist($subIssue);
@@ -56,6 +57,24 @@ readonly class SubIssueEditor
         $this->entityManager->flush();
 
         return $subIssue;
+    }
+
+    /**
+     * Sub issue first equals 1 than it means there is no space to put sub issue at first position
+     * and we have to reorder whole feature to find place
+     * @return int
+     */
+    private function getIssueOrder(): int
+    {
+        $subIssueFirstOrder = $this->issueRepository->getSubIssueFirstOrder($this->issue);
+
+        if ($subIssueFirstOrder <= 1) {
+            $this->issueRepository->reorderFeature($this->issue);
+
+            return floor(Issue::DEFAULT_ORDER_SPACE / 2);
+        }
+
+        return floor($subIssueFirstOrder / 2);
     }
 
     private function getSubIssueColumn(): IssueColumn

@@ -145,6 +145,17 @@ class IssueRepository extends ServiceEntityRepository
         return $query->getQuery()->getSingleScalarResult() ?? Issue::DEFAULT_ORDER_SPACE;
     }
 
+    public function getSubIssueFirstOrder(Issue $issue): int
+    {
+        $query = $this->createQueryBuilder('issue')
+            ->andWhere('issue.parent = :parent')
+            ->setParameter('parent', $issue);
+
+        $query->select('min(issue.issueOrder)');
+
+        return $query->getQuery()->getSingleScalarResult() ?? Issue::DEFAULT_ORDER_SPACE;
+    }
+
     /**
      * @param int[] $issueIds
      * @return array<int, Issue>
@@ -169,6 +180,37 @@ class IssueRepository extends ServiceEntityRepository
          */
         foreach ($query->toIterable() as $issue) {
             $issue->setColumnOrder($i * Issue::DEFAULT_ORDER_SPACE);
+
+            if (($i % $batchSize) === 0) {
+                $this->getEntityManager()->flush();
+                $this->getEntityManager()->clear();
+            }
+            $i++;
+        }
+
+        $this->getEntityManager()->flush();
+    }
+
+    public function reorderFeature(Issue $issue): void
+    {
+        $queryBuilder = $this->createQueryBuilder('issue');
+
+        $query = $queryBuilder
+            ->where('issue.parent = :parent')
+            ->setParameter('parent', $issue->getId())
+            ->andWhere('issue.type = :type')
+            ->setParameter('type', $this->issueTypeRepository->subIssueType())
+            ->getQuery();
+
+
+        $batchSize = 20;
+        $i = 1;
+
+        /**
+         * @var Issue $issue
+         */
+        foreach ($query->toIterable() as $issue) {
+            $issue->setIssueOrder($i * Issue::DEFAULT_ORDER_SPACE);
 
             if (($i % $batchSize) === 0) {
                 $this->getEntityManager()->flush();
