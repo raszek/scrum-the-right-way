@@ -100,7 +100,7 @@ class IssueRepository extends ServiceEntityRepository
         return $queryBuilder;
     }
 
-    public function subIssues(Issue $issue): array
+    public function featureSubIssues(Issue $issue): array
     {
         if (!$issue->hasEnabledSubIssues()) {
             return [];
@@ -111,7 +111,8 @@ class IssueRepository extends ServiceEntityRepository
         $queryBuilder
             ->where('issue.project = :project')
             ->andWhere('issue.parent = :parent')
-            ->andWhere('issue.issueColumn <> :column');
+            ->andWhere('issue.issueColumn <> :column')
+            ->orderBy('issue.issueOrder', 'ASC');
 
         $queryBuilder->sqidParameter('project', $issue->getProject()->getId());
         $queryBuilder->setParameter('parent', $issue->getId());

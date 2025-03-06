@@ -30,7 +30,7 @@ class Sprint
     #[ORM\Column]
     private bool $isCurrent;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'sprints')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
 

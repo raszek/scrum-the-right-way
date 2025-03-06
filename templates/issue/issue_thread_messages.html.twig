@@ -38,7 +38,7 @@
                     >
                        {{ message.issueTitle }}
                     </a>
-                    {% if is_granted('ISSUE_ADD_THREAD_MESSAGE') %}
+                    {% if is_granted('ISSUE_REMOVE_THREAD_MESSAGE', project) %}
                         <button class="btn btn-danger"
                                 data-action="confirm-dialog#open"
                                 data-confirm-dialog-url-param="{{ message.id }}"

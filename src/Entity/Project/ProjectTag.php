@@ -28,7 +28,7 @@ class ProjectTag
     #[ORM\Column(length: 255)]
     private string $backgroundColor;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'tags')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
 

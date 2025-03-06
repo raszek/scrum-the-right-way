@@ -136,7 +136,7 @@ class IssueController extends CommonIssueController
 
         $dependencies = $issueDependencyRepository->issueDependencies($issue);
 
-        $subIssues = $this->issueRepository->subIssues($issue);
+        $subIssues = $this->issueRepository->featureSubIssues($issue);
 
         $loggedInMember = $project->member($this->getLoggedInUser());
 

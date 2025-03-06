@@ -1,9 +1,10 @@
 <div class="card mb-3"
-     data-controller="issue--sub-issue"
+     data-controller="issue--sub-issue confirm-dialog"
      data-issue--sub-issue-add-url-value="{{ path('app_project_issue_add_sub_issue', {
          id: project.id,
          issueCode: issue.code
      }) }}"
+     data-confirm-dialog-attribute-name-value="data-issue--sub-issue-id-param"
 >
     <div class="card-header">
         Sub issues
@@ -47,8 +48,26 @@
                 data-issue--sub-issue-target="item"
                 data-issue--sub-issue-code-param=""
             >
-
             </li>
         </template>
     </div>
+    <dialog class="rounded-3" data-confirm-dialog-target="dialog">
+        <div class="d-flex flex-column m-4">
+            <p>Do you really want to archive this sub issue?</p>
+            <div class="d-flex justify-content-end">
+                <button data-action="confirm-dialog#close"
+                        class="btn btn-info"
+                >
+                    No
+                </button>
+                <button data-action="issue--sub-issue#removeSubIssue confirm-dialog#close"
+                        data-issue--sub-issue-id-param=""
+                        data-confirm-dialog-target="form"
+                        class="btn btn-danger ms-2"
+                >
+                    Yes
+                </button>
+            </div>
+        </div>
+    </dialog>
 </div>

@@ -74,7 +74,7 @@ class Issue
     #[ORM\JoinColumn(nullable: true)]
     private ?ProjectMember $assignee = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'subIssues')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Issue $parent = null;
 

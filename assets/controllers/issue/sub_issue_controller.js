@@ -5,7 +5,7 @@ import {randomString} from 'util';
 export default class extends Controller {
 
     static values = {
-        addUrl: String
+        addUrl: String,
     };
 
     static targets = [
@@ -42,7 +42,22 @@ export default class extends Controller {
         } catch (e) {
             item.textContent = 'Error';
         }
+    }
 
+    async removeSubIssue(e) {
+        const subIssueCode = e.params.id;
+
+        const item = this.findItem(subIssueCode);
+
+        if (!item) {
+            return;
+        }
+
+        const removeUrl = item.getAttribute('data-issue--sub-issue-remove-url-param');
+
+        item.remove();
+
+        return post(removeUrl);
     }
 
 

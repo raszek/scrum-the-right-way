@@ -7,10 +7,6 @@ use App\Entity\Issue\Issue;
 use App\Entity\User\User;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
-use App\Factory\Project\ProjectFactory;
-use App\Factory\Project\ProjectMemberFactory;
-use App\Factory\Project\ProjectMemberRoleFactory;
-use App\Factory\Project\ProjectRoleFactory;
 use App\Factory\UserFactory;
 use App\Form\Issue\SubIssueForm;
 use App\Repository\Issue\IssueRepository;
@@ -27,7 +23,7 @@ class SubIssueEditorTest extends KernelTestCase
     /** @test */
     public function when_there_is_no_space_left_for_first_sub_issue_every_feature_issue_should_be_reordered()
     {
-        $developer = UserFactory::createOne();
+        $user = UserFactory::createOne();
 
         $featureType = IssueTypeFactory::featureType();
 
@@ -52,8 +48,7 @@ class SubIssueEditorTest extends KernelTestCase
             'issueOrder' => 64
         ]);
 
-
-        $editor = $this->create($feature->_real(), $developer->_real());
+        $editor = $this->create($feature->_real(), $user->_real());
 
         $editor->add(new SubIssueForm(
             title: 'Some new title'
