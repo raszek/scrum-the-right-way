@@ -100,12 +100,8 @@ class IssueRepository extends ServiceEntityRepository
         return $queryBuilder;
     }
 
-    public function featureSubIssues(Issue $issue): array
+    public function featureIssueQuery(Issue $issue): QueryBuilder
     {
-        if (!$issue->hasEnabledSubIssues()) {
-            return [];
-        }
-
         $queryBuilder = $this->createQueryBuilder('issue');
 
         $queryBuilder
@@ -118,7 +114,16 @@ class IssueRepository extends ServiceEntityRepository
         $queryBuilder->setParameter('parent', $issue->getId());
         $queryBuilder->setParameter('column', IssueColumnEnum::Archived->value);
 
-        return $queryBuilder->getQuery()->getResult();
+        return $queryBuilder;
+    }
+
+    public function featureSubIssues(Issue $issue): array
+    {
+        if (!$issue->hasEnabledSubIssues()) {
+            return [];
+        }
+
+        return $this->featureIssueQuery($issue)->getQuery()->getResult();
     }
 
     public function issueQuery(Project $project, QueryParams $params): QueryBuilder

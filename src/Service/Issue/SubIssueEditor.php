@@ -3,86 +3,74 @@
 namespace App\Service\Issue;
 
 use App\Entity\Issue\Issue;
-use App\Entity\Issue\IssueColumn;
-use App\Entity\User\User;
-use App\Form\Issue\SubIssueForm;
-use App\Repository\Issue\IssueColumnRepository;
+use App\Exception\Issue\NoOrderSpaceException;
+use App\Exception\Issue\OutOfBoundPositionException;
 use App\Repository\Issue\IssueRepository;
-use App\Repository\Issue\IssueTypeRepository;
-use App\Service\Common\ClockInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 
 readonly class SubIssueEditor
 {
 
     public function __construct(
         private Issue $issue,
-        private User $user,
-        private EntityManagerInterface $entityManager,
         private IssueRepository $issueRepository,
-        private IssueColumnRepository $issueColumnRepository,
-        private IssueTypeRepository $issueTypeRepository,
-        private ClockInterface $clock,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
-    public function add(SubIssueForm $subIssueForm): Issue
+    /**
+     * @param int $position
+     * @return void
+     * @throws OutOfBoundPositionException
+     */
+    public function setPosition(int $position): void
     {
-        if (!$this->issue->isFeature()) {
-            throw new RuntimeException('Non feature issue cannot have sub issues.');
+        $query = $this->issueRepository->featureIssueQuery($this->issue->getParent());
+        $query->andWhere('issue.id <> :issueId');
+        $query->setParameter('issueId', $this->issue->getId());
+
+        $isFirstPosition = $position <= 1;
+        if ($isFirstPosition) {
+            $query->setMaxResults(1);
+        } else {
+            $query->setFirstResult($position - 2);
+            $query->setMaxResults(2);
         }
 
-        $nextIssueNumber = $this->issueRepository->getNextIssueNumber($this->issue->getProject());
+        $issues = $query->getQuery()->getResult();
 
-        $subIssueColumn = $this->getSubIssueColumn();
-
-        $lastColumnOrder = $this->issueRepository->getColumnLastOrder($this->issue->getProject(), $subIssueColumn);
-
-        $subIssue = new Issue(
-            number: $nextIssueNumber,
-            title: $subIssueForm->title,
-            columnOrder: $lastColumnOrder,
-            issueColumn: $subIssueColumn,
-            type: $this->issueTypeRepository->subIssueType(),
-            project: $this->issue->getProject(),
-            createdBy: $this->user,
-            createdAt: $this->clock->now(),
-            parent: $this->issue,
-            issueOrder: $this->getIssueOrder()
-        );
-
-        $this->entityManager->persist($subIssue);
+        try {
+            $order = $this->calculateOrder($issues, $isFirstPosition);
+            $this->issue->setIssueOrder($order);
+        } catch (NoOrderSpaceException) {
+            $this->issueRepository->reorderFeature($this->issue->getParent());
+            $this->setPosition($position);
+        }
 
         $this->entityManager->flush();
-
-        return $subIssue;
     }
 
     /**
-     * Sub issue first equals 1 than it means there is no space to put sub issue at first position
-     * and we have to reorder whole feature to find place
+     * @param Issue[] $issues
+     * @param bool $isFirstPosition
      * @return int
+     * @throws NoOrderSpaceException
+     * @throws OutOfBoundPositionException
      */
-    private function getIssueOrder(): int
+    public static function calculateOrder(array $issues, bool $isFirstPosition): int
     {
-        $subIssueFirstOrder = $this->issueRepository->getSubIssueFirstOrder($this->issue);
-
-        if ($subIssueFirstOrder <= 1) {
-            $this->issueRepository->reorderFeature($this->issue);
-
-            return floor(Issue::DEFAULT_ORDER_SPACE / 2);
+        if (count($issues) === 0) {
+            throw new OutOfBoundPositionException('Position number is bigger than issue count in the column');
         }
 
-        return floor($subIssueFirstOrder / 2);
-    }
-
-    private function getSubIssueColumn(): IssueColumn
-    {
-        if ($this->issue->getIssueColumn()->isBacklog()) {
-            return $this->issueColumnRepository->backlogColumn();
+        if (count($issues) === 1) {
+            if ($isFirstPosition) {
+                return IssueOrderCalculator::findOrderBetween(0, $issues[0]->getIssueOrder());
+            } else {
+                return $issues[0]->getIssueOrder() + Issue::DEFAULT_ORDER_SPACE;
+            }
         }
 
-        return $this->issueColumnRepository->toDoColumn();
+        return IssueOrderCalculator::findOrderBetween($issues[0]->getIssueOrder(), $issues[1]->getIssueOrder());
     }
 }

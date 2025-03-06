@@ -10,12 +10,12 @@ use App\Factory\Issue\IssueTypeFactory;
 use App\Factory\UserFactory;
 use App\Form\Issue\SubIssueForm;
 use App\Repository\Issue\IssueRepository;
-use App\Service\Issue\SubIssueEditor;
-use App\Service\Issue\SubIssueEditorFactory;
+use App\Service\Issue\FeatureEditor;
+use App\Service\Issue\FeatureEditorFactory;
 use App\Tests\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 
-class SubIssueEditorTest extends KernelTestCase
+class FeatureEditorTest extends KernelTestCase
 {
 
     use Factories;
@@ -70,8 +70,8 @@ class SubIssueEditorTest extends KernelTestCase
         return $this->getService(IssueRepository::class);
     }
 
-    private function create(Issue $issue, User $user): SubIssueEditor
+    private function create(Issue $issue, User $user): FeatureEditor
     {
-        return $this->getService(SubIssueEditorFactory::class)->create($issue, $user);
+        return $this->getService(FeatureEditorFactory::class)->create($issue, $user);
     }
 }

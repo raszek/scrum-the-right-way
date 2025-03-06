@@ -157,7 +157,7 @@ readonly class IssueEditor
      * @throws NoOrderSpaceException
      * @throws OutOfBoundPositionException
      */
-    private function calculateOrder(array $issues, bool $isFirstPosition): int
+    public static function calculateOrder(array $issues, bool $isFirstPosition): int
     {
         if (count($issues) === 0) {
             throw new OutOfBoundPositionException('Position number is bigger than issue count in the column');
@@ -165,21 +165,12 @@ readonly class IssueEditor
 
         if (count($issues) === 1) {
             if ($isFirstPosition) {
-                return $this->findOrderBetween(0, $issues[0]->getColumnOrder());
+                return IssueOrderCalculator::findOrderBetween(0, $issues[0]->getColumnOrder());
             } else {
                 return $issues[0]->getColumnOrder() + Issue::DEFAULT_ORDER_SPACE;
             }
         }
 
-        return $this->findOrderBetween($issues[0]->getColumnOrder(), $issues[1]->getColumnOrder());
-    }
-
-    private function findOrderBetween(int $firstOrder, int $secondOrder): int
-    {
-        if (abs($firstOrder - $secondOrder) <= 1) {
-            throw new NoOrderSpaceException('No order space exception');
-        }
-
-        return ($firstOrder + $secondOrder) / 2;
+        return IssueOrderCalculator::findOrderBetween($issues[0]->getColumnOrder(), $issues[1]->getColumnOrder());
     }
 }
