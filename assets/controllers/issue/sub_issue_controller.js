@@ -29,7 +29,7 @@ export default class extends Controller {
         const clone = this.templateTarget.content.cloneNode(true);
 
         clone.firstElementChild.setAttribute('data-issue--sub-issue-code-param', itemId);
-        clone.firstElementChild.innerText = formData.get('title');
+        clone.firstElementChild.prepend(String(formData.get('title')));
 
         this.listTarget.prepend(clone);
 

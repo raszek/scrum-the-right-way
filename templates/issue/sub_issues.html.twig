@@ -46,10 +46,13 @@
             {% endfor %}
         </ul>
         <template data-issue--sub-issue-target="template">
-            <li class="list-group-item"
+            <li class="list-group-item d-flex justify-content-between align-items-center"
                 data-issue--sub-issue-target="item"
                 data-issue--sub-issue-code-param=""
             >
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </li>
         </template>
     </div>
