@@ -6,25 +6,8 @@
     <div class="row mt-3">
         <div class="col-12">
             {% include 'issue/header.html.twig' %}
-            <div class="row mb-3">
-                <div class="col-md-9">
-                    {% include 'issue/title.html.twig' %}
-                    {% include 'issue/description.html.twig' %}
-                    {% if issue.hasEnabledSubIssues %}
-                        {% include 'issue/sub_issues.html.twig' %}
-                    {% endif %}
-                    {% include 'attachment/attachments.html.twig' %}
-                    {% include 'issue/issue_dependencies.html.twig' %}
-                    {% include 'issue/issue_thread_messages.html.twig' %}
-                    {% include 'issue/activities.html.twig' %}
-                </div>
-                <div class="col-md-3">
-                    {% include 'issue/select_assignee.html.twig' %}
-                    {% include 'issue/select_story_points.html.twig' %}
-                    {% include 'issue/select_tags.html.twig' %}
-                    {% include 'issue/observers.html.twig' %}
-                </div>
-            </div>
+
+            {% include 'issue/issue.html.twig' %}
         </div>
     </div>
 {% endblock %}

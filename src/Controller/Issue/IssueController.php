@@ -38,6 +38,8 @@ class IssueController extends CommonIssueController
         private readonly AttachmentRepository $attachmentRepository,
         private readonly IssueThreadMessageRepository $issueThreadMessageRepository,
         private readonly IssueSessionSettings $issueSessionSettings,
+        private readonly ProjectTagRepository $projectTagRepository,
+        private readonly IssueDependencyRepository $issueDependencyRepository
     ) {
         parent::__construct($this->issueRepository);
     }
@@ -122,26 +124,43 @@ class IssueController extends CommonIssueController
         Project $project,
         string $issueCode,
         Request $request,
-        ProjectTagRepository $projectTagRepository,
-        IssueDependencyRepository $issueDependencyRepository
     ): Response
     {
         $this->denyAccessUnlessGranted(IssueVoter::VIEW_ISSUE, $project);
 
         $issue = $this->findIssue($issueCode, $project);
 
+        return $this->render('issue/view.html.twig', $this->getIssueData($issue, $request));
+    }
+
+    #[Route(['/issues/{issueCode}/ajax'], name: 'app_project_issue_view_ajax')]
+    public function viewAjax(
+        Project $project,
+        string $issueCode,
+        Request $request,
+    ): Response
+    {
+        $this->denyAccessUnlessGranted(IssueVoter::VIEW_ISSUE, $project);
+
+        $issue = $this->findIssue($issueCode, $project);
+
+        return $this->render('issue/issue.html.twig', $this->getIssueData($issue, $request));
+    }
+
+    private function getIssueData(Issue $issue, Request $request): array
+    {
         $assignees = $this->projectMemberRepository->issueAssignees($issue);
 
         $attachments = $this->attachmentRepository->issueAttachments($issue);
 
-        $dependencies = $issueDependencyRepository->issueDependencies($issue);
+        $dependencies = $this->issueDependencyRepository->issueDependencies($issue);
 
         $subIssues = $this->issueRepository->featureSubIssues($issue);
 
-        $loggedInMember = $project->member($this->getLoggedInUser());
+        $loggedInMember = $issue->getProject()->member($this->getLoggedInUser());
 
-        return $this->render('issue/view.html.twig', [
-            'project' => $project,
+        return [
+            'project' => $issue->getProject(),
             'issue' => $issue,
             'loggedInMember' => $loggedInMember,
             'previousSite' => $this->getPreviousSite($request),
@@ -155,12 +174,12 @@ class IssueController extends CommonIssueController
                 'maxLength' => ProjectTag::NAME_MAX_LENGTH,
                 'maxItems' => Issue::MAX_TAG_COUNT
             ],
-            'projectTags' => $projectTagRepository->selectedTags($project, $issue),
+            'projectTags' => $this->projectTagRepository->selectedTags($issue->getProject(), $issue),
             'messages' => $this->issueThreadMessageRepository->getIssueMessages($issue),
             'dependencies' => $dependencies,
             'isActivitiesVisible' => $this->issueSessionSettings->isActivitiesVisible() ? 'true' : 'false',
             'subIssues' => $subIssues
-        ]);
+        ];
     }
 
     private function getPreviousSite(Request $request): string
