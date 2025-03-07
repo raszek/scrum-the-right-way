@@ -74,6 +74,7 @@ class SingleIssueVoter extends Voter
             self::UPDATE_ISSUE_TITLE,
             self::UPDATE_ISSUE_DESCRIPTION,
             self::UPDATE_ISSUE_ARCHIVE,
+            self::SORT_ISSUE
         ];
     }
 }

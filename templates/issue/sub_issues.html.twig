@@ -34,15 +34,17 @@
         <p class="mt-2 {{ subIssues | length < 1 ? '' : 'd-none' }}">
             Empty
         </p>
-        <div class="list-group mt-2"
-             data-issue--sub-issue-target="list"
+        <ul class="list-group mt-2"
+            data-issue--sub-issue-target="list"
+            {% if is_granted('SORT_SUB_ISSUE', project) %} data-controller="column-sortable" {% endif %}
+            data-sortable-animation-value="150"
         >
             {% for subIssue in subIssues %}
                 {% include 'issue/sub_issue.html.twig' with {
                     subIssue: subIssue
                 } %}
             {% endfor %}
-        </div>
+        </ul>
         <template data-issue--sub-issue-target="template">
             <li class="list-group-item"
                 data-issue--sub-issue-target="item"

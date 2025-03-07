@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Project\Project;
 use App\Factory\Issue\IssueDependencyFactory;
 use App\Repository\Issue\IssueRepository;
+use App\Repository\Issue\IssueTypeRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Service\Common\RandomService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -17,7 +18,8 @@ class IssueDependencyFixtures extends Fixture implements DependentFixtureInterfa
     public function __construct(
         private readonly IssueRepository $issueRepository,
         private readonly ProjectRepository $projectRepository,
-        private readonly RandomService $randomService
+        private readonly RandomService $randomService,
+        private readonly IssueTypeRepository $issueTypeRepository,
     ) {
     }
 
@@ -34,6 +36,7 @@ class IssueDependencyFixtures extends Fixture implements DependentFixtureInterfa
     {
         $issues = $this->issueRepository->findBy([
             'project' => $project,
+            'type' => $this->issueTypeRepository->issueType()
         ], orderBy: [
             'number' => 'ASC'
         ]);

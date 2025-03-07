@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/projects/{id}/issues/{issueCode}')]
+#[Route('/projects/{id}')]
 class SubIssueController extends CommonIssueController
 {
 
@@ -31,7 +31,7 @@ class SubIssueController extends CommonIssueController
         parent::__construct($this->issueRepository);
     }
 
-    #[Route('/sub-issues', name: 'app_project_issue_add_sub_issue', methods: ['POST'])]
+    #[Route('/issues/{issueCode}/sub-issues', name: 'app_project_issue_add_sub_issue', methods: ['POST'])]
     public function add(Project $project, string $issueCode, Request $request): Response
     {
         $this->denyAccessUnlessGranted(SubIssueVoter::ADD_ISSUE_SUB_ISSUE, $project);
@@ -53,19 +53,17 @@ class SubIssueController extends CommonIssueController
     }
 
     #[Route('/sub-issues/{subIssueCode}/sort', name: 'app_project_issue_sub_issue_sort', methods: ['POST'])]
-    public function sort(Project $project, string $issueCode, string $subIssueCode, Request $request): Response
+    public function sort(Project $project, string $subIssueCode, Request $request): Response
     {
         $this->denyAccessUnlessGranted(SubIssueVoter::SORT_SUB_ISSUE, $project);
 
         $position = $request->get('position');
 
         if (!$position) {
-            throw new UnprocessableEntityHttpException('position parameter is required.');
+            throw new UnprocessableEntityHttpException('Position parameter is required.');
         }
 
-        $issue = $this->findIssue($issueCode, $project);
-
-        $subIssue = $this->findSubIssue($issue, $subIssueCode, $project);
+        $subIssue = $this->findSubIssue($subIssueCode, $project);
 
         $editor = $this->subIssueEditorFactory->create($subIssue);
 
@@ -78,11 +76,11 @@ class SubIssueController extends CommonIssueController
         return new Response(status: 204);
     }
 
-    private function findSubIssue(Issue $issue, string $subIssueCode, Project $project): Issue
+    private function findSubIssue(string $subIssueCode, Project $project): Issue
     {
         $subIssue = $this->issueRepository->findByCode($subIssueCode, $project);
 
-        if (!$subIssue || $issue->getId() !== $subIssue->getParent()->getId()) {
+        if (!$subIssue) {
             throw new NotFoundHttpException('Sub issue not found.');
         }
 

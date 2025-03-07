@@ -38,7 +38,10 @@
                 </div>
                 {{ form_end(form) }}
             {% endif %}
-            <ul data-controller="column-sortable" data-sortable-animation-value="150" class="list-group">
+            <ul {% if is_granted('SORT_ISSUE', project) %} data-controller="column-sortable"  {% endif %}
+                data-sortable-animation-value="150"
+                class="list-group"
+            >
                 {% if not pagination.items %}
                     <li class="list-group-item">No issues</li>
                 {% endif %}

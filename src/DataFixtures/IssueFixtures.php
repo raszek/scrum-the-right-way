@@ -84,6 +84,7 @@ class IssueFixtures extends Fixture implements DependentFixtureInterface
                 'issueColumn' => $backlogColumn,
                 'number' => $i + 1,
                 'columnOrder' => ($i + 1) * 1024,
+                'issueOrder' => 1024,
                 'type' => $subIssueType,
                 'parent' => $issue,
             ]);
@@ -97,6 +98,7 @@ class IssueFixtures extends Fixture implements DependentFixtureInterface
                 'issueColumn' => $backlogColumn,
                 'number' => $i + 2,
                 'columnOrder' => ($i + 2) * 1024,
+                'issueOrder' => 2048,
                 'type' => $subIssueType,
                 'parent' => $issue,
             ]);

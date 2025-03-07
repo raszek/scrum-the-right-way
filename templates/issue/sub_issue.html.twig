@@ -5,6 +5,10 @@
         id: project.id,
         issueCode: subIssue.code
     }) }}"
+    data-sortable-update-url="{{ path('app_project_issue_sub_issue_sort', {
+        id: project.id,
+        subIssueCode: subIssue.code,
+    }) }}"
 >
     <a href="{{ path('app_project_issue_view', {
         id: project.id,
@@ -13,10 +17,12 @@
         {{ subIssue.prefixCodeTitle }}
     </a>
 
-    <button class="btn btn-danger"
-            data-action="confirm-dialog#open"
-            data-confirm-dialog-url-param="{{ subIssue.code }}"
-    >
-        <i class="bi bi-trash"></i>
-    </button>
+    {% if is_granted('UPDATE_ISSUE_ARCHIVE', project) %}
+        <button class="btn btn-danger"
+                data-action="confirm-dialog#open"
+                data-confirm-dialog-url-param="{{ subIssue.code }}"
+        >
+            <i class="bi bi-trash"></i>
+        </button>
+    {% endif %}
 </li>

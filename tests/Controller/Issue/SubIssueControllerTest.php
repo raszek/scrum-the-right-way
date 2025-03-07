@@ -127,7 +127,7 @@ class SubIssueControllerTest extends WebTestCase
         }
 
         $uri = sprintf(
-            '/projects/%s/issues/SCP-1/sub-issues/SCP-5/sort',
+            '/projects/%s/sub-issues/SCP-5/sort',
             $project->getId()
         );
 

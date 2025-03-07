@@ -97,7 +97,7 @@ class SingleIssueController extends CommonIssueController
     #[Route('/sort', name: 'app_project_issue_sort', methods: ['POST'])]
     public function sort(Project $project, string $issueCode, Request $request): Response
     {
-        $this->denyAccessUnlessGranted(IssueVoter::KANBAN_VIEW, $project);
+        $this->denyAccessUnlessGranted(SingleIssueVoter::SORT_ISSUE, $project);
 
         $position = $request->get('position');
 
