@@ -19,7 +19,7 @@ final class SprintGoalFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'name' => self::faker()->text(1024),
+            'name' => self::faker()->text(256),
             'sprint' => SprintFactory::new(),
         ];
     }

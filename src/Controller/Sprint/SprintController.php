@@ -9,6 +9,7 @@ use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintRepository;
 use App\Security\Voter\SprintVoter;
 use App\Service\Sprint\SprintEditorFactory;
+use App\Service\Sprint\SprintService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,8 +22,24 @@ class SprintController extends CommonIssueController
         private readonly SprintEditorFactory $sprintEditorFactory,
         private readonly IssueRepository $issueRepository,
         private readonly SprintRepository $sprintRepository,
+        private readonly SprintService $sprintService,
     ) {
         parent::__construct($this->issueRepository);
+    }
+
+
+    #[Route('/sprints/current', 'app_project_sprint_current_view')]
+    public function viewCurrent(Project $project): Response
+    {
+        $currentSprint = $this->getCurrentSprint($project);
+
+        $sprintGoals = $this->sprintService->getSprintGoals($currentSprint);
+
+        return $this->render('sprint/view.html.twig', [
+            'project' => $project,
+            'sprint' => $currentSprint,
+            'sprintGoals' => $sprintGoals,
+        ]);
     }
 
     #[Route('/sprints/current/issues/{issueCode}', 'app_project_sprint_add_issue', methods: ['POST'])]

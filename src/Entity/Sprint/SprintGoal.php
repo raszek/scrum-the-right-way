@@ -16,7 +16,7 @@ class SprintGoal
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 1024)]
+    #[ORM\Column()]
     private ?string $name = null;
 
     /**

@@ -2,7 +2,6 @@
 
 namespace App\Tests\Controller\Sprint;
 
-
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
@@ -12,6 +11,7 @@ use App\Factory\Project\ProjectMemberRoleFactory;
 use App\Factory\Project\ProjectRoleFactory;
 use App\Factory\Sprint\SprintFactory;
 use App\Factory\Sprint\SprintGoalFactory;
+use App\Factory\Sprint\SprintGoalIssueFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
@@ -19,6 +19,90 @@ use App\Tests\Controller\WebTestCase;
 
 class SprintControllerTest extends WebTestCase
 {
+
+    /** @test */
+    public function user_can_view_current_sprint()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $user = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $toDoColumn = IssueColumnFactory::todoColumn();
+
+        $issueType = IssueTypeFactory::issueType();
+
+        $featureType = IssueTypeFactory::featureType();
+
+        $subIssueType = IssueTypeFactory::subIssueType();
+
+        $issue = IssueFactory::createOne([
+            'title' => 'Issue task',
+            'project' => $project,
+            'issueColumn' => $toDoColumn,
+            'type' => $issueType,
+            'number' => 1,
+        ]);
+
+        $feature = IssueFactory::createOne([
+            'title' => 'Feature task',
+            'project' => $project,
+            'issueColumn' => $toDoColumn,
+            'type' => $featureType,
+            'number' => 2,
+        ]);
+
+        IssueFactory::createOne([
+            'title' => 'Sub issue task',
+            'project' => $project,
+            'issueColumn' => $toDoColumn,
+            'type' => $subIssueType,
+            'number' => 3,
+            'parent' => $feature,
+            'issueOrder' => 128
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+            'name' => 'First sprint goal',
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $issue,
+            'sprintGoal' => $sprintGoal,
+        ]);
+
+        $secondSprintGoal = SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+            'name' => 'Second sprint goal',
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $feature,
+            'sprintGoal' => $secondSprintGoal,
+        ]);
+
+        $this->loginAsUser($user);
+
+        $this->goToPage(sprintf('/projects/%s/sprints/current', $project->getId()));
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseHasText('Issue task');
+        $this->assertResponseHasText('Feature task');
+        $this->assertResponseHasText('First sprint goal');
+        $this->assertResponseHasText('Second sprint goal');
+        $this->assertResponseHasNoText('Sub issue task');
+    }
 
     /** @test */
     public function developer_can_add_issue_to_sprint_in_first_sprint_goal_only()

@@ -36,6 +36,13 @@ readonly class ProjectMenuDataProvider
                 'icon' => 'bi-backpack',
             ],
             [
+                'url' => $this->urlGenerator->generate('app_project_sprint_current_view', [
+                    'id' => $project->getId()
+                ]),
+                'label' => 'Sprint',
+                'icon' => 'iconoir-running',
+            ],
+            [
                 'url' => $this->urlGenerator->generate('app_project_kanban', [
                     'id' => $project->getId()
                 ]),

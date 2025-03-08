@@ -130,24 +130,26 @@ class IssueController extends CommonIssueController
 
         $issue = $this->findIssue($issueCode, $project);
 
-        return $this->render('issue/view.html.twig', $this->getIssueData($issue, $request));
+        return $this->render('issue/view.html.twig', [
+            'previousSite' => $this->getPreviousSite($request),
+            ...$this->getIssueData($issue)
+        ]);
     }
 
     #[Route(['/issues/{issueCode}/ajax'], name: 'app_project_issue_view_ajax')]
     public function viewAjax(
         Project $project,
         string $issueCode,
-        Request $request,
     ): Response
     {
         $this->denyAccessUnlessGranted(IssueVoter::VIEW_ISSUE, $project);
 
         $issue = $this->findIssue($issueCode, $project);
 
-        return $this->render('issue/issue.html.twig', $this->getIssueData($issue, $request));
+        return $this->render('issue/issue.html.twig', $this->getIssueData($issue));
     }
 
-    private function getIssueData(Issue $issue, Request $request): array
+    private function getIssueData(Issue $issue): array
     {
         $assignees = $this->projectMemberRepository->issueAssignees($issue);
 
@@ -163,7 +165,6 @@ class IssueController extends CommonIssueController
             'project' => $issue->getProject(),
             'issue' => $issue,
             'loggedInMember' => $loggedInMember,
-            'previousSite' => $this->getPreviousSite($request),
             'titleMaxLength' => Issue::TITLE_LENGTH,
             'assignees' => $assignees,
             'storyPoints' => $this->storyPointService->recommendedStoryPoints(),

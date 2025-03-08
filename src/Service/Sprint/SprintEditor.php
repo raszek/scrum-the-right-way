@@ -3,7 +3,6 @@
 namespace App\Service\Sprint;
 
 use App\Entity\Issue\Issue;
-use App\Entity\Issue\IssueColumn;
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoalIssue;
 use App\Repository\Issue\IssueColumnRepository;
@@ -24,6 +23,10 @@ readonly class SprintEditor
     {
         if ($issue->getProject()->getId() !== $this->sprint->getProject()->getId()) {
             throw new RuntimeException('Issue is from other project');
+        }
+
+        if ($issue->isSubIssue()) {
+            throw new RuntimeException('Cannot add sub issue to sprint');
         }
 
         if (!$this->sprint->isCurrent()) {

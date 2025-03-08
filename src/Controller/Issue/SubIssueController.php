@@ -46,8 +46,6 @@ class SubIssueController extends CommonIssueController
 
         $createdSubIssue = $editor->add($form);
 
-        sleep(10);
-
         return $this->render('issue/sub_issue.html.twig', [
             'subIssue' => $createdSubIssue,
             'project' => $project,

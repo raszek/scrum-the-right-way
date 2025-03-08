@@ -1,0 +1,25 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Sprint ' ~ sprint.number %}
+
+{% block content %}
+    <div class="row mt-3">
+        <div class="col-12">
+            {% include 'common/project_page_header.html.twig' %}
+
+            <ul class="list-group">
+                {% for goal in sprintGoals %}
+                    <li class="list-group-item">
+                        {{ goal.name }}
+
+                        <ul class="list-group">
+                            {% for goalIssue in goal.sprintGoalIssues %}
+                                <li class="list-group-item">{{ goalIssue.issue.title }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
