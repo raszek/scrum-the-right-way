@@ -16,9 +16,12 @@ use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Tests\Controller\WebTestCase;
+use Zenstruck\Foundry\Test\Factories;
 
 class SprintControllerTest extends WebTestCase
 {
+
+    use Factories;
 
     /** @test */
     public function user_can_view_current_sprint()
@@ -30,6 +33,11 @@ class SprintControllerTest extends WebTestCase
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $user,
+            'project' => $project
         ]);
 
         $toDoColumn = IssueColumnFactory::todoColumn();
@@ -184,6 +192,68 @@ class SprintControllerTest extends WebTestCase
         ]);
 
         $this->assertEquals(0, $notUpdatedAnotherSprintGoal->getSprintGoalIssues()->count());
+    }
+
+    /** @test */
+    public function developer_can_add_sprint_goal()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne([
+            'firstName' => 'Samba',
+            'lastName' => 'Bamba',
+        ]);
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
+            'number' => 1
+        ]);
+
+        SprintGoalFactory::createOne([
+            'name' => 'Some sprint name',
+            'sprint' => $sprint
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current',
+            $project->getId(),
+        );
+
+        $crawler = $this->goToPageSafe($uri);
+
+        $form = $crawler->selectButton('Add')->form();
+
+        $client->submit($form, [
+            'sprint_goal_form[name]' => 'Another sprint goal'
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $createdSprintGoal = $this->sprintGoalRepository()->findOneBy([
+            'name' => 'Another sprint goal'
+        ]);
+
+        $this->assertNotNull($createdSprintGoal);
     }
 
     private function sprintGoalRepository(): SprintGoalRepository

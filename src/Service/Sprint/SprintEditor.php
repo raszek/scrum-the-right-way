@@ -4,7 +4,9 @@ namespace App\Service\Sprint;
 
 use App\Entity\Issue\Issue;
 use App\Entity\Sprint\Sprint;
+use App\Entity\Sprint\SprintGoal;
 use App\Entity\Sprint\SprintGoalIssue;
+use App\Form\Sprint\SprintGoalForm;
 use App\Repository\Issue\IssueColumnRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -53,4 +55,15 @@ readonly class SprintEditor
         $this->entityManager->flush();
     }
 
+    public function addGoal(SprintGoalForm $sprintGoalForm): void
+    {
+        $newSprintGoal = new SprintGoal(
+            name: $sprintGoalForm->name,
+            sprint: $this->sprint,
+        );
+
+        $this->entityManager->persist($newSprintGoal);
+
+        $this->entityManager->flush();
+    }
 }

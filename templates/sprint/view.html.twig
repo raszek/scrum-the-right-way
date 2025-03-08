@@ -19,6 +19,22 @@
                         </ul>
                     </li>
                 {% endfor %}
+                <li class="list-group-item">
+                    {{ form_start(sprintGoalForm) }}
+                    <div class="d-flex align-items-start">
+                        <div style="width: 90%;">
+                            {{ form_row(sprintGoalForm.name, {
+                                label: false,
+                                row_class: 'mb-1',
+                                attr: {
+                                    placeholder: 'Enter new sprint goal'
+                                }
+                            }) }}
+                        </div>
+                        <input type="submit" value="Add" class="btn btn-primary" style="width: 9%;margin-left: 1%;">
+                    </div>
+                    {{ form_end(sprintGoalForm) }}
+                </li>
             </ul>
         </div>
     </div>

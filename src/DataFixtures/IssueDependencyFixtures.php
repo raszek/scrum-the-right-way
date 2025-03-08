@@ -42,7 +42,7 @@ class IssueDependencyFixtures extends Fixture implements DependentFixtureInterfa
         ]);
 
         for ($i = 0; $i < count($issues); $i+=2) {
-            if ($this->randomService->randomBoolean()) {
+            if ($this->randomService->randomBoolean() && isset($issues[$i + 1])) {
                 IssueDependencyFactory::createOne([
                     'issue' => $issues[$i],
                     'dependency' => $issues[$i + 1],
