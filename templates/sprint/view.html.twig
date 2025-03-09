@@ -3,39 +3,58 @@
 {% set page_title = 'Sprint ' ~ sprint.number %}
 
 {% block content %}
-    <div class="row mt-3">
-        <div class="col-12">
-            {% include 'common/project_page_header.html.twig' %}
+    <div data-controller="confirm-dialog">
+        <div class="row mt-3">
+            <div class="col-12">
+                {% include 'common/project_page_header.html.twig' %}
 
-            <ul class="list-group">
-                {% for goal in sprintGoals %}
+                <ul class="list-group">
+                    {% for goal in sprintGoals %}
+                        <li class="list-group-item">
+                            {{ goal.name }}
+
+                            <ul class="list-group">
+                                {% for goalIssue in goal.sprintGoalIssues %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ goalIssue.issue.title }}
+                                        {% if is_granted('REMOVE_CURRENT_SPRINT_ISSUE', project) %}
+                                            <button type="submit"
+                                                    class="btn btn-danger"
+                                                    data-action="confirm-dialog#open"
+                                                    data-confirm-dialog-url-param="{{ path('app_project_sprint_remove_issue', {
+                                                        id: project.id,
+                                                        issueCode: goalIssue.issue.code
+                                                    }) }}"
+                                            >
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
                     <li class="list-group-item">
-                        {{ goal.name }}
-
-                        <ul class="list-group">
-                            {% for goalIssue in goal.sprintGoalIssues %}
-                                <li class="list-group-item">{{ goalIssue.issue.title }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endfor %}
-                <li class="list-group-item">
-                    {{ form_start(sprintGoalForm) }}
-                    <div class="d-flex align-items-start">
-                        <div style="width: 90%;">
-                            {{ form_row(sprintGoalForm.name, {
-                                label: false,
-                                row_class: 'mb-1',
-                                attr: {
-                                    placeholder: 'Enter new sprint goal'
-                                }
-                            }) }}
+                        {{ form_start(sprintGoalForm) }}
+                        <div class="d-flex align-items-start">
+                            <div style="width: 90%;">
+                                {{ form_row(sprintGoalForm.name, {
+                                    label: false,
+                                    row_class: 'mb-1',
+                                    attr: {
+                                        placeholder: 'Enter new sprint goal'
+                                    }
+                                }) }}
+                            </div>
+                            <input type="submit" value="Add" class="btn btn-primary" style="width: 9%;margin-left: 1%;">
                         </div>
-                        <input type="submit" value="Add" class="btn btn-primary" style="width: 9%;margin-left: 1%;">
-                    </div>
-                    {{ form_end(sprintGoalForm) }}
-                </li>
-            </ul>
+                        {{ form_end(sprintGoalForm) }}
+                    </li>
+                </ul>
+            </div>
         </div>
+        {% include 'common/confirm_dialog.html.twig' with {
+            dialogText: 'Are you sure to remove this issue from sprint?'
+        } %}
     </div>
 {% endblock %}

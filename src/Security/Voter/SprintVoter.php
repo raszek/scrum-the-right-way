@@ -11,13 +11,16 @@ class SprintVoter extends Voter
 {
     public const ADD_CURRENT_SPRINT_ISSUE = 'ADD_CURRENT_SPRINT_ISSUE';
 
-    public const VIEW_SPRINT = 'VIEW_SPRINT';
+    public const REMOVE_CURRENT_SPRINT_ISSUE = 'REMOVE_CURRENT_SPRINT_ISSUE';
+
+    public const VIEW_CURRENT_SPRINT = 'VIEW_SPRINT';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         $attributes = [
             self::ADD_CURRENT_SPRINT_ISSUE,
-            self::VIEW_SPRINT,
+            self::VIEW_CURRENT_SPRINT,
+            self::REMOVE_CURRENT_SPRINT_ISSUE
         ];
 
         return in_array($attribute, $attributes) && $subject instanceof Project;
@@ -55,7 +58,8 @@ class SprintVoter extends Voter
     private function developerAttributes(): array
     {
         return [
-            self::ADD_CURRENT_SPRINT_ISSUE
+            self::ADD_CURRENT_SPRINT_ISSUE,
+            self::REMOVE_CURRENT_SPRINT_ISSUE,
         ];
     }
 }

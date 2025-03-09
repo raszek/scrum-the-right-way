@@ -33,7 +33,7 @@ class SprintController extends CommonIssueController
     #[Route('/sprints/current', 'app_project_sprint_current_view')]
     public function viewCurrent(Project $project, Request $request): Response
     {
-        $this->denyAccessUnlessGranted(SprintVoter::VIEW_SPRINT, $project);
+        $this->denyAccessUnlessGranted(SprintVoter::VIEW_CURRENT_SPRINT, $project);
 
         $currentSprint = $this->getCurrentSprint($project);
 
@@ -78,6 +78,24 @@ class SprintController extends CommonIssueController
 
         return $this->redirectToRoute('app_project_backlog', [
             'id'  => $project->getId(),
+        ]);
+    }
+
+    #[Route('/sprints/current/issues/{issueCode}/remove', 'app_project_sprint_remove_issue', methods: ['POST'])]
+    public function removeSprintIssue(Project $project, string $issueCode): Response
+    {
+        $this->denyAccessUnlessGranted(SprintVoter::REMOVE_CURRENT_SPRINT_ISSUE, $project);
+
+        $currentSprint = $this->getCurrentSprint($project);
+
+        $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
+
+        $issue = $this->findIssue($issueCode, $project);
+
+        $sprintEditor->removeSprintIssue($issue);
+
+        return $this->redirectToRoute('app_project_sprint_current_view', [
+            'id' => $project->getId(),
         ]);
     }
 

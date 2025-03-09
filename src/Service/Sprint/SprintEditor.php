@@ -8,6 +8,7 @@ use App\Entity\Sprint\SprintGoal;
 use App\Entity\Sprint\SprintGoalIssue;
 use App\Form\Sprint\SprintGoalForm;
 use App\Repository\Issue\IssueColumnRepository;
+use App\Repository\Sprint\SprintGoalIssueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 
@@ -18,6 +19,7 @@ readonly class SprintEditor
         private Sprint $sprint,
         private EntityManagerInterface $entityManager,
         private IssueColumnRepository $issueColumnRepository,
+        private SprintGoalIssueRepository $sprintGoalIssueRepository,
     ) {
     }
 
@@ -51,6 +53,21 @@ readonly class SprintEditor
         $this->entityManager->persist($sprintGoalIssue);
 
         $firstSprintGoal->addSprintGoalIssue($sprintGoalIssue);
+
+        $this->entityManager->flush();
+    }
+
+    public function removeSprintIssue(Issue $issue): void
+    {
+        $issue->setIssueColumn($this->issueColumnRepository->backlogColumn());
+
+        $sprintGoalIssue = $this->sprintGoalIssueRepository->findSprintIssue($issue, $this->sprint);
+
+        if (!$sprintGoalIssue) {
+            throw new RuntimeException('Sprint goal issue not found');
+        }
+
+        $this->entityManager->remove($sprintGoalIssue);
 
         $this->entityManager->flush();
     }

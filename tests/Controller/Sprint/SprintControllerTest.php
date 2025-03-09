@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller\Sprint;
 
+use App\Enum\Issue\IssueColumnEnum;
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
@@ -118,10 +119,7 @@ class SprintControllerTest extends WebTestCase
         $client = static::createClient();
         $client->followRedirects();
 
-        $developer = UserFactory::createOne([
-            'firstName' => 'Samba',
-            'lastName' => 'Bamba',
-        ]);
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
@@ -192,6 +190,78 @@ class SprintControllerTest extends WebTestCase
         ]);
 
         $this->assertEquals(0, $notUpdatedAnotherSprintGoal->getSprintGoalIssues()->count());
+    }
+
+    /** @test */
+    public function developer_can_remove_issue_from_the_sprint()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $backlogColumn = IssueColumnFactory::backlogColumn();
+        IssueColumnFactory::todoColumn();
+
+        $issueType = IssueTypeFactory::issueType();
+
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $issueType,
+            'number' => 12,
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'sprintGoal' => $sprintGoal,
+            'issue' => $issue,
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current/issues/SCP-12/remove',
+            $project->getId(),
+        );
+
+        $client->request('POST', $uri);
+
+        $this->assertResponseIsSuccessful();
+
+        $updatedSprintGoal = $this->sprintGoalRepository()->findOneBy([
+            'id' => $sprintGoal->getId()
+        ]);
+
+        $this->assertEquals(0, $updatedSprintGoal->getSprintGoalIssues()->count());
+
+        $updatedIssue = $this->issueRepository()->findByCode('SCP-12', $project);
+
+        $this->assertTrue($updatedIssue->getIssueColumn()->isBacklog());
     }
 
     /** @test */
