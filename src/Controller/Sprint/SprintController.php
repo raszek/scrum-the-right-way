@@ -5,8 +5,10 @@ namespace App\Controller\Sprint;
 use App\Controller\Issue\CommonIssueController;
 use App\Entity\Project\Project;
 use App\Entity\Sprint\Sprint;
+use App\Entity\Sprint\SprintGoal;
 use App\Form\Sprint\SprintGoalFormType;
 use App\Repository\Issue\IssueRepository;
+use App\Repository\Sprint\SprintGoalRepository;
 use App\Repository\Sprint\SprintRepository;
 use App\Security\Voter\SprintVoter;
 use App\Service\Sprint\SprintEditorFactory;
@@ -14,6 +16,7 @@ use App\Service\Sprint\SprintService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/projects/{id}')]
@@ -25,6 +28,7 @@ class SprintController extends CommonIssueController
         private readonly IssueRepository $issueRepository,
         private readonly SprintRepository $sprintRepository,
         private readonly SprintService $sprintService,
+        private readonly SprintGoalRepository $sprintGoalRepository
     ) {
         parent::__construct($this->issueRepository);
     }
@@ -97,6 +101,38 @@ class SprintController extends CommonIssueController
         return $this->redirectToRoute('app_project_sprint_current_view', [
             'id' => $project->getId(),
         ]);
+    }
+
+    #[Route('/sprints/current/goals/{goalId}/remove', 'app_project_sprint_remove_goal', methods: ['POST'])]
+    public function removeSprintGoal(Project $project, string $goalId): Response
+    {
+        $this->denyAccessUnlessGranted(SprintVoter::REMOVE_CURRENT_SPRINT_GOAL, $project);
+
+        $currentSprint = $this->getCurrentSprint($project);
+
+        $sprintGoal = $this->findSprintGoal($goalId, $currentSprint);
+
+        $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
+
+        $sprintEditor->removeSprintGoal($sprintGoal);
+
+        return $this->redirectToRoute('app_project_sprint_current_view', [
+            'id' => $project->getId(),
+        ]);
+    }
+
+    private function findSprintGoal(string $goalId, Sprint $sprint): SprintGoal
+    {
+        $sprintGoal = $this->sprintGoalRepository->findOneBy([
+            'sprint' => $sprint,
+            'id' => $goalId,
+        ]);
+
+        if (!$sprintGoal) {
+            throw new NotFoundHttpException('Sprint goal not found');
+        }
+
+        return $sprintGoal;
     }
 
     private function getCurrentSprint(Project $project): Sprint

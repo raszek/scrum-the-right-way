@@ -83,4 +83,15 @@ readonly class SprintEditor
 
         $this->entityManager->flush();
     }
+
+    public function removeSprintGoal(SprintGoal $sprintGoal): void
+    {
+        foreach ($sprintGoal->getSprintGoalIssues() as $goalIssue) {
+            $this->entityManager->remove($goalIssue);
+        }
+
+        $this->entityManager->remove($sprintGoal);
+
+        $this->entityManager->flush();
+    }
 }

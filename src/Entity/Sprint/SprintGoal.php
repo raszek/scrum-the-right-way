@@ -2,6 +2,7 @@
 
 namespace App\Entity\Sprint;
 
+use App\Doctrine\Sqid;
 use App\Repository\Sprint\SprintGoalRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,8 +14,8 @@ class SprintGoal
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'sqid')]
+    private ?Sqid $id = null;
 
     #[ORM\Column()]
     private ?string $name = null;
@@ -38,7 +39,7 @@ class SprintGoal
         $this->sprint = $sprint;
     }
 
-    public function getId(): ?int
+    public function getId(): ?Sqid
     {
         return $this->id;
     }

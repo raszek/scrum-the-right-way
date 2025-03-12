@@ -15,6 +15,7 @@ use App\Factory\Sprint\SprintGoalFactory;
 use App\Factory\Sprint\SprintGoalIssueFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
+use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Tests\Controller\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -270,10 +271,7 @@ class SprintControllerTest extends WebTestCase
         $client = static::createClient();
         $client->followRedirects();
 
-        $developer = UserFactory::createOne([
-            'firstName' => 'Samba',
-            'lastName' => 'Bamba',
-        ]);
+        $developer = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
@@ -326,9 +324,83 @@ class SprintControllerTest extends WebTestCase
         $this->assertNotNull($createdSprintGoal);
     }
 
+    /** @test */
+    public function developer_can_remove_sprint_goal()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
+            'number' => 1
+        ]);
+
+        SprintGoalFactory::createOne([
+            'name' => 'Some sprint goal',
+            'sprint' => $sprint
+        ]);
+
+        $sprintGoalToBeRemoved = SprintGoalFactory::createOne([
+            'name' => 'Another sprint goal',
+            'sprint' => $sprint
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'sprintGoal' => $sprintGoalToBeRemoved,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'sprintGoal' => $sprintGoalToBeRemoved,
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current/goals/%s/remove',
+            $project->getId(),
+            $sprintGoalToBeRemoved->getId()
+        );
+
+        $client->request('POST', $uri);
+
+        $this->assertResponseIsSuccessful();
+
+        $removedSprintGoal = $this->sprintGoalRepository()->findOneBy([
+            'id' => $sprintGoalToBeRemoved->getId()
+        ]);
+
+        $this->assertNull($removedSprintGoal);
+
+        $this->assertCount(0, $this->sprintGoalIssueRepository()->findAll());
+    }
+
     private function sprintGoalRepository(): SprintGoalRepository
     {
         return $this->getService(SprintGoalRepository::class);
+    }
+
+    private function sprintGoalIssueRepository(): SprintGoalIssueRepository
+    {
+        return $this->getService(SprintGoalIssueRepository::class);
     }
 
     private function issueRepository(): IssueRepository
