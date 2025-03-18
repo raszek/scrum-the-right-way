@@ -132,3 +132,7 @@ dialog[data-dialog-target='dialog'][closing] {
     border-radius: calc(var(--bs-border-radius) - 1px);
     display: inline-block;
 }
+
+.strw-no-events {
+    pointer-events: none;
+}

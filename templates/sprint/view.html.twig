@@ -3,15 +3,18 @@
 {% set page_title = 'Sprint ' ~ sprint.number %}
 
 {% block content %}
-    <div data-controller="confirm-modal">
+    <div data-controller="confirm-modal sprint">
         <div class="row mt-3">
             <div class="col-12">
                 {% include 'common/project_page_header.html.twig' %}
 
                 <ul class="list-group">
                     {% for goal in sprintGoals %}
-                        <li class="list-group-item bg-body-tertiary">
-                            <div class="d-flex justify-content-between align-items-center">
+                        <li data-sprint-target="goal"
+                            data-sprint-goal-id-param="{{ goal.id }}"
+                            class="list-group-item bg-body-tertiary"
+                        >
+                            <div class="d-flex justify-content-between align-items-center strw-no-events">
                                 {{ goal.name }}
                                 {% if is_granted('REMOVE_CURRENT_SPRINT_GOAL', project) and goal.canBeRemoved %}
                                     <button data-confirm-modal-url-param="{{ path('app_project_sprint_remove_goal', {
@@ -26,9 +29,13 @@
                                     </button>
                                 {% endif %}
                             </div>
-                            <ul class="list-group">
+                            <ul class="list-group mt-2">
                                 {% for goalIssue in goal.sprintGoalIssues %}
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <li data-sprint-target="issue"
+                                        data-sprint-issue-code-param="{{ goalIssue.issue.code }}"
+                                        data-sprint-issue-goal-id-param="{{ goal.id }}"
+                                        class="list-group-item d-flex justify-content-between align-items-center"
+                                    >
                                         {{ goalIssue.issue.title }}
                                         {% if is_granted('REMOVE_CURRENT_SPRINT_ISSUE', project) %}
                                             <button type="submit"
