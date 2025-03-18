@@ -89,4 +89,19 @@ class SprintGoal
 
         return $this;
     }
+
+    public function removeErrors(): array
+    {
+        $errors = [];
+        if ($this->sprint->getSprintGoals()->count() <= 1) {
+            $errors[] = 'Sprint must have at least one sprint goal';
+        }
+
+        return $errors;
+    }
+
+    public function canBeRemoved(): bool
+    {
+        return empty($this->removeErrors());
+    }
 }

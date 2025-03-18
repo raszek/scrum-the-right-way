@@ -94,4 +94,5 @@ readonly class SprintEditor
 
         $this->entityManager->flush();
     }
+
 }

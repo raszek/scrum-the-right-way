@@ -10,10 +10,10 @@
 
                 <ul class="list-group">
                     {% for goal in sprintGoals %}
-                        <li class="list-group-item">
+                        <li class="list-group-item bg-body-tertiary">
                             <div class="d-flex justify-content-between align-items-center">
                                 {{ goal.name }}
-                                {% if is_granted('REMOVE_CURRENT_SPRINT_GOAL', project) %}
+                                {% if is_granted('REMOVE_CURRENT_SPRINT_GOAL', project) and goal.canBeRemoved %}
                                     <button data-confirm-modal-url-param="{{ path('app_project_sprint_remove_goal', {
                                         id: project.id,
                                         goalId: goal.id

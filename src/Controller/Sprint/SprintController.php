@@ -16,6 +16,7 @@ use App\Service\Sprint\SprintService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -111,6 +112,12 @@ class SprintController extends CommonIssueController
         $currentSprint = $this->getCurrentSprint($project);
 
         $sprintGoal = $this->findSprintGoal($goalId, $currentSprint);
+
+        if (!$sprintGoal->canBeRemoved()) {
+            throw new BadRequestHttpException(
+                sprintf('Cannot remove sprint goal. Reason: %s', $sprintGoal->removeErrors()[0])
+            );
+        }
 
         $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
 
