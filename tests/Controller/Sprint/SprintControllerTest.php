@@ -393,6 +393,63 @@ class SprintControllerTest extends WebTestCase
         $this->assertCount(0, $this->sprintGoalIssueRepository()->findAll());
     }
 
+    /** @test */
+    public function developer_can_edit_sprint_goal_text()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
+            'number' => 1
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'name' => 'Some sprint goal',
+            'sprint' => $sprint
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current/goals/%s/name',
+            $project->getId(),
+            $sprintGoal->getId()
+        );
+
+        $client->request('POST', $uri, [
+            'name' => 'New name for sprint goal'
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $changedSprintGoal = $this->sprintGoalRepository()->findOneBy([
+            'id' => $sprintGoal->getId()
+        ]);
+
+        $this->assertNotNull($changedSprintGoal);
+        $this->assertEquals('New name for sprint goal', $changedSprintGoal->getName());
+    }
+
     private function sprintGoalRepository(): SprintGoalRepository
     {
         return $this->getService(SprintGoalRepository::class);

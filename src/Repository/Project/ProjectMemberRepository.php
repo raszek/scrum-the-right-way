@@ -5,7 +5,6 @@ namespace App\Repository\Project;
 use App\Entity\Issue\Issue;
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectMember;
-use App\Enum\Project\ProjectRoleEnum;
 use App\Form\Project\ProjectMemberSearchForm;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use App\Repository\QueryBuilder\QueryBuilder;
@@ -48,16 +47,6 @@ class ProjectMemberRepository extends ServiceEntityRepository
             ->innerJoin('projectMember.roles', 'projectMemberRoles')
             ->where('projectMember.project = :project')
             ->sqidParameter('project', $issue->getProject()->getId());
-
-        if ($issue->isOnDeveloperColumn()) {
-            $queryBuilder
-                ->andWhere('projectMember.roles = :developerRoleId)')
-                ->setParameter('developerRoleId', ProjectRoleEnum::Developer->value);
-        } else if ($issue->isOnTesterColumn()) {
-            $queryBuilder
-                ->andWhere('projectMember.roles = :testerRoleId)')
-                ->setParameter('testerRoleId', ProjectRoleEnum::Tester->value);
-        }
 
         return $queryBuilder->getQuery()->getResult();
     }
