@@ -13,7 +13,7 @@ use Zenstruck\Foundry\Test\Factories;
 class SiteControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function user_can_log_out()

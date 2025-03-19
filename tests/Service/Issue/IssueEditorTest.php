@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Test\Factories;
 class IssueEditorTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function editor_can_change_issue_at_row_number_position()

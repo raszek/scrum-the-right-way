@@ -81,13 +81,13 @@ readonly class ProjectIssueEditor
          */
         $firstIssue = $issues[0];
 
-        if ($firstIssue->getColumnOrder() === 1) {
-            $this->issueRepository->reorderColumn($this->project, $this->issueColumnRepository->backlogColumn());
+        if ($firstIssue->getColumnOrder() <= 1) {
+            $this->issueRepository->reorder($firstIssue);
 
             return Issue::DEFAULT_ORDER_SPACE / 2;
         }
 
-        return round($firstIssue->getColumnOrder() / 2);
+        return floor($firstIssue->getColumnOrder() / 2);
     }
 
 }

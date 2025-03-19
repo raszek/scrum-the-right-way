@@ -9,9 +9,12 @@ use Exception;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Zenstruck\Foundry\Test\Factories;
 
 class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
 {
+
+    use Factories;
 
     public function dataFileName(string $fileName): string
     {

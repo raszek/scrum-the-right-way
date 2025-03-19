@@ -5,6 +5,7 @@ namespace App\Service\Sprint;
 use App\Entity\Sprint\Sprint;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
+use App\Repository\Sprint\SprintGoalRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class SprintEditorFactory
@@ -14,6 +15,7 @@ readonly class SprintEditorFactory
         private EntityManagerInterface $entityManager,
         private IssueColumnRepository $issueColumnRepository,
         private SprintGoalIssueRepository $sprintGoalIssueRepository,
+        private SprintGoalRepository $sprintGoalRepository,
     ) {
     }
 
@@ -24,6 +26,7 @@ readonly class SprintEditorFactory
             entityManager: $this->entityManager,
             issueColumnRepository: $this->issueColumnRepository,
             sprintGoalIssueRepository: $this->sprintGoalIssueRepository,
+            sprintGoalRepository: $this->sprintGoalRepository
         );
     }
 }

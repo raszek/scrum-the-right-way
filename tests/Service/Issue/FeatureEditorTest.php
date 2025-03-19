@@ -18,7 +18,7 @@ use Zenstruck\Foundry\Test\Factories;
 class FeatureEditorTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function when_there_is_no_space_left_for_first_sub_issue_every_feature_issue_should_be_reordered()

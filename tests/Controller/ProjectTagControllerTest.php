@@ -12,7 +12,7 @@ use Zenstruck\Foundry\Test\Factories;
 
 class ProjectTagControllerTest extends WebTestCase
 {
-    use Factories;
+
 
     /** @test */
     public function developer_can_create_new_tag()

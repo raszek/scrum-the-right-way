@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Test\Factories;
 class EventControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function project_member_can_see_project_thread_activities()

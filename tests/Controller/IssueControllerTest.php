@@ -18,7 +18,7 @@ use Zenstruck\Foundry\Test\Factories;
 class IssueControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function project_member_can_access_backlog_issues()

@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Test\Factories;
 class ProjectEditorTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function member_admin_cannot_remove_yourself_from_project()

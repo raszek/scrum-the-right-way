@@ -4,14 +4,18 @@ namespace App\Entity\Sprint;
 
 use App\Doctrine\Sqid;
 use App\Repository\Sprint\SprintGoalRepository;
+use App\Service\Position\Positionable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use RuntimeException;
 
 #[ORM\Entity(repositoryClass: SprintGoalRepository::class)]
-class SprintGoal
+class SprintGoal implements Positionable
 {
+
+    const DEFAULT_ORDER_SPACE = 1024;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'sqid')]
@@ -19,6 +23,9 @@ class SprintGoal
 
     #[ORM\Column()]
     private ?string $name = null;
+
+    #[ORM\Column()]
+    private ?int $sprintOrder;
 
     /**
      * @var Collection<int, SprintGoalIssue>
@@ -32,11 +39,13 @@ class SprintGoal
 
     public function __construct(
         string $name,
+        int $sprintOrder,
         Sprint $sprint
     ) {
         $this->sprintGoalIssues = new ArrayCollection();
         $this->name = $name;
         $this->sprint = $sprint;
+        $this->sprintOrder = $sprintOrder;
     }
 
     public function getId(): ?Sqid
@@ -83,13 +92,6 @@ class SprintGoal
         return $this->sprint;
     }
 
-    public function setSprint(?Sprint $sprint): static
-    {
-        $this->sprint = $sprint;
-
-        return $this;
-    }
-
     public function removeErrors(): array
     {
         $errors = [];
@@ -103,5 +105,25 @@ class SprintGoal
     public function canBeRemoved(): bool
     {
         return empty($this->removeErrors());
+    }
+
+    public function getSprintOrder(): ?int
+    {
+        return $this->sprintOrder;
+    }
+
+    public function getOrder(): int
+    {
+        return $this->sprintOrder;
+    }
+
+    public function setOrder(int $order): void
+    {
+        $this->sprintOrder = $order;
+    }
+
+    public function getOrderSpace(): int
+    {
+        return self::DEFAULT_ORDER_SPACE;
     }
 }

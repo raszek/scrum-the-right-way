@@ -14,7 +14,7 @@ use Zenstruck\Foundry\Test\Factories;
 class ThreadMessageRepositoryTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function user_can_fuzzy_search_threads()

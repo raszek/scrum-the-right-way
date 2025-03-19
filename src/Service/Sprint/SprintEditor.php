@@ -9,6 +9,7 @@ use App\Entity\Sprint\SprintGoalIssue;
 use App\Form\Sprint\SprintGoalForm;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
+use App\Repository\Sprint\SprintGoalRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 
@@ -20,6 +21,7 @@ readonly class SprintEditor
         private EntityManagerInterface $entityManager,
         private IssueColumnRepository $issueColumnRepository,
         private SprintGoalIssueRepository $sprintGoalIssueRepository,
+        private SprintGoalRepository $sprintGoalRepository,
     ) {
     }
 
@@ -43,9 +45,12 @@ readonly class SprintEditor
             throw new RuntimeException('Sprint must have at least one sprint goal');
         }
 
+        $lastOrder = $this->sprintGoalIssueRepository->findLastOrder($firstSprintGoal);
+
         $sprintGoalIssue = new SprintGoalIssue(
             sprintGoal: $firstSprintGoal,
             issue: $issue,
+            goalOrder: $lastOrder + SprintGoalIssue::DEFAULT_ORDER_SPACE
         );
 
         $issue->setIssueColumn($this->issueColumnRepository->toDoColumn());
@@ -74,9 +79,12 @@ readonly class SprintEditor
 
     public function addGoal(SprintGoalForm $sprintGoalForm): void
     {
+        $lastOrder = $this->sprintGoalRepository->findLastOrder($this->sprint);
+
         $newSprintGoal = new SprintGoal(
             name: $sprintGoalForm->name,
-            sprint: $this->sprint,
+            sprintOrder: $lastOrder + SprintGoal::DEFAULT_ORDER_SPACE,
+            sprint: $this->sprint
         );
 
         $this->entityManager->persist($newSprintGoal);

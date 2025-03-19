@@ -63,42 +63,6 @@ class SprintController extends CommonIssueController
         ]);
     }
 
-    #[Route('/sprints/current/issues/{issueCode}', 'app_project_sprint_add_issue', methods: ['POST'])]
-    public function addSprintIssue(Project $project, string $issueCode): Response
-    {
-        $this->denyAccessUnlessGranted(SprintVoter::ADD_CURRENT_SPRINT_ISSUE, $project);
-
-        $currentSprint = $this->getCurrentSprint($project);
-
-        $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
-
-        $issue = $this->findIssue($issueCode, $project);
-
-        $sprintEditor->addSprintIssue($issue);
-
-        return $this->redirectToRoute('app_project_backlog', [
-            'id'  => $project->getId(),
-        ]);
-    }
-
-    #[Route('/sprints/current/issues/{issueCode}/remove', 'app_project_sprint_remove_issue', methods: ['POST'])]
-    public function removeSprintIssue(Project $project, string $issueCode): Response
-    {
-        $this->denyAccessUnlessGranted(SprintVoter::REMOVE_CURRENT_SPRINT_ISSUE, $project);
-
-        $currentSprint = $this->getCurrentSprint($project);
-
-        $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
-
-        $issue = $this->findIssue($issueCode, $project);
-
-        $sprintEditor->removeSprintIssue($issue);
-
-        return $this->redirectToRoute('app_project_sprint_current_view', [
-            'id' => $project->getId(),
-        ]);
-    }
-
     private function getCurrentSprint(Project $project): Sprint
     {
         $sprint = $this->sprintRepository->findOneBy([

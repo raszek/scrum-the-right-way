@@ -18,7 +18,7 @@ use Zenstruck\Foundry\Test\Factories;
 class ThreadControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function project_member_can_list_threads()

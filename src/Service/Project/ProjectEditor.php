@@ -63,7 +63,8 @@ readonly class ProjectEditor
 
         $sprintGoal = new SprintGoal(
             name: 'Define your sprint goal',
-            sprint: $sprint,
+            sprintOrder: SprintGoal::DEFAULT_ORDER_SPACE,
+            sprint: $sprint
         );
 
         $this->entityManager->persist($sprint);

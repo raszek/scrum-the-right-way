@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Test\Factories;
 class DependencyIssueEditorTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function issue_cannot_add_yourself_as_dependency()

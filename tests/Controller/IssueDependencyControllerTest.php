@@ -18,7 +18,7 @@ use Zenstruck\Foundry\Test\Factories;
 class IssueDependencyControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function developer_can_add_dependency_to_issue()

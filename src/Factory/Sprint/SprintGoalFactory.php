@@ -21,6 +21,7 @@ final class SprintGoalFactory extends PersistentProxyObjectFactory
         return [
             'name' => self::faker()->text(256),
             'sprint' => SprintFactory::new(),
+            'sprintOrder' => self::faker()->randomNumber()
         ];
     }
 

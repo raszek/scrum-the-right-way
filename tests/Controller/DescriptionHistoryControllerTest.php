@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Test\Factories;
 class DescriptionHistoryControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function project_member_can_list_issue_description_changes()

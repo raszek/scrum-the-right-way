@@ -90,13 +90,6 @@ class Sprint
         return $this->project;
     }
 
-    public function setProject(?Project $project): static
-    {
-        $this->project = $project;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, SprintGoal>
      */
@@ -105,35 +98,8 @@ class Sprint
         return $this->sprintGoals;
     }
 
-    public function addSprintGoal(SprintGoal $sprintGoal): static
-    {
-        if (!$this->sprintGoals->contains($sprintGoal)) {
-            $this->sprintGoals->add($sprintGoal);
-            $sprintGoal->setSprint($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSprintGoal(SprintGoal $sprintGoal): static
-    {
-        if ($this->sprintGoals->removeElement($sprintGoal)) {
-            // set the owning side to null (unless already changed)
-            if ($sprintGoal->getSprint() === $this) {
-                $sprintGoal->setSprint(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function isCurrent(): bool
     {
         return $this->isCurrent;
-    }
-
-    public function setIsCurrent(bool $isCurrent): void
-    {
-        $this->isCurrent = $isCurrent;
     }
 }

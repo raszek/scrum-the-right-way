@@ -2,7 +2,6 @@
 
 namespace App\Tests\Controller\Sprint;
 
-use App\Enum\Issue\IssueColumnEnum;
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
@@ -15,15 +14,13 @@ use App\Factory\Sprint\SprintGoalFactory;
 use App\Factory\Sprint\SprintGoalIssueFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
-use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Tests\Controller\WebTestCase;
-use Zenstruck\Foundry\Test\Factories;
 
 class SprintControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function user_can_view_current_sprint()
@@ -194,78 +191,6 @@ class SprintControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function developer_can_remove_issue_from_the_sprint()
-    {
-        $client = static::createClient();
-        $client->followRedirects();
-
-        $developer = UserFactory::createOne();
-
-        $project = ProjectFactory::createOne([
-            'code' => 'SCP'
-        ]);
-
-        $memberDeveloper = ProjectMemberFactory::createOne([
-            'user' => $developer,
-            'project' => $project
-        ]);
-
-        $developerRole = ProjectRoleFactory::developerRole();
-
-        ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberDeveloper,
-            'role' => $developerRole
-        ]);
-
-        $backlogColumn = IssueColumnFactory::backlogColumn();
-        IssueColumnFactory::todoColumn();
-
-        $issueType = IssueTypeFactory::issueType();
-
-        $issue = IssueFactory::createOne([
-            'project' => $project,
-            'issueColumn' => $backlogColumn,
-            'type' => $issueType,
-            'number' => 12,
-        ]);
-
-        $sprint = SprintFactory::createOne([
-            'project' => $project,
-            'isCurrent' => true
-        ]);
-
-        $sprintGoal = SprintGoalFactory::createOne([
-            'sprint' => $sprint,
-        ]);
-
-        SprintGoalIssueFactory::createOne([
-            'sprintGoal' => $sprintGoal,
-            'issue' => $issue,
-        ]);
-
-        $this->loginAsUser($developer);
-
-        $uri = sprintf(
-            '/projects/%s/sprints/current/issues/SCP-12/remove',
-            $project->getId(),
-        );
-
-        $client->request('POST', $uri);
-
-        $this->assertResponseIsSuccessful();
-
-        $updatedSprintGoal = $this->sprintGoalRepository()->findOneBy([
-            'id' => $sprintGoal->getId()
-        ]);
-
-        $this->assertEquals(0, $updatedSprintGoal->getSprintGoalIssues()->count());
-
-        $updatedIssue = $this->issueRepository()->findByCode('SCP-12', $project);
-
-        $this->assertTrue($updatedIssue->getIssueColumn()->isBacklog());
-    }
-
-    /** @test */
     public function developer_can_add_sprint_goal()
     {
         $client = static::createClient();
@@ -324,140 +249,9 @@ class SprintControllerTest extends WebTestCase
         $this->assertNotNull($createdSprintGoal);
     }
 
-    /** @test */
-    public function developer_can_remove_sprint_goal()
-    {
-        $client = static::createClient();
-        $client->followRedirects();
-
-        $developer = UserFactory::createOne();
-
-        $project = ProjectFactory::createOne([
-            'code' => 'SCP'
-        ]);
-
-        $memberDeveloper = ProjectMemberFactory::createOne([
-            'user' => $developer,
-            'project' => $project
-        ]);
-
-        $developerRole = ProjectRoleFactory::developerRole();
-
-        ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberDeveloper,
-            'role' => $developerRole
-        ]);
-
-        $sprint = SprintFactory::createOne([
-            'project' => $project,
-            'isCurrent' => true,
-            'number' => 1
-        ]);
-
-        SprintGoalFactory::createOne([
-            'name' => 'Some sprint goal',
-            'sprint' => $sprint
-        ]);
-
-        $sprintGoalToBeRemoved = SprintGoalFactory::createOne([
-            'name' => 'Another sprint goal',
-            'sprint' => $sprint
-        ]);
-
-        SprintGoalIssueFactory::createOne([
-            'sprintGoal' => $sprintGoalToBeRemoved,
-        ]);
-
-        SprintGoalIssueFactory::createOne([
-            'sprintGoal' => $sprintGoalToBeRemoved,
-        ]);
-
-        $this->loginAsUser($developer);
-
-        $uri = sprintf(
-            '/projects/%s/sprints/current/goals/%s/remove',
-            $project->getId(),
-            $sprintGoalToBeRemoved->getId()
-        );
-
-        $client->request('POST', $uri);
-
-        $this->assertResponseIsSuccessful();
-
-        $removedSprintGoal = $this->sprintGoalRepository()->findOneBy([
-            'id' => $sprintGoalToBeRemoved->getId()
-        ]);
-
-        $this->assertNull($removedSprintGoal);
-
-        $this->assertCount(0, $this->sprintGoalIssueRepository()->findAll());
-    }
-
-    /** @test */
-    public function developer_can_edit_sprint_goal_text()
-    {
-        $client = static::createClient();
-        $client->followRedirects();
-
-        $developer = UserFactory::createOne();
-
-        $project = ProjectFactory::createOne([
-            'code' => 'SCP'
-        ]);
-
-        $memberDeveloper = ProjectMemberFactory::createOne([
-            'user' => $developer,
-            'project' => $project
-        ]);
-
-        $developerRole = ProjectRoleFactory::developerRole();
-
-        ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberDeveloper,
-            'role' => $developerRole
-        ]);
-
-        $sprint = SprintFactory::createOne([
-            'project' => $project,
-            'isCurrent' => true,
-            'number' => 1
-        ]);
-
-        $sprintGoal = SprintGoalFactory::createOne([
-            'name' => 'Some sprint goal',
-            'sprint' => $sprint
-        ]);
-
-        $this->loginAsUser($developer);
-
-        $uri = sprintf(
-            '/projects/%s/sprints/current/goals/%s/name',
-            $project->getId(),
-            $sprintGoal->getId()
-        );
-
-        $client->request('POST', $uri, [
-            'name' => 'New name for sprint goal'
-        ]);
-
-        $this->assertResponseIsSuccessful();
-
-        $changedSprintGoal = $this->sprintGoalRepository()->findOneBy([
-            'id' => $sprintGoal->getId()
-        ]);
-
-        $this->assertNotNull($changedSprintGoal);
-        $this->assertEquals('New name for sprint goal', $changedSprintGoal->getName());
-    }
-
     private function sprintGoalRepository(): SprintGoalRepository
     {
         return $this->getService(SprintGoalRepository::class);
-    }
-
-    private function sprintGoalIssueRepository(): SprintGoalIssueRepository
-    {
-        return $this->getService(SprintGoalIssueRepository::class);
     }
 
     private function issueRepository(): IssueRepository

@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Test\Factories;
 class RemoveIssueDependencyEventRendererTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function it_renders_remove_issue_dependency_event()

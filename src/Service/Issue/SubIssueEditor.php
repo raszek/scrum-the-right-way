@@ -57,7 +57,7 @@ readonly class SubIssueEditor
      * @throws NoOrderSpaceException
      * @throws OutOfBoundPositionException
      */
-    public static function calculateOrder(array $issues, bool $isFirstPosition): int
+    public function calculateOrder(array $issues, bool $isFirstPosition): int
     {
         if (count($issues) === 0) {
             throw new OutOfBoundPositionException('Position number is bigger than issue count in the column');

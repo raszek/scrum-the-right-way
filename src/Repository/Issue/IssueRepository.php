@@ -12,6 +12,7 @@ use App\Enum\Issue\IssueColumnEnum;
 use App\Form\Issue\IssueSearchForm;
 use App\Helper\ArrayHelper;
 use App\Repository\QueryBuilder\QueryBuilder;
+use App\Service\Position\ReorderService;
 use App\Table\QueryParams;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -20,7 +21,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Issue>
  */
-class IssueRepository extends ServiceEntityRepository
+class IssueRepository extends ServiceEntityRepository implements ReorderService
 {
     public function __construct(
         ManagerRegistry $registry,
@@ -175,28 +176,6 @@ class IssueRepository extends ServiceEntityRepository
         return ArrayHelper::indexByCallback($issues, fn(Issue $issue) => $issue->getId());
     }
 
-    public function reorderColumn(Project $project, IssueColumn $column): void
-    {
-        $query = $this->orderedColumnQuery($project, $column)->getQuery();
-
-        $batchSize = 20;
-        $i = 1;
-        /**
-         * @var Issue $issue
-         */
-        foreach ($query->toIterable() as $issue) {
-            $issue->setColumnOrder($i * Issue::DEFAULT_ORDER_SPACE);
-
-            if (($i % $batchSize) === 0) {
-                $this->getEntityManager()->flush();
-                $this->getEntityManager()->clear();
-            }
-            $i++;
-        }
-
-        $this->getEntityManager()->flush();
-    }
-
     public function reorderFeature(Issue $issue): void
     {
         $queryBuilder = $this->createQueryBuilder('issue');
@@ -307,5 +286,31 @@ class IssueRepository extends ServiceEntityRepository
                 $queryBuilder->setParameter('updatedBefore', $value);
             },
         ];
+    }
+
+    /**
+     * @param Issue $positionable
+     * @return void
+     */
+    public function reorder($positionable): void
+    {
+        $query = $this->orderedColumnQuery($positionable->getProject(), $positionable->getIssueColumn())->getQuery();
+
+        $batchSize = 20;
+        $i = 1;
+        /**
+         * @var Issue $issue
+         */
+        foreach ($query->toIterable() as $issue) {
+            $issue->setColumnOrder($i * Issue::DEFAULT_ORDER_SPACE);
+
+            if (($i % $batchSize) === 0) {
+                $this->getEntityManager()->flush();
+                $this->getEntityManager()->clear();
+            }
+            $i++;
+        }
+
+        $this->getEntityManager()->flush();
     }
 }

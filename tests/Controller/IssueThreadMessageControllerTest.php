@@ -20,7 +20,7 @@ use Zenstruck\Foundry\Test\Factories;
 class IssueThreadMessageControllerTest extends WebTestCase
 {
     
-    use Factories;
+
 
     /** @test */
     public function developer_can_add_thread_message_to_issue()

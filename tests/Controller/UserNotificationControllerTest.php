@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Test\Factories;
 class UserNotificationControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function user_can_list_his_notifications()

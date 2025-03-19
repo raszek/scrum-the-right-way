@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Test\Factories;
 class AttachmentControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function developer_can_add_attachments_to_issue()

@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Test\Factories;
 class ProjectControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function user_can_create_sprint_project()

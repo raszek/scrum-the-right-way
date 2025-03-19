@@ -27,7 +27,7 @@ use Zenstruck\Foundry\Test\Factories;
 class EventServiceTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function remove_member_event_renderer_can_generate_content()

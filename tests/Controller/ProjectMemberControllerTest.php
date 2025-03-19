@@ -16,7 +16,7 @@ use Zenstruck\Foundry\Test\Factories;
 class ProjectMemberControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function project_member_can_access_member_list()

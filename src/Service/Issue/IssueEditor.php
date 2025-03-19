@@ -17,6 +17,7 @@ use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersister;
+use App\Service\Position\Positioner;
 use Doctrine\ORM\EntityManagerInterface;
 use Jfcherng\Diff\DiffHelper;
 use Symfony\Component\String\UnicodeString;
@@ -45,23 +46,13 @@ readonly class IssueEditor
         $query->andWhere('issue.id <> :issueId');
         $query->setParameter('issueId', $this->issue->getId());
 
-        $isFirstPosition = $position <= 1;
-        if ($isFirstPosition) {
-            $query->setMaxResults(1);
-        } else {
-            $query->setFirstResult($position - 2);
-            $query->setMaxResults(2);
-        }
+        $positioner = new Positioner(
+            query: $query,
+            positioned: $this->issue,
+            reorderService: $this->issueRepository
+        );
 
-        $issues = $query->getQuery()->getResult();
-
-        try {
-            $order = $this->calculateOrder($issues, $isFirstPosition);
-            $this->issue->setColumnOrder($order);
-        } catch (NoOrderSpaceException) {
-            $this->issueRepository->reorderColumn($this->issue->getProject(), $this->issue->getIssueColumn());
-            $this->setPosition($position);
-        }
+        $positioner->setPosition($position);
 
         $this->entityManager->flush();
     }
@@ -148,29 +139,5 @@ readonly class IssueEditor
         $this->issue->setIssueColumn($this->issueColumnRepository->archivedColumn());
 
         $this->entityManager->flush();
-    }
-
-    /**
-     * @param Issue[] $issues
-     * @param bool $isFirstPosition
-     * @return int
-     * @throws NoOrderSpaceException
-     * @throws OutOfBoundPositionException
-     */
-    public static function calculateOrder(array $issues, bool $isFirstPosition): int
-    {
-        if (count($issues) === 0) {
-            throw new OutOfBoundPositionException('Position number is bigger than issue count in the column');
-        }
-
-        if (count($issues) === 1) {
-            if ($isFirstPosition) {
-                return IssueOrderCalculator::findOrderBetween(0, $issues[0]->getColumnOrder());
-            } else {
-                return $issues[0]->getColumnOrder() + Issue::DEFAULT_ORDER_SPACE;
-            }
-        }
-
-        return IssueOrderCalculator::findOrderBetween($issues[0]->getColumnOrder(), $issues[1]->getColumnOrder());
     }
 }

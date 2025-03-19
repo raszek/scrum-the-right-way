@@ -20,7 +20,7 @@ use Zenstruck\Foundry\Test\Factories;
 class ProjectMemberEditorTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function cannot_add_role_to_project_member_which_already_have_this_role()

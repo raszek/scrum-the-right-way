@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Test\Factories;
 class IssueObserverControllerTest extends WebTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function project_member_can_observe_issue()

@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Test\Factories;
 
 class SingleIssueControllerTest extends WebTestCase
 {
-    use Factories;
+
 
     /** @test */
     public function project_developer_can_edit_issue_title()

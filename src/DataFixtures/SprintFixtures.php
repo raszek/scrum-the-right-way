@@ -46,6 +46,7 @@ class SprintFixtures extends Fixture implements DependentFixtureInterface
 
             SprintGoalFactory::createOne([
                 'sprint' => $sprint,
+                'sprintOrder' => 1024
             ]);
         }
 
@@ -57,6 +58,7 @@ class SprintFixtures extends Fixture implements DependentFixtureInterface
 
         SprintGoalFactory::createOne([
             'sprint' => $sprint,
+            'sprintOrder' => 1024
         ]);
     }
 

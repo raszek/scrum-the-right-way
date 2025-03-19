@@ -6,6 +6,8 @@ use App\Controller\Issue\CommonIssueController;
 use App\Entity\Project\Project;
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
+use App\Form\Position\PositionForm;
+use App\Form\Sprint\SprintGoalNameForm;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Repository\Sprint\SprintRepository;
@@ -13,14 +15,13 @@ use App\Security\Voter\SprintVoter;
 use App\Service\Sprint\SprintEditorFactory;
 use App\Service\Sprint\SprintGoalEditorFactory;
 use RuntimeException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/projects/{id}')]
+#[Route('/projects/{id}/sprints/current')]
 class SprintGoalController extends CommonIssueController
 {
 
@@ -34,16 +35,14 @@ class SprintGoalController extends CommonIssueController
         parent::__construct($issueRepository);
     }
 
-    #[Route('/sprints/current/goals/{goalId}/name', 'app_project_sprint_edit_goal_name', methods: ['POST'])]
-    public function editSprintGoalName(Project $project, string $goalId, Request $request): Response
+    #[Route('/goals/{goalId}/name', 'app_project_sprint_edit_goal_name', methods: ['POST'])]
+    public function editSprintGoalName(
+        Project $project,
+        string $goalId,
+        #[MapRequestPayload] SprintGoalNameForm $form,
+    ): Response
     {
         $this->denyAccessUnlessGranted(SprintVoter::EDIT_SPRINT_GOAL_NAME, $project);
-
-        $name = $request->get('name');
-
-        if (!$name) {
-            throw new UnprocessableEntityHttpException('No name field was provided');
-        }
 
         $currentSprint = $this->getCurrentSprint($project);
 
@@ -51,14 +50,14 @@ class SprintGoalController extends CommonIssueController
 
         $sprintGoalEditor = $this->sprintGoalEditorFactory->create($sprintGoal);
 
-        $sprintGoalEditor->editName($name);
+        $sprintGoalEditor->editName($form->name);
 
         return $this->redirectToRoute('app_project_sprint_current_view', [
             'id' => $project->getId(),
         ]);
     }
 
-    #[Route('/sprints/current/goals/{goalId}/remove', 'app_project_sprint_remove_goal', methods: ['POST'])]
+    #[Route('/goals/{goalId}/remove', 'app_project_sprint_remove_goal', methods: ['POST'])]
     public function removeSprintGoal(Project $project, string $goalId): Response
     {
         $this->denyAccessUnlessGranted(SprintVoter::REMOVE_CURRENT_SPRINT_GOAL, $project);
@@ -80,6 +79,26 @@ class SprintGoalController extends CommonIssueController
         return $this->redirectToRoute('app_project_sprint_current_view', [
             'id' => $project->getId(),
         ]);
+    }
+
+    #[Route('/goals/{goalId}/sort', 'app_project_sprint_sort_goal', methods: ['POST'])]
+    public function sortSprintGoal(
+        Project $project,
+        string $goalId,
+        #[MapRequestPayload] PositionForm $form
+    ): Response
+    {
+        $this->denyAccessUnlessGranted(SprintVoter::SORT_SPRINT_GOAL, $project);
+
+        $currentSprint = $this->getCurrentSprint($project);
+
+        $sprintGoal = $this->findSprintGoal($goalId, $currentSprint);
+
+        $sprintEditor = $this->sprintGoalEditorFactory->create($sprintGoal);
+
+        $sprintEditor->setPosition($form->position);
+
+        return new Response(status: 204);
     }
 
     private function findSprintGoal(string $goalId, Sprint $sprint): SprintGoal

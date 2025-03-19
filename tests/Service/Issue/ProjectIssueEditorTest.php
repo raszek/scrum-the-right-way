@@ -21,7 +21,7 @@ use Zenstruck\Foundry\Test\Factories;
 class ProjectIssueEditorTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function issues_will_be_defragmented_when_no_space_on_first_position()

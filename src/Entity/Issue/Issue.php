@@ -7,6 +7,7 @@ use App\Entity\Project\ProjectMember;
 use App\Entity\Project\ProjectTag;
 use App\Entity\User\User;
 use App\Repository\Issue\IssueRepository;
+use App\Service\Position\Positionable;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,7 +17,7 @@ use RuntimeException;
 
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
 #[ORM\UniqueConstraint(columns: ['project_id', 'number'])]
-class Issue
+class Issue implements Positionable
 {
 
     const DEFAULT_ORDER_SPACE = 1024;
@@ -477,5 +478,20 @@ class Issue
         }
 
         $this->issueOrder = $issueOrder;
+    }
+
+    public function getOrder(): int
+    {
+        return $this->getColumnOrder();
+    }
+
+    public function setOrder(int $order): void
+    {
+        $this->setColumnOrder($order);
+    }
+
+    public function getOrderSpace(): int
+    {
+        return self::DEFAULT_ORDER_SPACE;
     }
 }

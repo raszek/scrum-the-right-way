@@ -64,12 +64,12 @@
                                     >
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots"></i>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            {% if is_granted('ADD_CURRENT_SPRINT_ISSUE', project) %}
+                                    {% if is_granted('ADD_CURRENT_SPRINT_ISSUE', project) %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
                                                 <li>
                                                     <form action="{{ path('app_project_sprint_add_issue', {
                                                         id: project.id,
@@ -78,9 +78,9 @@
                                                         <input type="submit" class="dropdown-item" value="Add to sprint">
                                                     </form>
                                                 </li>
-                                            {% endif %}
-                                        </ul>
-                                    </div>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </li>

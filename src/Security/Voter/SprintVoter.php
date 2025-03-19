@@ -13,10 +13,13 @@ class SprintVoter extends Voter
 
     public const REMOVE_CURRENT_SPRINT_ISSUE = 'REMOVE_CURRENT_SPRINT_ISSUE';
 
+    public const MOVE_CURRENT_SPRINT_ISSUE = 'MOVE_CURRENT_SPRINT_ISSUE';
 
     public const REMOVE_CURRENT_SPRINT_GOAL = 'REMOVE_CURRENT_SPRINT_GOAL';
 
     public const EDIT_SPRINT_GOAL_NAME = 'CHANGE_SPRINT_GOAL_NAME';
+
+    public const SORT_SPRINT_GOAL = 'SORT_SPRINT_GOAL';
 
     public const VIEW_CURRENT_SPRINT = 'VIEW_SPRINT';
 
@@ -28,7 +31,9 @@ class SprintVoter extends Voter
             self::VIEW_CURRENT_SPRINT,
             self::REMOVE_CURRENT_SPRINT_ISSUE,
             self::REMOVE_CURRENT_SPRINT_GOAL,
-            self::EDIT_SPRINT_GOAL_NAME
+            self::EDIT_SPRINT_GOAL_NAME,
+            self::MOVE_CURRENT_SPRINT_ISSUE,
+            self::SORT_SPRINT_GOAL
         ];
 
         return in_array($attribute, $attributes) && $subject instanceof Project;
@@ -70,6 +75,8 @@ class SprintVoter extends Voter
             self::REMOVE_CURRENT_SPRINT_ISSUE,
             self::REMOVE_CURRENT_SPRINT_GOAL,
             self::EDIT_SPRINT_GOAL_NAME,
+            self::MOVE_CURRENT_SPRINT_ISSUE,
+            self::SORT_SPRINT_GOAL
         ];
     }
 }

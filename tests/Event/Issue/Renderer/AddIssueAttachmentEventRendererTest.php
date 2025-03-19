@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Test\Factories;
 class AddIssueAttachmentEventRendererTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function it_renders_add_attachment_activity()

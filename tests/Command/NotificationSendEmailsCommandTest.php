@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 class NotificationSendEmailsCommandTest extends KernelTestCase
 {
 
-    use Factories;
+
 
     /** @test */
     public function cron_can_send_notification_emails()
