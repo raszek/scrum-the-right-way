@@ -136,3 +136,7 @@ dialog[data-dialog-target='dialog'][closing] {
 .strw-no-events {
     pointer-events: none;
 }
+
+.strw-dragover {
+    border: 3px dotted red;
+}

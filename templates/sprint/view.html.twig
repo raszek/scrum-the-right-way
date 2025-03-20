@@ -4,39 +4,50 @@
 
 {% block content %}
     <div data-controller="confirm-modal sprint">
-        <div class="row mt-3">
+        <div class="row">
             <div class="col-12">
                 {% include 'common/project_page_header.html.twig' %}
 
-                <ul class="list-group">
+                <ul class="list-group" data-sprint-target="goals">
                     {% for goal in sprintGoals %}
-                        <li data-sprint-target="goal"
-                            data-sprint-goal-id-param="{{ goal.id }}"
-                            class="list-group-item bg-body-tertiary"
+                        <li class="list-group-item bg-body-tertiary"
+                            data-sprint-goal-url-param="{{ path('app_project_sprint_sort_goal', {
+                                id: project.id,
+                                goalId: goal.id
+                            }) }}"
                         >
-                            <div class="d-flex justify-content-between align-items-center strw-no-events">
+                            <div class="d-flex justify-content-between align-items-center">
                                 {{ goal.name }}
-                                {% if is_granted('REMOVE_CURRENT_SPRINT_GOAL', project) and goal.canBeRemoved %}
-                                    <button data-confirm-modal-url-param="{{ path('app_project_sprint_remove_goal', {
-                                        id: project.id,
-                                        goalId: goal.id
-                                    }) }}"
-                                            data-confirm-modal-id-param="remove-goal"
-                                            data-action="confirm-modal#open"
-                                            class="btn btn-danger"
-                                    >
-                                        <i class="bi bi-trash"></i>
+                                <div>
+                                    <button class="btn btn-primary">
+                                        <i class="bi bi-pencil"></i>
                                     </button>
-                                {% endif %}
+                                    {% if is_granted('REMOVE_CURRENT_SPRINT_GOAL', project) and goal.canBeRemoved %}
+                                        <button data-confirm-modal-url-param="{{ path('app_project_sprint_remove_goal', {
+                                            id: project.id,
+                                            goalId: goal.id
+                                        }) }}"
+                                                data-confirm-modal-id-param="remove-goal"
+                                                data-action="confirm-modal#open"
+                                                class="btn btn-danger"
+                                        >
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <ul class="list-group mt-2">
+                            <ul data-sprint-target="issues"
+                                data-sprint-goal-id-param="{{ goal.id }}"
+                                class="list-group mt-2"
+                            >
                                 {% for goalIssue in goal.sprintGoalIssues %}
-                                    <li data-sprint-target="issue"
-                                        data-sprint-issue-code-param="{{ goalIssue.issue.code }}"
-                                        data-sprint-issue-goal-id-param="{{ goal.id }}"
+                                    <li data-sprint-issue-sort-url-param="{{ path('app_project_sprint_move_issue', {
+                                            id: project.id,
+                                            issueCode: goalIssue.issue.code
+                                        }) }}"
                                         class="list-group-item d-flex justify-content-between align-items-center"
                                     >
-                                        <a class="strw-no-events" href="{{ path('app_project_issue_view', {
+                                        <a href="{{ path('app_project_issue_view', {
                                             id: project.id,
                                             issueCode: goalIssue.issue.code
                                         }) }}">

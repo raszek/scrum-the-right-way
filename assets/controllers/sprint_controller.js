@@ -1,109 +1,62 @@
 import { Controller } from '@hotwired/stimulus';
+import {Sortable} from 'sortablejs';
+import {post} from 'util';
 
 export default class extends Controller {
 
-
-    static targets = ['goal', 'issue'];
+    static targets = ['issues', 'goals'];
 
     connect() {
-        this.makeIssuesDraggable();
-        this.makeGoalsDroppable();
-    }
-
-    onIssueStartDrag(event) {
-        const issueCode = event.target.getAttribute('data-sprint-issue-code-param');
-        const issueGoalId = event.target.getAttribute('data-sprint-issue-goal-id-param');
-
-        event.dataTransfer.setData('application/issue-code', issueCode);
-        event.dataTransfer.setData('application/issue-goal-id', issueGoalId);
-        event.dataTransfer.effectAllowed = 'move';
+        this.makeIssueSortable();
+        this.makeGoalSortable();
     }
 
 
-    onGoalEnter(event) {
-        event.preventDefault();
+    sortGoal(event) {
 
-        const issueGoalId = event.dataTransfer.getData('application/issue-goal-id');
-        const goalId = event.target.getAttribute('data-sprint-goal-id-param');
+        const goalUrl = event.item.getAttribute('data-sprint-goal-url-param');
 
-        if (goalId && goalId !== issueGoalId) {
-            event.target.style.border = '3px dotted red';
+        const position = event.newIndex + 1;
+
+        const formData = new FormData;
+        formData.append('position', position);
+
+        return post(goalUrl, formData);
+    }
+
+    sortIssue(event) {
+        const goalId = event.to.getAttribute('data-sprint-goal-id-param');
+
+        const position = event.newIndex + 1;
+
+        const url = event.item.getAttribute('data-sprint-issue-sort-url-param');
+
+        const formData = new FormData;
+        formData.append('position', position);
+        formData.append('goalId', goalId);
+
+        return post(url, formData);
+    }
+
+    makeGoalSortable() {
+        for (const goalTarget of this.goalsTargets) {
+            new Sortable(goalTarget, {
+                group: 'goals',
+                animation: 150,
+                onUpdate: this.sortGoal.bind(this)
+            });
         }
     }
 
-    onGoalLeave(event) {
-        event.preventDefault();
-
-        const issueGoalId = event.dataTransfer.getData('application/issue-goal-id');
-        const goalId = event.target.getAttribute('data-sprint-goal-id-param');
-
-        if (goalId && goalId !== issueGoalId) {
-            event.target.style.border = '';
+    makeIssueSortable() {
+        for (const issueTarget of this.issuesTargets) {
+            new Sortable(issueTarget, {
+                group: 'issues',
+                animation: 150,
+                onUpdate: this.sortIssue.bind(this),
+                onAdd: this.sortIssue.bind(this),
+            });
         }
     }
 
-    handleIssueDrop(event) {
-        event.preventDefault();
-
-        event.target.style.border = '';
-
-        const issueCode = event.dataTransfer.getData('application/issue-code');
-        const issueGoalId = event.dataTransfer.getData('application/issue-goal-id');
-        const goalId = event.target.getAttribute('data-sprint-goal-id-param');
-
-        if (goalId === issueGoalId) {
-            return;
-        }
-
-        const issue = this.findIssue(issueCode);
-
-        if (!issue) {
-            throw new Error('Issue not found');
-        }
-
-        const ul = event.target.querySelector('ul');
-
-        const movedIssue = issue.cloneNode(true);
-        movedIssue.setAttribute('data-sprint-issue-goal-id-param', goalId)
-        this.makeIssueDraggable(movedIssue);
-
-        ul.append(movedIssue);
-
-        issue.remove();
-    }
-
-    findIssue(issueCode) {
-        for (const issueTarget of this.issueTargets) {
-            if (issueTarget.getAttribute('data-sprint-issue-code-param') === issueCode) {
-                return issueTarget;
-            }
-        }
-
-        return undefined;
-    }
-
-    onIssueDragOver(event) {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
-    }
-
-    makeIssuesDraggable() {
-        for (const issueTarget of this.issueTargets) {
-            this.makeIssueDraggable(issueTarget);
-        }
-    }
-
-    makeIssueDraggable(issue) {
-        issue.draggable = true;
-        issue.ondragstart = this.onIssueStartDrag.bind(this)
-    }
-
-    makeGoalsDroppable() {
-        for (const goalTarget of this.goalTargets) {
-            goalTarget.ondrop = this.handleIssueDrop.bind(this);
-            goalTarget.ondragover = this.onIssueDragOver.bind(this);
-            goalTarget.ondragenter = this.onGoalEnter.bind(this);
-            goalTarget.ondragleave = this.onGoalLeave.bind(this);
-        }
-    }
 }
