@@ -5,13 +5,13 @@ namespace App\Form\Sprint;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class SprintGoalForm
+readonly class SprintGoalForm
 {
 
     public function __construct(
         #[NotBlank]
-        #[Length(max: 255)]
-        public ?string $name = null,
+        #[Length(min: 1, max: 255)]
+        public ?string $name = null
     ) {
     }
 

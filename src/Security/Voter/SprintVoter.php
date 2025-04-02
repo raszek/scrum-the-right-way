@@ -17,7 +17,7 @@ class SprintVoter extends Voter
 
     public const REMOVE_CURRENT_SPRINT_GOAL = 'REMOVE_CURRENT_SPRINT_GOAL';
 
-    public const EDIT_SPRINT_GOAL_NAME = 'CHANGE_SPRINT_GOAL_NAME';
+    public const EDIT_SPRINT_GOAL = 'EDIT_SPRINT_GOAL';
 
     public const SORT_SPRINT_GOAL = 'SORT_SPRINT_GOAL';
 
@@ -31,7 +31,7 @@ class SprintVoter extends Voter
             self::VIEW_CURRENT_SPRINT,
             self::REMOVE_CURRENT_SPRINT_ISSUE,
             self::REMOVE_CURRENT_SPRINT_GOAL,
-            self::EDIT_SPRINT_GOAL_NAME,
+            self::EDIT_SPRINT_GOAL,
             self::MOVE_CURRENT_SPRINT_ISSUE,
             self::SORT_SPRINT_GOAL
         ];
@@ -74,7 +74,7 @@ class SprintVoter extends Voter
             self::ADD_CURRENT_SPRINT_ISSUE,
             self::REMOVE_CURRENT_SPRINT_ISSUE,
             self::REMOVE_CURRENT_SPRINT_GOAL,
-            self::EDIT_SPRINT_GOAL_NAME,
+            self::EDIT_SPRINT_GOAL,
             self::MOVE_CURRENT_SPRINT_ISSUE,
             self::SORT_SPRINT_GOAL
         ];

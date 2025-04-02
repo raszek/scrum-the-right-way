@@ -7,7 +7,7 @@ use App\Entity\Project\Project;
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
 use App\Form\Position\PositionForm;
-use App\Form\Sprint\SprintGoalNameForm;
+use App\Form\Sprint\SprintGoalForm;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Repository\Sprint\SprintRepository;
@@ -35,14 +35,14 @@ class SprintGoalController extends CommonIssueController
         parent::__construct($issueRepository);
     }
 
-    #[Route('/goals/{goalId}/name', 'app_project_sprint_edit_goal_name', methods: ['POST'])]
-    public function editSprintGoalName(
+    #[Route('/goals/{goalId}/edit', 'app_project_sprint_edit_goal', methods: ['POST'])]
+    public function editSprintGoal(
         Project $project,
         string $goalId,
-        #[MapRequestPayload] SprintGoalNameForm $form,
+        #[MapRequestPayload] SprintGoalForm $form,
     ): Response
     {
-        $this->denyAccessUnlessGranted(SprintVoter::EDIT_SPRINT_GOAL_NAME, $project);
+        $this->denyAccessUnlessGranted(SprintVoter::EDIT_SPRINT_GOAL, $project);
 
         $currentSprint = $this->getCurrentSprint($project);
 

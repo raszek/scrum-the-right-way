@@ -6,7 +6,7 @@ use App\Entity\Issue\Issue;
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
 use App\Entity\Sprint\SprintGoalIssue;
-use App\Form\Sprint\SprintGoalForm;
+use App\Form\Sprint\CreateSprintGoalForm;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
@@ -77,7 +77,7 @@ readonly class SprintEditor
         $this->entityManager->flush();
     }
 
-    public function addGoal(SprintGoalForm $sprintGoalForm): void
+    public function addGoal(CreateSprintGoalForm $sprintGoalForm): void
     {
         $lastOrder = $this->sprintGoalRepository->findLastOrder($this->sprint);
 

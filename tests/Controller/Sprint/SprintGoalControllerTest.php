@@ -55,7 +55,7 @@ class SprintGoalControllerTest extends WebTestCase
         $this->loginAsUser($developer);
 
         $uri = sprintf(
-            '/projects/%s/sprints/current/goals/%s/name',
+            '/projects/%s/sprints/current/goals/%s/edit',
             $project->getId(),
             $sprintGoal->getId()
         );

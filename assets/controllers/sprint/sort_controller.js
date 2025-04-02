@@ -11,10 +11,8 @@ export default class extends Controller {
         this.makeGoalSortable();
     }
 
-
     sortGoal(event) {
-
-        const goalUrl = event.item.getAttribute('data-sprint-goal-url-param');
+        const goalUrl = event.item.getAttribute('data-sprint--sort-goal-url-param');
 
         const position = event.newIndex + 1;
 
@@ -25,11 +23,11 @@ export default class extends Controller {
     }
 
     sortIssue(event) {
-        const goalId = event.to.getAttribute('data-sprint-goal-id-param');
+        const goalId = event.to.getAttribute('data-sprint--sort-goal-id-param');
 
         const position = event.newIndex + 1;
 
-        const url = event.item.getAttribute('data-sprint-issue-sort-url-param');
+        const url = event.item.getAttribute('data-sprint--sort-issue-sort-url-param');
 
         const formData = new FormData;
         formData.append('position', position);
@@ -39,13 +37,11 @@ export default class extends Controller {
     }
 
     makeGoalSortable() {
-        for (const goalTarget of this.goalsTargets) {
-            new Sortable(goalTarget, {
-                group: 'goals',
-                animation: 150,
-                onUpdate: this.sortGoal.bind(this)
-            });
-        }
+        new Sortable(this.goalsTarget, {
+            group: 'goals',
+            animation: 150,
+            onUpdate: this.sortGoal.bind(this)
+        });
     }
 
     makeIssueSortable() {

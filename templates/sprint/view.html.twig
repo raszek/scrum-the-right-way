@@ -3,25 +3,39 @@
 {% set page_title = 'Sprint ' ~ sprint.number %}
 
 {% block content %}
-    <div data-controller="confirm-modal sprint">
+    <div data-controller="confirm-modal sprint--sort sprint--edit-goal">
         <div class="row">
             <div class="col-12">
                 {% include 'common/project_page_header.html.twig' %}
 
-                <ul class="list-group" data-sprint-target="goals">
+                <ul class="list-group" data-sprint--sort-target="goals">
                     {% for goal in sprintGoals %}
                         <li class="list-group-item bg-body-tertiary"
-                            data-sprint-goal-url-param="{{ path('app_project_sprint_sort_goal', {
+                            data-sprint--sort-goal-url-param="{{ path('app_project_sprint_sort_goal', {
                                 id: project.id,
                                 goalId: goal.id
                             }) }}"
                         >
                             <div class="d-flex justify-content-between align-items-center">
-                                {{ goal.name }}
+                                <div data-sprint--edit-goal-target="goal"
+                                     data-sprint--edit-goal-id-param="{{ goal.id }}"
+                                >
+                                    {{ goal.name }}
+                                </div>
                                 <div>
-                                    <button class="btn btn-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
+                                    {% if is_granted('EDIT_SPRINT_GOAL', project) %}
+                                        <button type="button"
+                                                data-action="sprint--edit-goal#showModal"
+                                                data-sprint--edit-goal-id-param="{{ goal.id }}"
+                                                data-sprint--edit-goal-url-param="{{ path('app_project_sprint_edit_goal', {
+                                                    id: project.id,
+                                                    goalId: goal.id
+                                                }) }}"
+                                                class="btn btn-secondary"
+                                        >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    {% endif %}
                                     {% if is_granted('REMOVE_CURRENT_SPRINT_GOAL', project) and goal.canBeRemoved %}
                                         <button data-confirm-modal-url-param="{{ path('app_project_sprint_remove_goal', {
                                             id: project.id,
@@ -36,12 +50,12 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <ul data-sprint-target="issues"
-                                data-sprint-goal-id-param="{{ goal.id }}"
+                            <ul data-sprint--sort-target="issues"
+                                data-sprint--sort-goal-id-param="{{ goal.id }}"
                                 class="list-group mt-2"
                             >
                                 {% for goalIssue in goal.sprintGoalIssues %}
-                                    <li data-sprint-issue-sort-url-param="{{ path('app_project_sprint_move_issue', {
+                                    <li data-sprint--sort-issue-sort-url-param="{{ path('app_project_sprint_move_issue', {
                                             id: project.id,
                                             issueCode: goalIssue.issue.code
                                         }) }}"
@@ -71,7 +85,7 @@
                             </ul>
                         </li>
                     {% endfor %}
-                    <li class="list-group-item">
+                    <li class="list-group-item bg-body-tertiary">
                         {{ form_start(sprintGoalForm) }}
                         <div class="d-flex align-items-start">
                             <div style="width: 90%;">
@@ -90,6 +104,7 @@
                 </ul>
             </div>
         </div>
+        {% include 'sprint/edit_goal_modal.html.twig' %}
         {% include 'common/confirm_modal.html.twig' with {
             dialogText: 'Are you sure to remove this issue from sprint?',
             id: 'remove-issue'
