@@ -23,6 +23,8 @@ class SprintVoter extends Voter
 
     public const VIEW_CURRENT_SPRINT = 'VIEW_SPRINT';
 
+    public const START_CURRENT_SPRINT = 'START_CURRENT_SPRINT';
+
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -33,7 +35,8 @@ class SprintVoter extends Voter
             self::REMOVE_CURRENT_SPRINT_GOAL,
             self::EDIT_SPRINT_GOAL,
             self::MOVE_CURRENT_SPRINT_ISSUE,
-            self::SORT_SPRINT_GOAL
+            self::SORT_SPRINT_GOAL,
+            self::START_CURRENT_SPRINT,
         ];
 
         return in_array($attribute, $attributes) && $subject instanceof Project;
@@ -76,7 +79,8 @@ class SprintVoter extends Voter
             self::REMOVE_CURRENT_SPRINT_GOAL,
             self::EDIT_SPRINT_GOAL,
             self::MOVE_CURRENT_SPRINT_ISSUE,
-            self::SORT_SPRINT_GOAL
+            self::SORT_SPRINT_GOAL,
+            self::START_CURRENT_SPRINT
         ];
     }
 }

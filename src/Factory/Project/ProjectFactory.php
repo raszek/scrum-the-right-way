@@ -23,6 +23,13 @@ final class ProjectFactory extends PersistentProxyObjectFactory
         ]);
     }
 
+    public function withScrumType(): self
+    {
+        return $this->with([
+            'type' => ProjectTypeFactory::scrumType()
+        ]);
+    }
+
     protected function defaults(): array|callable
     {
         return [

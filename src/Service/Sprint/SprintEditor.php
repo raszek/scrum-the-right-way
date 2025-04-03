@@ -6,10 +6,12 @@ use App\Entity\Issue\Issue;
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
 use App\Entity\Sprint\SprintGoalIssue;
+use App\Exception\Sprint\CannotStartSprintException;
 use App\Form\Sprint\CreateSprintGoalForm;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
+use App\Service\Common\ClockInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 
@@ -22,6 +24,7 @@ readonly class SprintEditor
         private IssueColumnRepository $issueColumnRepository,
         private SprintGoalIssueRepository $sprintGoalIssueRepository,
         private SprintGoalRepository $sprintGoalRepository,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -99,6 +102,29 @@ readonly class SprintEditor
         }
 
         $this->entityManager->remove($sprintGoal);
+
+        $this->entityManager->flush();
+    }
+
+    public function start(): void
+    {
+        if (!$this->sprint->isCurrent()) {
+            throw new RuntimeException('Only current sprint can be started');
+        }
+
+        if ($this->sprint->isStarted()) {
+            throw new RuntimeException('Cannot start sprint. Sprint already started');
+        }
+
+        foreach ($this->sprint->getSprintGoals() as $sprintGoal) {
+            if ($sprintGoal->getSprintGoalIssues()->isEmpty()) {
+                throw new CannotStartSprintException(
+                    'Cannot start sprint. Every sprint goal must have at least one issue.'
+                );
+            }
+        }
+
+        $this->sprint->setStartedAt($this->clock->now());
 
         $this->entityManager->flush();
     }

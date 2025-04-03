@@ -8,7 +8,14 @@
             <div class="col-12">
                 {% include 'common/project_page_header.html.twig' %}
 
-                <ul class="list-group" data-sprint--sort-target="goals">
+                <form action="{{ path('app_project_sprint_current_start', {
+                    id: project.id
+                }) }}"
+                      method="post"
+                >
+                    <button type="submit" class="btn btn-primary w-100">Start sprint</button>
+                </form>
+                <ul class="list-group mt-3" data-sprint--sort-target="goals">
                     {% for goal in sprintGoals %}
                         <li class="list-group-item bg-body-tertiary"
                             data-sprint--sort-goal-url-param="{{ path('app_project_sprint_sort_goal', {

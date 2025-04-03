@@ -8,15 +8,13 @@ use App\Factory\Project\ProjectFactory;
 use App\Factory\Project\ProjectMemberFactory;
 use App\Factory\Project\ProjectMemberRoleFactory;
 use App\Factory\Project\ProjectRoleFactory;
+use App\Factory\Sprint\SprintFactory;
 use App\Factory\UserFactory;
 use App\Helper\JsonHelper;
 use App\Repository\Project\ProjectMemberRepository;
-use Zenstruck\Foundry\Test\Factories;
 
 class ProjectMemberControllerTest extends WebTestCase
 {
-
-
 
     /** @test */
     public function project_member_can_access_member_list()
@@ -39,7 +37,16 @@ class ProjectMemberControllerTest extends WebTestCase
             'lastName' => 'Developerlastname',
         ]);
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create([
+                'code' => 'SCP'
+            ]);
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         $anotherProject = ProjectFactory::createOne();
 
@@ -93,7 +100,14 @@ class ProjectMemberControllerTest extends WebTestCase
             'email' => 'developer@example.com',
         ]);
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ProjectMemberFactory::createOne([
             'user' => $admin,
@@ -138,7 +152,14 @@ class ProjectMemberControllerTest extends WebTestCase
 
         $developer = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         $projectAdminRole = ProjectRoleFactory::adminRole();
         ProjectRoleFactory::developerRole();
@@ -189,7 +210,14 @@ class ProjectMemberControllerTest extends WebTestCase
 
         $analytic = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         $developerRole = ProjectRoleFactory::developerRole();
 
@@ -246,7 +274,14 @@ class ProjectMemberControllerTest extends WebTestCase
 
         $developer = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         $adminRole = ProjectRoleFactory::adminRole();
 
@@ -303,7 +338,14 @@ class ProjectMemberControllerTest extends WebTestCase
 
         $newUser = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         $adminRole = ProjectRoleFactory::adminRole();
 

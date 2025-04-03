@@ -10,10 +10,10 @@ use App\Factory\Project\ProjectFactory;
 use App\Factory\Project\ProjectMemberFactory;
 use App\Factory\Project\ProjectMemberRoleFactory;
 use App\Factory\Project\ProjectRoleFactory;
+use App\Factory\Sprint\SprintFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
 use Carbon\CarbonImmutable;
-use Zenstruck\Foundry\Test\Factories;
 
 class IssueControllerTest extends WebTestCase
 {
@@ -28,7 +28,14 @@ class IssueControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ProjectMemberFactory::createOne([
             'user' => $user,
@@ -69,7 +76,14 @@ class IssueControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ProjectMemberFactory::createOne([
             'user' => $user,
@@ -146,8 +160,15 @@ class IssueControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne([
-            'code' => 'SCP'
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create([
+                'code' => 'SCP'
+            ]);
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
         ]);
 
         $developerMember = ProjectMemberFactory::createOne([
@@ -208,8 +229,15 @@ class IssueControllerTest extends WebTestCase
             'lastName' => 'Mann',
         ]);
 
-        $project = ProjectFactory::createOne([
-            'code' => 'SCP'
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create([
+                'code' => 'SCP'
+            ]);
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
         ]);
 
         ProjectMemberFactory::createOne([
@@ -262,8 +290,15 @@ class IssueControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne([
-            'code' => 'SCP'
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create([
+                'code' => 'SCP'
+            ]);
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
         ]);
 
         ProjectMemberFactory::createOne([
@@ -302,8 +337,15 @@ class IssueControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne([
-            'code' => 'SCP'
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create([
+                'code' => 'SCP'
+            ]);
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
         ]);
 
         ProjectMemberFactory::createOne([

@@ -109,16 +109,6 @@ class IssueController extends CommonIssueController
         ]);
     }
 
-    #[Route('/kanban', name: 'app_project_kanban')]
-    public function kanban(Project $project): Response
-    {
-        $this->denyAccessUnlessGranted(IssueVoter::KANBAN_VIEW, $project);
-
-        return $this->render('issue/kanban.html.twig', [
-            'project' => $project
-        ]);
-    }
-
     #[Route(['/issues/{issueCode}', '/backlog/issues/{issueCode}'], name: 'app_project_issue_view')]
     public function view(
         Project $project,

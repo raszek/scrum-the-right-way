@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Factory\Project\ProjectFactory;
 use App\Factory\Project\ProjectMemberFactory;
+use App\Factory\Sprint\SprintFactory;
 use App\Factory\Thread\ThreadFactory;
 use App\Factory\Thread\ThreadMessageFactory;
 use App\Factory\Thread\ThreadStatusFactory;
@@ -13,12 +14,9 @@ use App\Repository\Thread\ThreadRepository;
 use App\Repository\Thread\ThreadStatusRepository;
 use App\Service\Common\ClockInterface;
 use Carbon\CarbonImmutable;
-use Zenstruck\Foundry\Test\Factories;
 
 class ThreadControllerTest extends WebTestCase
 {
-
-
 
     /** @test */
     public function project_member_can_list_threads()
@@ -28,7 +26,14 @@ class ThreadControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         $threadOpenStatus = ThreadStatusFactory::openStatus();
 
@@ -82,7 +87,14 @@ class ThreadControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         $threadOpenStatus = ThreadStatusFactory::openStatus();
 
@@ -144,7 +156,14 @@ class ThreadControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ThreadStatusFactory::threadStatuses();
 
@@ -197,7 +216,14 @@ class ThreadControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ProjectMemberFactory::createOne([
             'user' => $user,
@@ -257,7 +283,14 @@ class ThreadControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ProjectMemberFactory::createOne([
             'user' => $user,
@@ -328,7 +361,14 @@ class ThreadControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ThreadStatusFactory::threadStatuses();
 
@@ -394,7 +434,14 @@ class ThreadControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ThreadStatusFactory::threadStatuses();
 
@@ -444,11 +491,6 @@ class ThreadControllerTest extends WebTestCase
     private function threadStatusRepository(): ThreadStatusRepository
     {
         return $this->getService(ThreadStatusRepository::class);
-    }
-
-    private function threadMessageRepository(): ThreadMessageRepository
-    {
-        return $this->getService(ThreadMessageRepository::class);
     }
 
     private function threadRepository(): ThreadRepository

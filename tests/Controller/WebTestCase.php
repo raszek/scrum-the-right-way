@@ -64,6 +64,11 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         return $crawler;
     }
 
+    /**
+     * @template T
+     * @param class-string<T> $className
+     * @return T
+     */
     public function getService(string $className): mixed
     {
         return self::getClient()->getContainer()->get($className);

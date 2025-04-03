@@ -7,15 +7,13 @@ use App\Event\Thread\ThreadEventList;
 use App\Factory\Event\EventFactory;
 use App\Factory\Project\ProjectFactory;
 use App\Factory\Project\ProjectMemberFactory;
+use App\Factory\Sprint\SprintFactory;
 use App\Factory\Thread\ThreadFactory;
 use App\Factory\UserFactory;
 use Carbon\CarbonImmutable;
-use Zenstruck\Foundry\Test\Factories;
 
 class EventControllerTest extends WebTestCase
 {
-
-
 
     /** @test */
     public function project_member_can_see_project_thread_activities()
@@ -28,7 +26,14 @@ class EventControllerTest extends WebTestCase
             'lastName' => 'Smith'
         ]);
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ProjectMemberFactory::createOne([
             'user' => $user,
@@ -102,7 +107,14 @@ class EventControllerTest extends WebTestCase
             'lastName' => 'Smith'
         ]);
 
-        $project = ProjectFactory::createOne();
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create();
+
+        SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project
+        ]);
 
         ProjectMemberFactory::createOne([
             'user' => $user,

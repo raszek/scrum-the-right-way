@@ -15,12 +15,11 @@ use App\Factory\Sprint\SprintGoalIssueFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
+use App\Repository\Sprint\SprintRepository;
 use App\Tests\Controller\WebTestCase;
 
 class SprintControllerTest extends WebTestCase
 {
-
-
 
     /** @test */
     public function user_can_view_current_sprint()
@@ -34,7 +33,7 @@ class SprintControllerTest extends WebTestCase
             'code' => 'SCP'
         ]);
 
-        $memberDeveloper = ProjectMemberFactory::createOne([
+        ProjectMemberFactory::createOne([
             'user' => $user,
             'project' => $project
         ]);
@@ -249,9 +248,78 @@ class SprintControllerTest extends WebTestCase
         $this->assertNotNull($createdSprintGoal);
     }
 
+    /** @test */
+    public function developer_can_start_sprint()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
+            'number' => 1,
+            'startedAt' => null
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'name' => 'Some sprint name',
+            'sprint' => $sprint
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $issue,
+            'sprintGoal' => $sprintGoal
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current/start',
+            $project->getId(),
+        );
+
+        $client->request('POST', $uri);
+
+        $this->assertResponseIsSuccessful();
+
+        $updatedSprint = $this->sprintRepository()->findOneBy([
+            'id' => $sprint->getId()
+        ]);
+
+        $this->assertNotNull($updatedSprint);
+        $this->assertNotNull($updatedSprint->getStartedAt());
+    }
+
     private function sprintGoalRepository(): SprintGoalRepository
     {
         return $this->getService(SprintGoalRepository::class);
+    }
+
+    private function sprintRepository(): SprintRepository
+    {
+        return $this->getService(SprintRepository::class);
     }
 
     private function issueRepository(): IssueRepository

@@ -3,12 +3,16 @@
 namespace App\Service\Menu;
 
 use App\Entity\Project\Project;
+use App\Service\Kanban\KanbanAccess;
+use App\Service\Sprint\SprintAccess;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class ProjectMenuDataProvider
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator
+        private UrlGeneratorInterface $urlGenerator,
+        private SprintAccess $sprintAccess,
+        private KanbanAccess $kanbanAccess
     ) {
     }
 
@@ -16,6 +20,10 @@ readonly class ProjectMenuDataProvider
     {
         $links = [];
         foreach ($this->getMenuLinks($project) as $menuLink) {
+            if (isset($menuLink['canBeAccessed']) && $menuLink['canBeAccessed'] === false) {
+                continue;
+            }
+
             $links[] = [
                 'isActive' => str_contains($currentPath, $menuLink['url']),
                 ...$menuLink
@@ -41,6 +49,7 @@ readonly class ProjectMenuDataProvider
                 ]),
                 'label' => 'Sprint',
                 'icon' => 'iconoir-running',
+                'canBeAccessed' => $this->sprintAccess->isSprintViewAccessible($project),
             ],
             [
                 'url' => $this->urlGenerator->generate('app_project_kanban', [
@@ -48,6 +57,7 @@ readonly class ProjectMenuDataProvider
                 ]),
                 'label' => 'Kanban',
                 'icon' => 'bi-kanban',
+                'canBeAccessed' => $this->kanbanAccess->isKanbanViewAccessible($project),
             ],
             [
                 'url' => $this->urlGenerator->generate('app_project_thread_list', [

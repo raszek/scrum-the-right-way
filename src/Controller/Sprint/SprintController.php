@@ -5,15 +5,18 @@ namespace App\Controller\Sprint;
 use App\Controller\Issue\CommonIssueController;
 use App\Entity\Project\Project;
 use App\Entity\Sprint\Sprint;
+use App\Exception\Sprint\CannotStartSprintException;
 use App\Form\Sprint\SprintGoalFormType;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintRepository;
 use App\Security\Voter\SprintVoter;
+use App\Service\Sprint\SprintAccess;
 use App\Service\Sprint\SprintEditorFactory;
 use App\Service\Sprint\SprintService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/projects/{id}')]
@@ -31,9 +34,14 @@ class SprintController extends CommonIssueController
 
 
     #[Route('/sprints/current', 'app_project_sprint_current_view')]
-    public function viewCurrent(Project $project, Request $request): Response
+    public function viewCurrent(Project $project, Request $request, SprintAccess $sprintAccess): Response
     {
         $this->denyAccessUnlessGranted(SprintVoter::VIEW_CURRENT_SPRINT, $project);
+
+        $error = $sprintAccess->sprintViewAccessError($project);
+        if ($error) {
+            throw new BadRequestHttpException($error);
+        }
 
         $currentSprint = $this->getCurrentSprint($project);
 
@@ -60,6 +68,31 @@ class SprintController extends CommonIssueController
             'sprint' => $currentSprint,
             'sprintGoals' => $sprintGoals,
             'sprintGoalForm' => $sprintGoalForm,
+        ]);
+    }
+
+    #[Route('/sprints/current/start', 'app_project_sprint_current_start', methods: ['POST'])]
+    public function start(Project $project): Response
+    {
+        $this->denyAccessUnlessGranted(SprintVoter::START_CURRENT_SPRINT, $project);
+
+        $currentSprint = $this->getCurrentSprint($project);
+
+        $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
+
+        try {
+            $sprintEditor->start();
+        } catch (CannotStartSprintException $e) {
+
+            $this->errorFlash($e->getMessage());
+
+            return $this->redirectToRoute('app_project_sprint_current_view', [
+                'id' => $project->getId(),
+            ]);
+        }
+
+        return $this->redirectToRoute('app_project_kanban', [
+            'id' => $project->getId()
         ]);
     }
 

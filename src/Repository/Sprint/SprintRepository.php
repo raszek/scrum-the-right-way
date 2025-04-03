@@ -7,6 +7,7 @@ use App\Entity\Sprint\Sprint;
 use App\Repository\QueryBuilder\QueryBuilder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use RuntimeException;
 
 /**
  * @extends ServiceEntityRepository<Sprint>
@@ -16,6 +17,20 @@ class SprintRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Sprint::class);
+    }
+
+    public function getCurrentSprint(Project $project): Sprint
+    {
+        $currentSprint = $this->findOneBy([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        if (!$currentSprint) {
+            throw new RuntimeException('Current sprint not found.');
+        }
+
+        return $currentSprint;
     }
 
     public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder

@@ -8,16 +8,14 @@ use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
 use App\Factory\Project\ProjectFactory;
 use App\Factory\Project\ProjectMemberFactory;
+use App\Factory\Sprint\SprintFactory;
 use App\Factory\UserFactory;
 use App\Helper\JsonHelper;
 use Carbon\CarbonImmutable;
 use Symfony\Component\DomCrawler\Crawler;
-use Zenstruck\Foundry\Test\Factories;
 
 class DescriptionHistoryControllerTest extends WebTestCase
 {
-
-
 
     /** @test */
     public function project_member_can_list_issue_description_changes()
@@ -46,6 +44,11 @@ class DescriptionHistoryControllerTest extends WebTestCase
             'type' => $issueType,
             'number' => 12,
             'description' => null
+        ]);
+
+        SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
         ]);
 
         DescriptionHistoryFactory::createOne([

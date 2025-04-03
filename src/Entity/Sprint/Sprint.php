@@ -61,6 +61,11 @@ class Sprint
         return $this->number;
     }
 
+    public function isStarted(): bool
+    {
+        return $this->getStartedAt() !== null;
+    }
+
     public function getStartedAt(): ?DateTimeImmutable
     {
         return $this->startedAt;

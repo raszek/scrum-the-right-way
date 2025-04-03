@@ -151,13 +151,7 @@ class Project
 
     public function hasMember(User $searchedMember): bool
     {
-        foreach ($this->getMembers() as $member) {
-            if ($searchedMember->getId() === $member->getUser()->getId()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->findMember($searchedMember) !== null;
     }
 
     /**
