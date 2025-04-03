@@ -18,6 +18,11 @@ class IssueColumnRepository extends ServiceEntityRepository
         parent::__construct($registry, IssueColumn::class);
     }
 
+    public function fromEnum(IssueColumnEnum $enum): IssueColumn
+    {
+        return $this->getReference($enum->value);
+    }
+
     public function backlogColumn(): IssueColumn
     {
         return $this->getReference(IssueColumnEnum::Backlog->value);

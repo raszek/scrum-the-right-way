@@ -6,6 +6,7 @@ use App\Controller\Controller;
 use App\Entity\Project\Project;
 use App\Security\Voter\IssueVoter;
 use App\Service\Kanban\KanbanAccess;
+use App\Service\Kanban\KanbanService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -13,6 +14,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/projects/{id}')]
 class KanbanController extends Controller
 {
+
+    public function __construct(
+        private readonly KanbanService $kanbanService,
+    ) {
+    }
 
     #[Route('/kanban', name: 'app_project_kanban')]
     public function kanban(Project $project, KanbanAccess $kanbanAccess): Response
@@ -24,8 +30,11 @@ class KanbanController extends Controller
             throw new BadRequestHttpException($error);
         }
 
+        $columns = $this->kanbanService->getColumns($project);
+
         return $this->render('issue/kanban.html.twig', [
-            'project' => $project
+            'project' => $project,
+            'columns' => $columns,
         ]);
     }
 }

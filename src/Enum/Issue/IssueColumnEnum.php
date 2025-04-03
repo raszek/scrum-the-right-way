@@ -34,4 +34,18 @@ enum IssueColumnEnum: int
         };
     }
 
+    /**
+     * @return IssueColumnEnum[]
+     */
+    public static function kanbanColumns(): array
+    {
+        return [
+            IssueColumnEnum::ToDo,
+            IssueColumnEnum::InProgress,
+            IssueColumnEnum::Test,
+            IssueColumnEnum::InTests,
+            IssueColumnEnum::Done,
+        ];
+    }
+
 }
