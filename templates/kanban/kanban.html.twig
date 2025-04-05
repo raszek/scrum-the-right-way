@@ -1,0 +1,47 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Kanban' %}
+
+{% block content %}
+    <div data-controller="kanban--filter">
+        {% embed 'common/project_page_header.html.twig' %}
+            {% block buttons %}
+                <div class="btn-group btn-group-sm">
+                    <button data-kanban--filter-target="button"
+                            data-action="kanban--filter#filter"
+                            data-kanban--filter-url-param="{{ path('app_project_kanban_columns', {
+                                id: project.id,
+                                filter: 'big'
+                            }) }}"
+                            class="btn btn-primary {{ filter.value == 'big' ? 'active' : '' }}"
+                            aria-current="page"
+                    >
+                        Big
+                    </button>
+                    <button data-kanban--filter-target="button"
+                            data-action="kanban--filter#filter"
+                            data-kanban--filter-url-param="{{ path('app_project_kanban_columns', {
+                                id: project.id,
+                                filter: 'small'
+                            }) }}"
+                            class="btn btn-primary {{ filter.value == 'small' ? 'active' : '' }}"
+                    >
+                        Small
+                    </button>
+                </div>
+            {% endblock %}
+        {% endembed %}
+
+        <div data-kanban--filter-target="loader"
+             class="d-flex justify-content-center d-none"
+        >
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div data-kanban--filter-target="container">
+            {% include 'kanban/kanban_columns.html.twig' %}
+        </div>
+    </div>
+{% endblock %}

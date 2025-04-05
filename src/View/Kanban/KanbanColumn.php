@@ -9,6 +9,7 @@ readonly class KanbanColumn
 
     public function __construct(
         public string $name,
+        public string $key,
         /**
          * @var Issue[]
          */

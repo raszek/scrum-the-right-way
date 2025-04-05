@@ -2,10 +2,13 @@
 
 namespace App\Service\Kanban;
 
+use App\Entity\Issue\IssueColumn;
 use App\Entity\Project\Project;
 use App\Enum\Issue\IssueColumnEnum;
+use App\Enum\Kanban\KanbanFilterEnum;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
+use App\Repository\QueryBuilder\QueryBuilder;
 use App\View\Kanban\KanbanColumn;
 
 readonly class KanbanService
@@ -20,25 +23,34 @@ readonly class KanbanService
     /**
      * @return KanbanColumn[]
      */
-    public function getColumns(Project $project): array
+    public function getColumns(Project $project, KanbanFilterEnum $filter = KanbanFilterEnum::Big): array
     {
         $columns = [];
 
         foreach (IssueColumnEnum::kanbanColumns() as $issueColumn) {
-            $columnQuery = $this->issueRepository->columnQuery(
-                $project,
-                $this->issueColumnRepository->fromEnum($issueColumn)
+            $query = $this->getColumnQuery(
+                filter: $filter,
+                project: $project,
+                column: $this->issueColumnRepository->fromEnum($issueColumn),
             );
-
-            $columnQuery->setMaxResults(100);
 
             $columns[] = new KanbanColumn(
                 name: $issueColumn->label(),
-                items: $columnQuery->getQuery()->getResult(),
+                key: $issueColumn->key(),
+                items: $query->getQuery()->getResult(),
             );
         }
 
         return $columns;
+    }
+
+    private function getColumnQuery(KanbanFilterEnum $filter, Project $project, IssueColumn $column): QueryBuilder
+    {
+        if ($filter === KanbanFilterEnum::Big) {
+            return $this->issueRepository->bigColumnQuery($project, $column);
+        }
+
+        return $this->issueRepository->smallColumnQuery($project, $column);
     }
 
 }

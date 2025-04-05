@@ -1,7 +1,7 @@
 <div class="row mt-3">
-    <div class="col-12">
+    <div class="col-12 d-flex justify-content-between align-items-center">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{{ path('app_project_kanban', {id: project.id}) }}">Project home</a></li>
                 {% for link in links ?? [] %}
                     <li class="breadcrumb-item"><a href="{{ link.url }}">{{ link.label }}</a></li>
@@ -9,6 +9,8 @@
                 <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
             </ol>
         </nav>
-        <hr>
+        {% block buttons %}
+        {% endblock %}
     </div>
 </div>
+<hr>

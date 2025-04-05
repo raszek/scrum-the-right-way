@@ -1,0 +1,28 @@
+<div data-controller="kanban--move"
+     class="row"
+>
+    {% for column in columns %}
+        <div class="col">
+            <h4>
+                {{ column.name }}
+            </h4>
+            <hr>
+            <div class="d-flex flex-column"
+                 data-kanban--move-target="column"
+                 data-kanban--move-column-key-param="{{ column.key }}"
+            >
+                {% for issue in column.items %}
+                    <div class="card w-100 mb-1">
+                        <div class="card-body">
+                            <h5 class="card-title d-flex justify-content-between">
+                                {{ issue.code }}
+                                <small>{{ issue.type.label }}</small>
+                            </h5>
+                            <p class="card-text">{{ issue.title }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

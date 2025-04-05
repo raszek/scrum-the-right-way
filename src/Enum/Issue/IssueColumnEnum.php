@@ -34,6 +34,34 @@ enum IssueColumnEnum: int
         };
     }
 
+    public function key(): string
+    {
+        return match ($this) {
+            IssueColumnEnum::Backlog => 'backlog',
+            IssueColumnEnum::ToDo => 'to-do',
+            IssueColumnEnum::InProgress => 'in-progress',
+            IssueColumnEnum::Test => 'test',
+            IssueColumnEnum::InTests => 'in-tests',
+            IssueColumnEnum::Done => 'done',
+            IssueColumnEnum::Closed => 'closed',
+            IssueColumnEnum::Archived => 'archived',
+        };
+    }
+
+    public static function fromKey(string $key): IssueColumnEnum
+    {
+        return match ($key) {
+            'backlog' => IssueColumnEnum::Backlog,
+            'to-do' => IssueColumnEnum::ToDo,
+            'in-progress' => IssueColumnEnum::InProgress,
+            'test' => IssueColumnEnum::Test,
+            'in-tests' => IssueColumnEnum::InTests,
+            'done' => IssueColumnEnum::Done,
+            'closed' => IssueColumnEnum::Closed,
+            'archived' => IssueColumnEnum::Archived,
+        };
+    }
+
     /**
      * @return IssueColumnEnum[]
      */

@@ -58,6 +58,10 @@ readonly class SprintEditor
 
         $issue->setIssueColumn($this->issueColumnRepository->toDoColumn());
 
+        foreach ($issue->getSubIssues() as $subIssue) {
+            $subIssue->setIssueColumn($this->issueColumnRepository->toDoColumn());
+        }
+
         $this->entityManager->persist($sprintGoalIssue);
 
         $firstSprintGoal->addSprintGoalIssue($sprintGoalIssue);
@@ -67,12 +71,20 @@ readonly class SprintEditor
 
     public function removeSprintIssue(Issue $issue): void
     {
-        $issue->setIssueColumn($this->issueColumnRepository->backlogColumn());
+        if ($issue->isSubIssue()) {
+            throw new RuntimeException('Cannot remove sub issue');
+        }
 
         $sprintGoalIssue = $this->sprintGoalIssueRepository->findSprintIssue($issue, $this->sprint);
 
         if (!$sprintGoalIssue) {
             throw new RuntimeException('Sprint goal issue not found');
+        }
+
+        $issue->setIssueColumn($this->issueColumnRepository->backlogColumn());
+
+        foreach ($issue->getSubIssues() as $subIssue) {
+            $subIssue->setIssueColumn($this->issueColumnRepository->backlogColumn());
         }
 
         $this->entityManager->remove($sprintGoalIssue);

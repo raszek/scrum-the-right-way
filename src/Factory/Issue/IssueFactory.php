@@ -39,8 +39,6 @@ final class IssueFactory extends PersistentProxyObjectFactory
      */
     protected function initialize(): static
     {
-        return $this
-            // ->afterInstantiate(function(Issue $issue): void {})
-        ;
+        return $this;
     }
 }

@@ -101,6 +101,33 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
         return $queryBuilder;
     }
 
+    public function kanbanColumnQuery(Project $project, IssueColumn $issueColumn): QueryBuilder
+    {
+        $columnQuery = $this->columnQuery($project, $issueColumn);
+        $columnQuery->setMaxResults(100);
+        $columnQuery->orderBy('issue.columnOrder', 'ASC');
+
+        return $columnQuery;
+    }
+
+    public function bigColumnQuery(Project $project, IssueColumn $issueColumn): QueryBuilder
+    {
+        $kanbanColumnQuery = $this->kanbanColumnQuery($project, $issueColumn);
+        $kanbanColumnQuery->andWhere('issue.type <> :type');
+        $kanbanColumnQuery->setParameter('type', $this->issueTypeRepository->subIssueType());
+
+        return $kanbanColumnQuery;
+    }
+
+    public function smallColumnQuery(Project $project, IssueColumn $issueColumn): QueryBuilder
+    {
+        $kanbanColumnQuery = $this->kanbanColumnQuery($project, $issueColumn);
+        $kanbanColumnQuery->andWhere('issue.type <> :type');
+        $kanbanColumnQuery->setParameter('type', $this->issueTypeRepository->featureType());
+
+        return $kanbanColumnQuery;
+    }
+
     public function featureIssueQuery(Issue $issue): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('issue');

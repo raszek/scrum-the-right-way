@@ -3,7 +3,6 @@
 namespace App\Repository\Issue;
 
 use App\Entity\Issue\IssueColumn;
-use App\Entity\Project\Project;
 use App\Enum\Issue\IssueColumnEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 readonly class IssueSessionSettings
 {
 
-    CONST ACTIVITIES_VISIBLE_KEY = 'activities-visible';
+    CONST ACTIVITIES_VISIBLE_KEY = 'ACTIVITIES_VISIBLE_KEY';
 
     public function __construct(
         private RequestStack $requestStack,

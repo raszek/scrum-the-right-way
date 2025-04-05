@@ -29,6 +29,16 @@ class IssueColumn
         return $this->id;
     }
 
+    public function getKey(): string
+    {
+        return IssueColumnEnum::tryFrom($this->getId())->key();
+    }
+
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
     public function isBacklog(): bool
     {
         return $this->isColumn(IssueColumnEnum::Backlog);
@@ -57,10 +67,5 @@ class IssueColumn
     public function isColumn(IssueColumnEnum $issueColumnEnum): bool
     {
         return $this->getId() === $issueColumnEnum->value;
-    }
-
-    public function getLabel(): ?string
-    {
-        return $this->label;
     }
 }
