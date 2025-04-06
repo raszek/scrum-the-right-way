@@ -44,7 +44,7 @@ class IssueEditorTest extends KernelTestCase
 
         $issueToBeMoved = $this->getIssueEditor($issues[4]->_real(), $user->_real());
 
-        $issueToBeMoved->setPosition(2);
+        $issueToBeMoved->sort(2);
 
         $updatedIssues = $this->issueRepository()->backlogQuery($project)->getQuery()->getResult();
 
@@ -82,7 +82,7 @@ class IssueEditorTest extends KernelTestCase
 
         $issueEditor = $this->getIssueEditor($issueToBeMoved->_real(), $user->_real());
 
-        $issueEditor->setPosition(1);
+        $issueEditor->sort(1);
 
         $updatedIssues = $this->issueRepository()->backlogQuery($project)->getQuery()->getResult();
 
@@ -116,7 +116,7 @@ class IssueEditorTest extends KernelTestCase
 
         $issueToBeMoved = $this->getIssueEditor($issues[0]->_real(), $user->_real());
 
-        $issueToBeMoved->setPosition(5);
+        $issueToBeMoved->sort(5);
 
         $updatedIssues = $this->issueRepository()->backlogQuery($project)->getQuery()->getResult();
 
@@ -150,7 +150,7 @@ class IssueEditorTest extends KernelTestCase
 
         $issueToBeMoved = $this->getIssueEditor($issues[0]->_real(), $user->_real());
 
-        $issueToBeMoved->setPosition(2);
+        $issueToBeMoved->sort(2);
 
         $updatedIssues = $this->issueRepository()->backlogQuery($project)->getQuery()->getResult();
 

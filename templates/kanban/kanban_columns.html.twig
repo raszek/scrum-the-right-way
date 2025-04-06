@@ -12,7 +12,12 @@
                  data-kanban--move-column-key-param="{{ column.key }}"
             >
                 {% for issue in column.items %}
-                    <div class="card w-100 mb-1">
+                    <div class="card w-100 mb-1"
+                         data-kanban--move-url-param="{{ path('app_project_kanban_issue_move', {
+                             id: project.id,
+                             issueCode: issue.code
+                         }) }}"
+                    >
                         <div class="card-body">
                             <h5 class="card-title d-flex justify-content-between">
                                 {{ issue.code }}

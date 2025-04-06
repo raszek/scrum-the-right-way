@@ -11,22 +11,22 @@
                             data-action="kanban--filter#filter"
                             data-kanban--filter-url-param="{{ path('app_project_kanban_columns', {
                                 id: project.id,
+                                filter: 'small'
+                            }) }}"
+                            class="btn btn-primary {{ filter.value == 'small' ? 'active' : '' }}"
+                    >
+                        Small
+                    </button>
+                    <button data-kanban--filter-target="button"
+                            data-action="kanban--filter#filter"
+                            data-kanban--filter-url-param="{{ path('app_project_kanban_columns', {
+                                id: project.id,
                                 filter: 'big'
                             }) }}"
                             class="btn btn-primary {{ filter.value == 'big' ? 'active' : '' }}"
                             aria-current="page"
                     >
                         Big
-                    </button>
-                    <button data-kanban--filter-target="button"
-                            data-action="kanban--filter#filter"
-                            data-kanban--filter-url-param="{{ path('app_project_kanban_columns', {
-                                id: project.id,
-                                filter: 'small'
-                            }) }}"
-                            class="btn btn-primary {{ filter.value == 'small' ? 'active' : '' }}"
-                    >
-                        Small
                     </button>
                 </div>
             {% endblock %}

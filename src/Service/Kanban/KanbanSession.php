@@ -20,7 +20,9 @@ readonly class KanbanSession
     {
         $session = $this->requestStack->getSession();
 
-        return KanbanFilterEnum::tryFrom($session->get(self::KANBAN_FILTER_KEY)) ?? KanbanFilterEnum::Big;
+        $filterValue = $session->get(self::KANBAN_FILTER_KEY) ?? '';
+
+        return KanbanFilterEnum::tryFrom($filterValue) ?? KanbanFilterEnum::Small;
     }
 
     public function setFilter(KanbanFilterEnum $enum): void

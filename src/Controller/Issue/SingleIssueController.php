@@ -7,6 +7,7 @@ use App\Entity\Project\ProjectMember;
 use App\Exception\Issue\CannotSetIssueTitleException;
 use App\Exception\Issue\CannotSetStoryPointsException;
 use App\Exception\Issue\OutOfBoundPositionException;
+use App\Form\Issue\SortIssueForm;
 use App\Form\Tag\TagsForm;
 use App\Helper\IntegerHelper;
 use App\Repository\Issue\IssueRepository;
@@ -20,6 +21,7 @@ use App\Service\Tag\IssueTagEditorFactory;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -95,21 +97,21 @@ class SingleIssueController extends CommonIssueController
     }
 
     #[Route('/sort', name: 'app_project_issue_sort', methods: ['POST'])]
-    public function sort(Project $project, string $issueCode, Request $request): Response
+    public function sort(
+        Project $project,
+        string $issueCode,
+        #[MapRequestPayload] SortIssueForm $moveIssueForm
+    ): Response
     {
         $this->denyAccessUnlessGranted(SingleIssueVoter::SORT_ISSUE, $project);
-
-        $position = $request->get('position');
-
-        if (!$position) {
-            throw new BadRequestException('No position set');
-        }
 
         $issue = $this->findIssue($issueCode, $project);
         $issueEditor = $this->issueEditorFactory->create($issue, $this->getLoggedInUser());
 
         try {
-            $issueEditor->setPosition($position);
+            $issueEditor->sort(
+                position: $moveIssueForm->position
+            );
         } catch (OutOfBoundPositionException $e) {
             throw new BadRequestException($e->getMessage());
         }
@@ -137,13 +139,14 @@ class SingleIssueController extends CommonIssueController
         $this->denyAccessUnlessGranted(SingleIssueVoter::STORY_POINTS_SET, $project);
 
         $issue = $this->findIssue($issueCode, $project);
-        $issueEditor = $this->issueEditorFactory->create($issue, $this->getLoggedInUser());
 
         $storyPoints = $request->get('points');
 
         if ($storyPoints && !IntegerHelper::isInteger($storyPoints)) {
             throw new UnprocessableEntityHttpException('[points] must be integer');
         }
+
+        $issueEditor = $this->issueEditorFactory->create($issue, $this->getLoggedInUser());
 
         try {
             $issueEditor->setStoryPoints($storyPoints);

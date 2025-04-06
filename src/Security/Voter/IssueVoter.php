@@ -9,7 +9,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class IssueVoter extends Voter
 {
-    public const KANBAN_VIEW = 'KANBAN_VIEW';
 
     public const BACKLOG_VIEW = 'BACKLOG_VIEW';
 
@@ -23,7 +22,6 @@ class IssueVoter extends Voter
     protected function supports(string $attribute, mixed $subject): bool
     {
         $actions = [
-            self::KANBAN_VIEW,
             self::BACKLOG_VIEW,
             self::CREATE_ISSUE,
             self::VIEW_ISSUE,

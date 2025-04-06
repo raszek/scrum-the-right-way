@@ -4,6 +4,7 @@ namespace App\Service\Issue;
 
 use App\Entity\Issue\DescriptionHistory;
 use App\Entity\Issue\Issue;
+use App\Enum\Issue\IssueColumnEnum;
 use App\Event\Issue\Event\SetIssueDescriptionEvent;
 use App\Event\Issue\Event\SetIssueStoryPointsEvent;
 use App\Exception\Issue\CannotSetIssueDescriptionException;
@@ -20,6 +21,7 @@ use App\Service\Event\EventPersister;
 use App\Service\Position\Positioner;
 use Doctrine\ORM\EntityManagerInterface;
 use Jfcherng\Diff\DiffHelper;
+use RuntimeException;
 use Symfony\Component\String\UnicodeString;
 
 readonly class IssueEditor
@@ -35,12 +37,23 @@ readonly class IssueEditor
     ) {
     }
 
+    public function changeKanbanColumn(IssueColumnEnum $column): void
+    {
+        if (!in_array($column, IssueColumnEnum::kanbanColumns())) {
+            throw new RuntimeException('Invalid column. This method can only change columns in kanban.');
+        }
+
+        $this->issue->setIssueColumn($this->issueColumnRepository->fromEnum($column));
+
+        $this->entityManager->flush();
+    }
+
     /**
      * @param int $position
      * @return void
      * @throws OutOfBoundPositionException
      */
-    public function setPosition(int $position): void
+    public function sort(int $position): void
     {
         $query = $this->issueRepository->orderedColumnQuery($this->issue->getProject(), $this->issue->getIssueColumn());
         $query->andWhere('issue.id <> :issueId');

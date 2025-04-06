@@ -15,7 +15,6 @@ use App\Factory\UserFactory;
 use App\Repository\Event\EventRepository;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\User\UserNotificationRepository;
-use Zenstruck\Foundry\Test\Factories;
 
 class SingleIssueControllerTest extends WebTestCase
 {

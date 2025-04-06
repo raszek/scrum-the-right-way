@@ -18,8 +18,6 @@ use Carbon\CarbonImmutable;
 class IssueControllerTest extends WebTestCase
 {
 
-
-
     /** @test */
     public function project_member_can_access_backlog_issues()
     {

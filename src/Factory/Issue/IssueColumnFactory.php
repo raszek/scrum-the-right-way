@@ -27,11 +27,11 @@ final class IssueColumnFactory extends PersistentProxyObjectFactory
         }
     }
 
-    public static function testColumn(): IssueColumn
+    public static function inProgressColumn(): IssueColumn
     {
         return IssueColumnFactory::createOne([
-            'id' => IssueColumnEnum::Test->value,
-            'label' => IssueColumnEnum::Test->label()
+            'id' => IssueColumnEnum::InProgress->value,
+            'label' => IssueColumnEnum::InProgress->label()
         ]);
     }
 
