@@ -59,6 +59,7 @@ class Project
     ) {
         $this->members = new ArrayCollection();
         $this->sprints = new ArrayCollection();
+        $this->tags = new ArrayCollection();
         $this->name = $name;
         $this->code = $code;
         $this->type = $type;

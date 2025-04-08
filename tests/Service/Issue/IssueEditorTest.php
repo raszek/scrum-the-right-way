@@ -4,22 +4,25 @@ namespace App\Tests\Service\Issue;
 
 use App\Entity\Issue\Issue;
 use App\Entity\User\User;
+use App\Enum\Issue\IssueColumnEnum;
 use App\Exception\Issue\CannotSetStoryPointsException;
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Project\ProjectFactory;
+use App\Factory\Sprint\SprintFactory;
+use App\Factory\Sprint\SprintGoalFactory;
+use App\Factory\Sprint\SprintGoalIssueFactory;
 use App\Factory\UserFactory;
 use App\Helper\ArrayHelper;
 use App\Repository\Issue\IssueRepository;
-use App\Service\Issue\IssueEditor;
-use App\Service\Issue\IssueEditorFactory;
+use App\Repository\Sprint\SprintGoalIssueRepository;
+use App\Service\Issue\IssueEditor\IssueEditor;
+use App\Service\Issue\IssueEditor\IssueEditorFactory;
 use App\Tests\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
+use Carbon\CarbonImmutable;
 
 class IssueEditorTest extends KernelTestCase
 {
-
-
 
     /** @test */
     public function editor_can_change_issue_at_row_number_position()
@@ -181,6 +184,104 @@ class IssueEditorTest extends KernelTestCase
         $this->assertEquals('Story points value must be bigger than 0', $errorMessage);
     }
 
+    /** @test */
+    public function changing_column_to_done_should_mark_issue_in_sprint_as_done()
+    {
+        $project = ProjectFactory::createOne();
+
+        $user = UserFactory::createOne();
+
+        IssueColumnFactory::doneColumn();
+
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => IssueColumnFactory::inTestsColumn()
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $issue,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => null
+        ]);
+
+        $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
+
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::Done);
+
+        $updatedIssue = $this->issueRepository()->findOneBy([
+            'id' => $issue->getId()
+        ]);
+
+        $this->assertNotNull($updatedIssue);
+        $this->assertEquals(IssueColumnEnum::Done->value, $updatedIssue->getIssueColumn()->getId());
+
+        $updatedSprintGoalIssue = $this->sprintGoalIssueRepository()->findOneBy([
+            'sprintGoal' => $sprintGoal->getId(),
+            'issue' => $issue->getId(),
+        ]);
+
+        $this->assertNotNull($updatedSprintGoalIssue);
+        $this->assertNotNull($updatedSprintGoalIssue->getFinishedAt());
+    }
+
+    /** @test */
+    public function moving_issue_from_column_done_to_other_column_mark_issue_as_not_finished()
+    {
+        $project = ProjectFactory::createOne();
+
+        $user = UserFactory::createOne();
+
+        IssueColumnFactory::todoColumn();
+
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => IssueColumnFactory::doneColumn()
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $issue,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 12, 12, 12)
+        ]);
+
+        $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
+
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::ToDo);
+
+        $updatedIssue = $this->issueRepository()->findOneBy([
+            'id' => $issue->getId()
+        ]);
+
+        $this->assertNotNull($updatedIssue);
+        $this->assertEquals(IssueColumnEnum::ToDo->value, $updatedIssue->getIssueColumn()->getId());
+
+        $updatedSprintGoalIssue = $this->sprintGoalIssueRepository()->findOneBy([
+            'sprintGoal' => $sprintGoal->getId(),
+            'issue' => $issue->getId(),
+        ]);
+
+        $this->assertNotNull($updatedSprintGoalIssue);
+        $this->assertNull($updatedSprintGoalIssue->getFinishedAt());
+    }
+
     private function issueRepository(): IssueRepository
     {
         return $this->getService(IssueRepository::class);
@@ -189,5 +290,10 @@ class IssueEditorTest extends KernelTestCase
     private function getIssueEditor(Issue $issue, User $user): IssueEditor
     {
         return $this->getService(IssueEditorFactory::class)->create($issue, $user);
+    }
+
+    private function sprintGoalIssueRepository(): SprintGoalIssueRepository
+    {
+        return $this->getService(SprintGoalIssueRepository::class);
     }
 }

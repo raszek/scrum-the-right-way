@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Service\Issue;
+namespace App\Service\Issue\IssueEditor;
 
 use App\Entity\Issue\Issue;
 use App\Entity\User\User;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
+use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersisterFactory;
+use App\Service\Sprint\SprintIssueEditorStrategy;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class IssueEditorFactory
@@ -19,6 +21,7 @@ readonly class IssueEditorFactory
         private EntityManagerInterface $entityManager,
         private ClockInterface $clock,
         private EventPersisterFactory $eventPersisterFactory,
+        private SprintGoalIssueRepository $sprintGoalIssueRepository,
     ) {
     }
 
@@ -28,9 +31,19 @@ readonly class IssueEditorFactory
             issue: $issue,
             issueRepository: $this->issueRepository,
             issueColumnRepository: $this->issueColumnRepository,
+            projectIssueEditorStrategy: $this->getProjectIssueEditorStrategy($issue),
             entityManager: $this->entityManager,
             clock: $this->clock,
             eventPersister: $this->eventPersisterFactory->create($issue->getProject(), $user)
+        );
+    }
+
+    private function getProjectIssueEditorStrategy(Issue $issue): ProjectIssueEditorStrategy
+    {
+        return new SprintIssueEditorStrategy(
+            issue: $issue,
+            sprintGoalIssueRepository: $this->sprintGoalIssueRepository,
+            clock: $this->clock,
         );
     }
 

@@ -35,6 +35,22 @@ final class IssueColumnFactory extends PersistentProxyObjectFactory
         ]);
     }
 
+    public static function doneColumn(): IssueColumn
+    {
+        return IssueColumnFactory::createOne([
+            'id' => IssueColumnEnum::Done->value,
+            'label' => IssueColumnEnum::Done->label()
+        ]);
+    }
+
+    public static function inTestsColumn(): IssueColumn
+    {
+        return IssueColumnFactory::createOne([
+            'id' => IssueColumnEnum::InTests->value,
+            'label' => IssueColumnEnum::InTests->label()
+        ]);
+    }
+
     public static function todoColumn(): IssueColumn
     {
         return IssueColumnFactory::createOne([

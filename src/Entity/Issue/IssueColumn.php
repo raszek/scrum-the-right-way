@@ -49,6 +49,11 @@ class IssueColumn
         return $this->isColumn(IssueColumnEnum::ToDo);
     }
 
+    public function isDone(): bool
+    {
+        return $this->isColumn(IssueColumnEnum::Done);
+    }
+
     public function isInProgress(): bool
     {
         return $this->isColumn(IssueColumnEnum::InProgress);

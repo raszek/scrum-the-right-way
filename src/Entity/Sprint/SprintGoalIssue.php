@@ -6,6 +6,7 @@ use App\Doctrine\Sqid;
 use App\Entity\Issue\Issue;
 use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Service\Position\Positionable;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SprintGoalIssueRepository::class)]
@@ -28,6 +29,9 @@ class SprintGoalIssue implements Positionable
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Issue $issue;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $finishedAt = null;
 
     public function __construct(
         SprintGoal $sprintGoal,
@@ -72,5 +76,15 @@ class SprintGoalIssue implements Positionable
     public function getOrderSpace(): int
     {
         return self::DEFAULT_ORDER_SPACE;
+    }
+
+    public function getFinishedAt(): ?DateTimeImmutable
+    {
+        return $this->finishedAt;
+    }
+
+    public function setFinishedAt(?DateTimeImmutable $finishedAt): void
+    {
+        $this->finishedAt = $finishedAt;
     }
 }

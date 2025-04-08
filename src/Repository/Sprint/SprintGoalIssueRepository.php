@@ -16,8 +16,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SprintGoalIssueRepository extends ServiceEntityRepository implements ReorderService
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly SprintRepository $sprintRepository,
+    ) {
         parent::__construct($registry, SprintGoalIssue::class);
     }
 
@@ -38,6 +40,13 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
             ->orderBy('sprintGoalIssue.goalOrder', 'ASC');
 
         return $queryBuilder;
+    }
+
+    public function findCurrentSprintIssue(Issue $issue): ?SprintGoalIssue
+    {
+        $currentSprint = $this->sprintRepository->getCurrentSprint($issue->getProject());
+
+        return $this->findSprintIssue($issue, $currentSprint);
     }
 
     public function findSprintIssue(Issue $issue, Sprint $sprint): ?SprintGoalIssue

@@ -9,7 +9,7 @@ use App\Enum\Kanban\KanbanFilterEnum;
 use App\Form\Kanban\MoveIssueForm;
 use App\Repository\Issue\IssueRepository;
 use App\Security\Voter\KanbanVoter;
-use App\Service\Issue\IssueEditorFactory;
+use App\Service\Issue\IssueEditor\IssueEditorFactory;
 use App\Service\Kanban\KanbanAccess;
 use App\Service\Kanban\KanbanService;
 use App\Service\Kanban\KanbanSession;

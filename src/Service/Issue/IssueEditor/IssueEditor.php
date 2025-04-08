@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Issue;
+namespace App\Service\Issue\IssueEditor;
 
 use App\Entity\Issue\DescriptionHistory;
 use App\Entity\Issue\Issue;
@@ -10,15 +10,16 @@ use App\Event\Issue\Event\SetIssueStoryPointsEvent;
 use App\Exception\Issue\CannotSetIssueDescriptionException;
 use App\Exception\Issue\CannotSetIssueTitleException;
 use App\Exception\Issue\CannotSetStoryPointsException;
-use App\Exception\Issue\NoOrderSpaceException;
 use App\Exception\Issue\OutOfBoundPositionException;
 use App\Helper\JsonHelper;
 use App\Helper\StringHelper;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
+use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersister;
 use App\Service\Position\Positioner;
+use App\Service\Sprint\SprintIssueEditorStrategy;
 use Doctrine\ORM\EntityManagerInterface;
 use Jfcherng\Diff\DiffHelper;
 use RuntimeException;
@@ -31,6 +32,7 @@ readonly class IssueEditor
         private Issue $issue,
         private IssueRepository $issueRepository,
         private IssueColumnRepository $issueColumnRepository,
+        private ProjectIssueEditorStrategy $projectIssueEditorStrategy,
         private EntityManagerInterface $entityManager,
         private ClockInterface $clock,
         private EventPersister $eventPersister
@@ -39,9 +41,15 @@ readonly class IssueEditor
 
     public function changeKanbanColumn(IssueColumnEnum $column): void
     {
+        if ($this->issue->getIssueColumn()->getId() === $column->value) {
+            return;
+        }
+
         if (!in_array($column, IssueColumnEnum::kanbanColumns())) {
             throw new RuntimeException('Invalid column. This method can only change columns in kanban.');
         }
+
+        $this->projectIssueEditorStrategy->changeKanbanColumn($column);
 
         $this->issue->setIssueColumn($this->issueColumnRepository->fromEnum($column));
 
