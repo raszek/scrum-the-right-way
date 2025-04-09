@@ -36,7 +36,7 @@ readonly class IssueAssigneeEditor
         }
 
         $this->eventPersister->createIssueEvent(new SetIssueAssigneeEvent(
-            issueId: $this->issue->getId(),
+            issueId: $this->issue->getId()->integerId(),
             userId: $projectMember?->getUser()->getId()
         ), $this->issue);
     }

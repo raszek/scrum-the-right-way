@@ -2,6 +2,7 @@
 
 namespace App\Entity\Issue;
 
+use App\Doctrine\Sqid;
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectMember;
 use App\Entity\Project\ProjectTag;
@@ -28,8 +29,8 @@ class Issue implements Positionable
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'sqid')]
+    private ?Sqid $id = null;
 
     #[ORM\Column]
     private int $number;
@@ -154,7 +155,7 @@ class Issue implements Positionable
         $this->subIssues = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Sqid
     {
         return $this->id;
     }

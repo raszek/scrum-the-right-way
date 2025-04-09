@@ -10,12 +10,9 @@ use App\Factory\User\UserNotificationFactory;
 use App\Factory\UserFactory;
 use App\Repository\User\UserNotificationRepository;
 use Carbon\CarbonImmutable;
-use Zenstruck\Foundry\Test\Factories;
 
 class UserNotificationControllerTest extends WebTestCase
 {
-
-
 
     /** @test */
     public function user_can_list_his_notifications()
@@ -45,7 +42,7 @@ class UserNotificationControllerTest extends WebTestCase
             'name' => IssueEventList::SET_ISSUE_ASSIGNEE,
             'params' => [
                 'userId' => $user->getId(),
-                'issueId' => $issue->getId()
+                'issueId' => $issue->getId()->integerId()
             ],
             'project' => $project,
             'createdBy' => $analytic,
@@ -94,7 +91,7 @@ class UserNotificationControllerTest extends WebTestCase
             'name' => IssueEventList::SET_ISSUE_ASSIGNEE,
             'params' => [
                 'userId' => $user->getId(),
-                'issueId' => $issue->getId()
+                'issueId' => $issue->getId()->integerId()
             ],
             'project' => $project,
             'createdBy' => $analytic,

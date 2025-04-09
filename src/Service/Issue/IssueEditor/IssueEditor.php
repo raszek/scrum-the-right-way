@@ -67,7 +67,7 @@ readonly class IssueEditor
     {
         $query = $this->issueRepository->orderedColumnQuery($this->issue->getProject(), $this->issue->getIssueColumn());
         $query->andWhere('issue.id <> :issueId');
-        $query->setParameter('issueId', $this->issue->getId());
+        $query->setParameter('issueId', $this->issue->getId()->integerId());
 
         $positioner = new Positioner(
             query: $query,
@@ -129,7 +129,7 @@ readonly class IssueEditor
         $this->entityManager->flush();
 
         $this->eventPersister->createIssueEvent(new SetIssueDescriptionEvent(
-            issueId: $this->issue->getId(),
+            issueId: $this->issue->getId()->integerId(),
             historyId: $change->getId()->integerId()
         ), $this->issue);
     }
@@ -150,7 +150,7 @@ readonly class IssueEditor
         $this->entityManager->flush();
 
         $event = new SetIssueStoryPointsEvent(
-            issueId: $this->issue->getId(),
+            issueId: $this->issue->getId()->integerId(),
             storyPoints: $storyPoints
         );
 

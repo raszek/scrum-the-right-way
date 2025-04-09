@@ -142,7 +142,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new CreateIssueEvent(
-            $issue->getId(),
+            $issue->getId()->integerId(),
         );
 
         $event = $eventPersister->create($eventData);
@@ -185,7 +185,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new SetIssueAssigneeEvent(
-            issueId: $issue->getId(),
+            issueId: $issue->getId()->integerId(),
             userId: $assigneeUser->getId()
         );
 
@@ -226,7 +226,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new SetIssueDescriptionEvent(
-            issueId: $issue->getId(),
+            issueId: $issue->getId()->integerId(),
             historyId: $descriptionHistory->getId()->integerId()
         );
 
@@ -267,7 +267,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new SetIssueStoryPointsEvent(
-            issueId: $issue->getId(),
+            issueId: $issue->getId()->integerId(),
             storyPoints: 13
         );
 
@@ -306,7 +306,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new SetIssueTagsEvent(
-            issueId: $issue->getId(),
+            issueId: $issue->getId()->integerId(),
             tags: ['CODE_REVIEW', 'DEV']
         );
 
@@ -356,7 +356,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new AddIssueThreadMessageEvent(
-            issueId: $issue->getId(),
+            issueId: $issue->getId()->integerId(),
             threadMessageId: $threadMessage->getId()->integerId()
         );
 
@@ -408,7 +408,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new RemoveIssueThreadMessageEvent(
-            issueId: $issue->getId(),
+            issueId: $issue->getId()->integerId(),
             threadMessageId: $threadMessage->getId()->integerId()
         );
 

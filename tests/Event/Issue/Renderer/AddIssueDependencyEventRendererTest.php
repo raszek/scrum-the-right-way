@@ -12,7 +12,6 @@ use App\Factory\Project\ProjectFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
 use App\Tests\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
 
 class AddIssueDependencyEventRendererTest extends KernelTestCase
 {
@@ -44,8 +43,8 @@ class AddIssueDependencyEventRendererTest extends KernelTestCase
         ]);
 
         $eventData = new AddIssueDependencyEvent(
-            issueId: $issue->getId(),
-            dependencyId: $dependency->getId()
+            issueId: $issue->getId()->integerId(),
+            dependencyId: $dependency->getId()->integerId(),
         );
 
         $event = EventFactory::new()
@@ -95,8 +94,8 @@ class AddIssueDependencyEventRendererTest extends KernelTestCase
         ]);
 
         $eventData = new AddIssueDependencyEvent(
-            issueId: $issue->getId(),
-            dependencyId: $dependency->getId()
+            issueId: $issue->getId()->integerId(),
+            dependencyId: $dependency->getId()->integerId(),
         );
 
         $event = EventFactory::new()

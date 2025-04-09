@@ -14,12 +14,9 @@ use App\Factory\UserFactory;
 use App\Repository\Issue\AttachmentRepository;
 use App\Repository\Issue\IssueRepository;
 use App\Tests\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
 
 class AddIssueAttachmentEventRendererTest extends KernelTestCase
 {
-
-
 
     /** @test */
     public function it_renders_add_attachment_activity()
@@ -49,7 +46,7 @@ class AddIssueAttachmentEventRendererTest extends KernelTestCase
         ]);
 
         $eventData = new AddIssueAttachmentEvent(
-            issueId: $issue->getId(),
+            issueId: $issue->getId()->integerId(),
             attachmentId: $attachment->getId()->integerId()
         );
 

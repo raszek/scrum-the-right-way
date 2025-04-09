@@ -1,13 +1,20 @@
 import { Controller } from '@hotwired/stimulus';
 import {Sortable} from 'sortablejs';
 import {post} from 'util';
+import {Modal} from 'bootstrap';
 
 export default class extends Controller {
 
-    static targets = ['column'];
+    static values = {
+        userCurrentIssue: String
+    }
+
+    static targets = ['column', 'modal'];
 
     connect() {
         this.makeColumnSortable();
+
+        this.modal = new Modal(this.modalTarget);
     }
 
     makeColumnSortable() {
@@ -16,14 +23,23 @@ export default class extends Controller {
             new Sortable(columnTarget, {
                 group: 'issue',
                 animation: 150,
-                onUpdate: this.moveIssue.bind(this),
-                onAdd: this.moveIssue.bind(this),
+                onUpdate: this.dragIssue.bind(this),
+                onAdd: this.dragIssue.bind(this),
             });
         }
     }
 
-    moveIssue(event) {
+    moveIssue(issueId, targetColumn) {
+
+    }
+
+    dragIssue(event) {
         const targetColumn = event.to.getAttribute('data-kanban--move-column-key-param');
+
+        if (['in-progress', 'in-tests'].includes(targetColumn)) {
+
+            return;
+        }
 
         const url = event.item.getAttribute('data-kanban--move-url-param')
 

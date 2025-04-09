@@ -103,7 +103,11 @@ class SprintEditorTest extends KernelTestCase
         $this->assertCount(1, $updatedSprintGoal->getSprintGoalIssues());
 
         $updatedIssues = $this->issueRepository()->findBy([
-            'id' => [$feature->getId(), $subIssueOne->getId(), $subIssueTwo->getId()],
+            'id' => [
+                $feature->getId()->integerId(),
+                $subIssueOne->getId()->integerId(),
+                $subIssueTwo->getId()->integerId(),
+            ],
         ]);
 
         $this->assertTrue($updatedIssues[0]->getIssueColumn()->isToDo());
@@ -176,7 +180,11 @@ class SprintEditorTest extends KernelTestCase
         $this->assertCount(0, $updatedSprintGoal->getSprintGoalIssues());
 
         $updatedIssues = $this->issueRepository()->findBy([
-            'id' => [$feature->getId(), $subIssueOne->getId(), $subIssueTwo->getId()],
+            'id' => [
+                $feature->getId()->integerId(),
+                $subIssueOne->getId()->integerId(),
+                $subIssueTwo->getId()->integerId(),
+            ],
         ]);
 
         $this->assertTrue($updatedIssues[0]->getIssueColumn()->isBacklog());

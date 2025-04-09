@@ -12,13 +12,10 @@ use App\Factory\UserFactory;
 use App\Tests\KernelTestCase;
 use Carbon\CarbonImmutable;
 use Symfony\Component\Console\Tester\CommandTester;
-use Zenstruck\Foundry\Test\Factories;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 class NotificationSendEmailsCommandTest extends KernelTestCase
 {
-
-
 
     /** @test */
     public function cron_can_send_notification_emails()
@@ -47,7 +44,7 @@ class NotificationSendEmailsCommandTest extends KernelTestCase
             'name' => IssueEventList::SET_ISSUE_ASSIGNEE,
             'params' => [
                 'userId' => $user->getId(),
-                'issueId' => $issue->getId()
+                'issueId' => $issue->getId()->integerId()
             ],
             'project' => $project,
             'createdBy' => $analytic,

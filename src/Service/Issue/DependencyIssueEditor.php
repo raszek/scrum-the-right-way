@@ -46,8 +46,8 @@ readonly class DependencyIssueEditor
         $this->entityManager->flush();
 
         $this->eventPersister->createIssueEvent(new AddIssueDependencyEvent(
-            issueId: $this->issue->getId(),
-            dependencyId: $dependency->getId()
+            issueId: $this->issue->getId()->integerId(),
+            dependencyId: $dependency->getId()->integerId()
         ), $this->issue);
     }
 
@@ -80,8 +80,8 @@ readonly class DependencyIssueEditor
         $this->entityManager->flush();
 
         $this->eventPersister->createIssueEvent(new RemoveIssueDependencyEvent(
-            issueId: $this->issue->getId(),
-            dependencyId: $dependency->getId()
+            issueId: $this->issue->getId()->integerId(),
+            dependencyId: $dependency->getId()->integerId()
         ), $this->issue);
     }
 

@@ -13,7 +13,6 @@ use App\Factory\Project\ProjectFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
 use App\Tests\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
 
 class RemoveIssueAttachmentEventRendererTest extends KernelTestCase
 {
@@ -41,13 +40,13 @@ class RemoveIssueAttachmentEventRendererTest extends KernelTestCase
             'name' => 'test.png',
         ]);
 
-        $attachment = AttachmentFactory::createOne([
+        AttachmentFactory::createOne([
             'issue' => $issue,
             'file' => $file,
         ]);
 
         $eventData = new RemoveIssueAttachmentEvent(
-            issueId: $issue->getId(),
+            issueId: $issue->getId()->integerId(),
             fileName: $file->getName(),
         );
 

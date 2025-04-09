@@ -139,7 +139,7 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
             ->orderBy('issue.issueOrder', 'ASC');
 
         $queryBuilder->sqidParameter('project', $issue->getProject()->getId());
-        $queryBuilder->setParameter('parent', $issue->getId());
+        $queryBuilder->sqidParameter('parent', $issue->getId());
         $queryBuilder->setParameter('column', IssueColumnEnum::Archived->value);
 
         return $queryBuilder;
@@ -183,7 +183,7 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
     {
         $query = $this->createQueryBuilder('issue')
             ->andWhere('issue.parent = :parent')
-            ->setParameter('parent', $issue);
+            ->sqidParameter('parent', $issue->getId());
 
         $query->select('min(issue.issueOrder)');
 
@@ -200,7 +200,7 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
             'id' => $issueIds
         ]);
 
-        return ArrayHelper::indexByCallback($issues, fn(Issue $issue) => $issue->getId());
+        return ArrayHelper::indexByCallback($issues, fn(Issue $issue) => $issue->getId()->integerId());
     }
 
     public function reorderFeature(Issue $issue): void
@@ -209,7 +209,7 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
 
         $query = $queryBuilder
             ->where('issue.parent = :parent')
-            ->setParameter('parent', $issue->getId())
+            ->sqidParameter('parent', $issue->getId())
             ->andWhere('issue.type = :type')
             ->setParameter('type', $this->issueTypeRepository->subIssueType())
             ->getQuery();
@@ -242,8 +242,8 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
     public function searchIssueDependencies(Issue $issue, string $search): array
     {
         $excludedIds = array_merge($issue->getIssueDependencies()
-            ->map(fn(IssueDependency $issueDependency) => $issueDependency->getDependency()->getId())
-            ->getValues(), [$issue->getId()]);
+            ->map(fn(IssueDependency $issueDependency) => $issueDependency->getDependency()->getId()->integerId())
+            ->getValues(), [$issue->getId()->integerId()]);
 
         $queryBuilder = $this->createQueryBuilder('issue');
 

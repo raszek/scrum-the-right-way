@@ -35,7 +35,7 @@ class IssueDependencyRepository extends ServiceEntityRepository
 
         $queryBuilder
             ->where('issueDependency.issue = :issue')
-            ->setParameter('issue', $issue->getId());
+            ->setParameter('issue', $issue->getId()->integerId());
 
         return $queryBuilder->getQuery()->getResult();
     }

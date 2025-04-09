@@ -137,6 +137,8 @@ class SubIssueControllerTest extends WebTestCase
             'position' => 2,
         ]);
 
+        $this->assertResponseStatusCodeSame(204);
+
         $updatedSubIssues = $this->issueRepository()->featureSubIssues($feature);
 
         $numbers = ArrayHelper::map($updatedSubIssues, fn(Issue $issue) => $issue->getNumber());

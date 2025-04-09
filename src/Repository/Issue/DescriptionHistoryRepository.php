@@ -31,7 +31,7 @@ class DescriptionHistoryRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('descriptionHistory');
 
         $queryBuilder->where('descriptionHistory.issue = :issue');
-        $queryBuilder->setParameter('issue', $issue);
+        $queryBuilder->sqidParameter('issue', $issue->getId());
 
         $queryBuilder->orderBy('descriptionHistory.createdAt', 'DESC');
 

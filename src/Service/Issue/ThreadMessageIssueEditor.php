@@ -42,7 +42,7 @@ readonly class ThreadMessageIssueEditor
         $this->issue->setUpdatedAt($this->clock->now());
 
         $this->eventPersister->createIssueEvent(new AddIssueThreadMessageEvent(
-            issueId: $this->issue->getId(),
+            issueId: $this->issue->getId()->integerId(),
             threadMessageId: $threadMessage->getId()->integerId()
         ), $this->issue);
 
@@ -66,7 +66,7 @@ readonly class ThreadMessageIssueEditor
         $this->issue->setUpdatedAt($this->clock->now());
 
         $this->eventPersister->createIssueEvent(new RemoveIssueThreadMessageEvent(
-            issueId: $this->issue->getId(),
+            issueId: $this->issue->getId()->integerId(),
             threadMessageId: $threadMessage->getId()->integerId()
         ), $this->issue);
 

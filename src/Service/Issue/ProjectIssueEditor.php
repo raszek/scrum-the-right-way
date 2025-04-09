@@ -60,7 +60,7 @@ readonly class ProjectIssueEditor
         $this->entityManager->flush();
 
         $this->eventPersister->createIssueEvent(new CreateIssueEvent(
-            issueId: $createdIssue->getId(),
+            issueId: $createdIssue->getId()->integerId(),
         ), $createdIssue);
     }
 

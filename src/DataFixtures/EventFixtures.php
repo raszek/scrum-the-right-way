@@ -47,7 +47,7 @@ class EventFixtures extends Fixture implements DependentFixtureInterface
                 'createdAt' => $issue->getCreatedAt(),
                 'issue' => $issue,
                 'params' => [
-                    'issueId' => $issue->getId()
+                    'issueId' => $issue->getId()->integerId()
                 ]
             ]);
         }

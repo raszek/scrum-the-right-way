@@ -12,12 +12,9 @@ use App\Factory\Project\ProjectFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
 use App\Tests\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
 
 class RemoveIssueDependencyEventRendererTest extends KernelTestCase
 {
-
-
 
     /** @test */
     public function it_renders_remove_issue_dependency_event()
@@ -44,8 +41,8 @@ class RemoveIssueDependencyEventRendererTest extends KernelTestCase
         ]);
 
         $eventData = new RemoveIssueDependencyEvent(
-            issueId: $issue->getId(),
-            dependencyId: $dependency->getId()
+            issueId: $issue->getId()->integerId(),
+            dependencyId: $dependency->getId()->integerId(),
         );
 
         $event = EventFactory::new()

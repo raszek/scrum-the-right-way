@@ -29,7 +29,7 @@ class AttachmentRepository extends ServiceEntityRepository
             ->addSelect('files')
             ->join('attachment.file', 'files')
             ->where('attachment.issue = :issue')
-            ->setParameter('issue', $issue);
+            ->setParameter('issue', $issue->getId()->integerId());
 
         return $queryBuilder->getQuery()->getResult();
     }

@@ -13,6 +13,7 @@
             >
                 {% for issue in column.items %}
                     <div class="card w-100 mb-1"
+                         data-kanban--move-id-param="{{ issue.id }}"
                          data-kanban--move-url-param="{{ path('app_project_kanban_issue_move', {
                              id: project.id,
                              issueCode: issue.code

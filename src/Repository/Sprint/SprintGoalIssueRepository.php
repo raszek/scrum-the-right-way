@@ -58,7 +58,7 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
             ->where('sprintGoal.sprint = :sprint')
             ->sqidParameter('sprint', $sprint->getId())
             ->andWhere('sprintGoalIssue.issue = :issue')
-            ->setParameter('issue', $issue);
+            ->sqidParameter('issue', $issue->getId());
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
     }

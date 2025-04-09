@@ -32,7 +32,7 @@ readonly class IssueTagEditor
         $this->entityManager->flush();
 
         $event = new SetIssueTagsEvent(
-            issueId: $this->issue->getId(),
+            issueId: $this->issue->getId()->integerId(),
             tags: $tags
         );
 

@@ -27,7 +27,7 @@ readonly class SubIssueEditor
     {
         $query = $this->issueRepository->featureIssueQuery($this->issue->getParent());
         $query->andWhere('issue.id <> :issueId');
-        $query->setParameter('issueId', $this->issue->getId());
+        $query->setParameter('issueId', $this->issue->getId()->integerId());
 
         $isFirstPosition = $position <= 1;
         if ($isFirstPosition) {
