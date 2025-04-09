@@ -29,6 +29,7 @@ readonly class IssueEditorFactory
     {
         return new IssueEditor(
             issue: $issue,
+            user: $user,
             issueRepository: $this->issueRepository,
             issueColumnRepository: $this->issueColumnRepository,
             projectIssueEditorStrategy: $this->getProjectIssueEditorStrategy($issue),

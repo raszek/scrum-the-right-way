@@ -16,6 +16,7 @@ use App\Factory\UserFactory;
 use App\Helper\ArrayHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
+use App\Repository\User\UserRepository;
 use App\Service\Issue\IssueEditor\IssueEditor;
 use App\Service\Issue\IssueEditor\IssueEditorFactory;
 use App\Tests\KernelTestCase;
@@ -282,6 +283,134 @@ class IssueEditorTest extends KernelTestCase
         $this->assertNull($updatedSprintGoalIssue->getFinishedAt());
     }
 
+    /** @test */
+    public function developer_cannot_do_2_issues_in_progress()
+    {
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $toDoColumn = IssueColumnFactory::todoColumn();
+
+        $inProgressIssue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => IssueColumnFactory::inProgressColumn(),
+            'number' => 2
+        ]);
+
+        $user = UserFactory::createOne([
+            'inProgressIssue' => $inProgressIssue
+        ]);
+
+        $issueMovedToInProgress = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $toDoColumn,
+            'number' => 1
+        ]);
+
+        $issueEditor = $this->getIssueEditor($issueMovedToInProgress->_real(), $user->_real());
+
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress);
+
+        $updatedIssue = $this->issueRepository()->findOneBy([
+            'id' => $issueMovedToInProgress->getId()
+        ]);
+
+        $this->assertNotNull($updatedIssue);
+        $this->assertEquals(IssueColumnEnum::InProgress->value, $updatedIssue->getIssueColumn()->getId());
+
+        $updatedInProgressIssue = $this->issueRepository()->findOneBy([
+            'id' => $inProgressIssue->getId()
+        ]);
+
+        $this->assertNotNull($updatedInProgressIssue);
+        $this->assertEquals(IssueColumnEnum::ToDo->value, $updatedInProgressIssue->getIssueColumn()->getId());
+
+        $updatedUser = $this->userRepository()->findOneBy([
+            'id' => $user->getId()
+        ]);
+
+        $this->assertNotNull($updatedUser);
+        $this->assertEquals($issueMovedToInProgress->getId(), $updatedUser->getInProgressIssue()->getId());
+    }
+
+    /** @test */
+    public function moving_issue_to_test_mark_user_that_he_has_no_in_progress_tasks()
+    {
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        IssueColumnFactory::testColumn();
+
+        $inProgressIssue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => IssueColumnFactory::inProgressColumn(),
+            'number' => 2
+        ]);
+
+        $user = UserFactory::createOne([
+            'inProgressIssue' => $inProgressIssue
+        ]);
+
+        $issueEditor = $this->getIssueEditor($inProgressIssue->_real(), $user->_real());
+
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::Test);
+
+        $updatedIssue = $this->issueRepository()->findOneBy([
+            'id' => $inProgressIssue->getId()
+        ]);
+
+        $this->assertNotNull($updatedIssue);
+        $this->assertEquals(IssueColumnEnum::Test->value, $updatedIssue->getIssueColumn()->getId());
+
+        $updatedUser = $this->userRepository()->findOneBy([
+            'id' => $user->getId()
+        ]);
+
+        $this->assertNotNull($updatedUser);
+        $this->assertNull($updatedUser->getInProgressIssue());
+    }
+
+    /** @test */
+    public function moving_issue_to_in_progress_marks_user_task_as_in_progress()
+    {
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        IssueColumnFactory::inProgressColumn();
+
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => IssueColumnFactory::todoColumn(),
+            'number' => 1
+        ]);
+
+        $user = UserFactory::createOne([
+            'inProgressIssue' => null
+        ]);
+
+        $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
+
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress);
+
+        $updatedIssue = $this->issueRepository()->findOneBy([
+            'id' => $issue->getId()
+        ]);
+
+        $this->assertNotNull($updatedIssue);
+        $this->assertEquals(IssueColumnEnum::InProgress->value, $updatedIssue->getIssueColumn()->getId());
+
+        $updatedUser = $this->userRepository()->findOneBy([
+            'id' => $user->getId()
+        ]);
+
+        $this->assertNotNull($updatedUser);
+        $this->assertNotNull($updatedUser->getInProgressIssue());
+        $this->assertEquals($issue->getId(), $updatedUser->getInProgressIssue()->getId());
+    }
+
     private function issueRepository(): IssueRepository
     {
         return $this->getService(IssueRepository::class);
@@ -295,5 +424,10 @@ class IssueEditorTest extends KernelTestCase
     private function sprintGoalIssueRepository(): SprintGoalIssueRepository
     {
         return $this->getService(SprintGoalIssueRepository::class);
+    }
+
+    private function userRepository(): UserRepository
+    {
+        return $this->getService(UserRepository::class);
     }
 }

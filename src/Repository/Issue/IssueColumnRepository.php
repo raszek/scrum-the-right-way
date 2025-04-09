@@ -27,6 +27,11 @@ class IssueColumnRepository extends ServiceEntityRepository
         return $this->getReference(IssueColumnEnum::Backlog->value);
     }
 
+    public function testColumn(): IssueColumn
+    {
+        return $this->getReference(IssueColumnEnum::Test->value);
+    }
+
     public function toDoColumn(): IssueColumn
     {
         return $this->getReference(IssueColumnEnum::ToDo->value);

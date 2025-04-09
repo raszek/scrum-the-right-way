@@ -51,6 +51,14 @@ final class IssueColumnFactory extends PersistentProxyObjectFactory
         ]);
     }
 
+    public static function testColumn(): IssueColumn
+    {
+        return IssueColumnFactory::createOne([
+            'id' => IssueColumnEnum::Test->value,
+            'label' => IssueColumnEnum::Test->label()
+        ]);
+    }
+
     public static function todoColumn(): IssueColumn
     {
         return IssueColumnFactory::createOne([

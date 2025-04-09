@@ -2,6 +2,7 @@
 
 namespace App\Entity\User;
 
+use App\Entity\Issue\Issue;
 use App\Entity\Project\ProjectMember;
 use App\Repository\User\UserRepository;
 use DateTimeImmutable;
@@ -45,6 +46,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?DateTimeImmutable $createdAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Issue $inProgressIssue = null;
 
     #[ORM\OneToMany(targetEntity: ProjectMember::class, mappedBy: 'user')]
     private Collection $projectMembers;
@@ -236,5 +241,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ->andWhere(Criteria::expr()->eq('isSentEmail', false));
 
         return $this->notifications->matching($criteria);
+    }
+
+    public function getInProgressIssue(): ?Issue
+    {
+        return $this->inProgressIssue;
+    }
+
+    public function setInProgressIssue(?Issue $inProgressIssue): void
+    {
+        $this->inProgressIssue = $inProgressIssue;
     }
 }

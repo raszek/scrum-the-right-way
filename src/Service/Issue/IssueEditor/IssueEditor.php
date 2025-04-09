@@ -4,6 +4,7 @@ namespace App\Service\Issue\IssueEditor;
 
 use App\Entity\Issue\DescriptionHistory;
 use App\Entity\Issue\Issue;
+use App\Entity\User\User;
 use App\Enum\Issue\IssueColumnEnum;
 use App\Event\Issue\Event\SetIssueDescriptionEvent;
 use App\Event\Issue\Event\SetIssueStoryPointsEvent;
@@ -15,11 +16,9 @@ use App\Helper\JsonHelper;
 use App\Helper\StringHelper;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
-use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersister;
 use App\Service\Position\Positioner;
-use App\Service\Sprint\SprintIssueEditorStrategy;
 use Doctrine\ORM\EntityManagerInterface;
 use Jfcherng\Diff\DiffHelper;
 use RuntimeException;
@@ -30,6 +29,7 @@ readonly class IssueEditor
 
     public function __construct(
         private Issue $issue,
+        private User $user,
         private IssueRepository $issueRepository,
         private IssueColumnRepository $issueColumnRepository,
         private ProjectIssueEditorStrategy $projectIssueEditorStrategy,
@@ -50,6 +50,8 @@ readonly class IssueEditor
         }
 
         $this->projectIssueEditorStrategy->changeKanbanColumn($column);
+
+        $this->setInProgressIssue($column);
 
         $this->issue->setIssueColumn($this->issueColumnRepository->fromEnum($column));
 
@@ -160,5 +162,29 @@ readonly class IssueEditor
         $this->issue->setIssueColumn($this->issueColumnRepository->archivedColumn());
 
         $this->entityManager->flush();
+    }
+
+    private function setInProgressIssue(IssueColumnEnum $column): void
+    {
+        $inProgressIssue = $this->user->getInProgressIssue();
+        if (!$inProgressIssue) {
+            if ($column->isInProgress() || $column->isInTests()) {
+                $this->user->setInProgressIssue($this->issue);
+            }
+            return;
+        }
+
+        if ($column->isInProgress()) {
+            $inProgressIssue->setIssueColumn($this->issueColumnRepository->toDoColumn());
+
+            $this->user->setInProgressIssue($this->issue);
+        } else if ($column->isInTests()) {
+            $inProgressIssue->setIssueColumn($this->issueColumnRepository->testColumn());
+
+            $this->user->setInProgressIssue($this->issue);
+        } else {
+            $this->user->setInProgressIssue(null);
+        }
+
     }
 }
