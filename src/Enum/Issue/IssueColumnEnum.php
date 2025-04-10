@@ -34,16 +34,6 @@ enum IssueColumnEnum: int
         };
     }
 
-    public function isInProgress(): bool
-    {
-        return $this === IssueColumnEnum::InProgress;
-    }
-
-    public function isInTests(): bool
-    {
-        return $this === IssueColumnEnum::InTests;
-    }
-
     public function key(): string
     {
         return match ($this) {
@@ -86,4 +76,13 @@ enum IssueColumnEnum: int
         ];
     }
 
+    public function isInProgress(): bool
+    {
+        return $this === IssueColumnEnum::InProgress;
+    }
+
+    public function isInTests(): bool
+    {
+        return $this === IssueColumnEnum::InTests;
+    }
 }

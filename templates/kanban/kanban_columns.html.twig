@@ -1,4 +1,5 @@
 <div data-controller="kanban--move"
+     data-kanban--move-current-issue-id-value="{{ currentIssueId }}"
      class="row"
 >
     {% for column in columns %}
@@ -13,6 +14,7 @@
             >
                 {% for issue in column.items %}
                     <div class="card w-100 mb-1"
+                         data-kanban--move-target="issue"
                          data-kanban--move-id-param="{{ issue.id }}"
                          data-kanban--move-url-param="{{ path('app_project_kanban_issue_move', {
                              id: project.id,
@@ -31,4 +33,26 @@
             </div>
         </div>
     {% endfor %}
+    <div class="modal"
+         tabindex="-1"
+         data-kanban--move-target="modal"
+    >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Are you sure?</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                    >
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

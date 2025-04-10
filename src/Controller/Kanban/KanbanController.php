@@ -49,6 +49,7 @@ class KanbanController extends CommonIssueController
             'project' => $project,
             'columns' => $columns,
             'filter' => $filter,
+            'currentIssueId' => $this->getLoggedInUser()?->getInProgressIssue()->getId(),
         ]);
     }
 
@@ -75,6 +76,7 @@ class KanbanController extends CommonIssueController
         return $this->render('kanban/kanban_columns.html.twig', [
             'project' => $project,
             'columns' => $columns,
+            'currentIssueId' => $this->getLoggedInUser()?->getInProgressIssue()->getId(),
         ]);
     }
 
