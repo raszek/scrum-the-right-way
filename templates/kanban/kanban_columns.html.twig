@@ -1,5 +1,5 @@
-<div data-controller="kanban--move"
-     data-kanban--move-current-issue-id-value="{{ currentIssueId }}"
+<div data-controller="kanban--move issue--modal"
+     data-kanban--move-current-issue-value="{{ currentIssue }}"
      class="row"
 >
     {% for column in columns %}
@@ -16,6 +16,10 @@
                     <div class="card w-100 mb-1"
                          data-kanban--move-target="issue"
                          data-kanban--move-id-param="{{ issue.id }}"
+                         data-kanban--move-issue-url-param="{{ path('app_project_issue_view', {
+                             id: project.id,
+                             issueCode: issue.code
+                         }) }}"
                          data-kanban--move-url-param="{{ path('app_project_kanban_issue_move', {
                              id: project.id,
                              issueCode: issue.code
@@ -26,33 +30,21 @@
                                 {{ issue.code }}
                                 <small>{{ issue.type.label }}</small>
                             </h5>
-                            <p class="card-text">{{ issue.title }}</p>
+                            <a class="card-text strw-clickable" data-action="issue--modal#show"
+                               data-issue--modal-url-param="{{ path('app_project_issue_view_ajax', {
+                                   id: project.id,
+                                   issueCode: issue.code
+                               }) }}"
+                               data-issue--modal-code-param="{{ issue.code }}"
+                            >
+                                {{ issue.title }}
+                            </a>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         </div>
     {% endfor %}
-    <div class="modal"
-         tabindex="-1"
-         data-kanban--move-target="modal"
-    >
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Are you sure?</h5>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                    >
-                    </button>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'kanban/move_issue_modal.html.twig' %}
+    {% include 'issue/issue_modal.html.twig' %}
 </div>

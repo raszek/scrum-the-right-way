@@ -3,10 +3,12 @@
 namespace App\Controller\Kanban;
 
 use App\Controller\Issue\CommonIssueController;
+use App\Entity\Issue\Issue;
 use App\Entity\Project\Project;
 use App\Enum\Issue\IssueColumnEnum;
 use App\Enum\Kanban\KanbanFilterEnum;
 use App\Form\Kanban\MoveIssueForm;
+use App\Helper\JsonHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Security\Voter\KanbanVoter;
 use App\Service\Issue\IssueEditor\IssueEditorFactory;
@@ -49,7 +51,7 @@ class KanbanController extends CommonIssueController
             'project' => $project,
             'columns' => $columns,
             'filter' => $filter,
-            'currentIssueId' => $this->getLoggedInUser()?->getInProgressIssue()->getId(),
+            'currentIssue' => $this->getInProgressIssueData(),
         ]);
     }
 
@@ -76,7 +78,7 @@ class KanbanController extends CommonIssueController
         return $this->render('kanban/kanban_columns.html.twig', [
             'project' => $project,
             'columns' => $columns,
-            'currentIssueId' => $this->getLoggedInUser()?->getInProgressIssue()->getId(),
+            'currentIssue' => $this->getInProgressIssueData(),
         ]);
     }
 
@@ -101,5 +103,23 @@ class KanbanController extends CommonIssueController
         $issueEditor->sort($form->position);
 
         return new Response(status: 204);
+    }
+
+    private function getInProgressIssueData(): string
+    {
+        $inProgressIssue = $this->getLoggedInUser()->getInProgressIssue();
+
+        if (!$inProgressIssue) {
+            return '{}';
+        }
+
+        return JsonHelper::encode([
+            'id' => $inProgressIssue->getId()->get(),
+            'url' => $this->generateUrl('app_project_issue_view', [
+                'id' => $inProgressIssue->getProject()->getId(),
+                'issueCode' => $inProgressIssue->getCode()
+            ]),
+            'currentColumn' => $inProgressIssue->getIssueColumn()->getKey()
+        ]);
     }
 }

@@ -1,0 +1,34 @@
+<div class="modal"
+     tabindex="-1"
+     data-kanban--move-target="modal"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Your current task</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                >
+                </button>
+            </div>
+            <div class="modal-body">
+                You are currently working on another
+                <a data-kanban--move-target="currentTaskUrl" href="" target="_blank">
+                    task
+                </a>.
+                Do you want to stop this task and work on your selected?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button"
+                        class="btn btn-primary"
+                        data-action="kanban--move#confirmMove"
+                >
+                    Yes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,9 @@ export function randomString(length) {
     return result;
 }
 
+export function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
 
 export class Color
 {
