@@ -6,15 +6,18 @@
     <div data-controller="confirm-modal sprint--sort sprint--edit-goal">
         <div class="row">
             <div class="col-12">
-                {% include 'common/project_page_header.html.twig' %}
+                {% embed 'common/project_page_header.html.twig' %}
+                    {% block buttons %}
+                        <form action="{{ path('app_project_sprint_current_start', {
+                            id: project.id
+                        }) }}"
+                              method="post"
+                        >
+                            <button type="submit" class="btn btn-primary">Start sprint</button>
+                        </form>
+                    {% endblock %}
+                {% endembed %}
 
-                <form action="{{ path('app_project_sprint_current_start', {
-                    id: project.id
-                }) }}"
-                      method="post"
-                >
-                    <button type="submit" class="btn btn-primary w-100">Start sprint</button>
-                </form>
                 <ul class="list-group mt-3" data-sprint--sort-target="goals">
                     {% for goal in sprintGoals %}
                         <li class="list-group-item bg-body-tertiary"
@@ -72,7 +75,7 @@
                                             id: project.id,
                                             issueCode: goalIssue.issue.code
                                         }) }}">
-                                            {{ goalIssue.issue.title }}
+                                            {{ goalIssue.issue.fullText }}
                                         </a>
                                         {% if is_granted('REMOVE_CURRENT_SPRINT_ISSUE', project) %}
                                             <button type="submit"

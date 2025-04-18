@@ -14,23 +14,19 @@ use App\Exception\Project\ProjectMemberCannotAddRoleException;
 use App\Exception\Project\ProjectMemberCannotRemoveRoleException;
 use App\Repository\Project\ProjectRoleRepository;
 use App\Service\Event\EventPersister;
-use App\Service\Event\EventPersisterFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
 readonly class ProjectMemberEditor
 {
-    private EventPersister $eventPersister;
 
     public function __construct(
         private ProjectMember $projectMember,
         private User $user,
         private ProjectRoleRepository $projectRoleRepository,
         private EntityManagerInterface $entityManager,
-        Project $project,
-        EventPersisterFactory $eventPersisterFactory,
+        private EventPersister $eventPersister
     ) {
-        $this->eventPersister = $eventPersisterFactory->create($project, $this->user);
     }
 
     public function addRole(ProjectRoleEnum $role): void

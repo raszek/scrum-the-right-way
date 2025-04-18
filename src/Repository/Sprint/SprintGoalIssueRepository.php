@@ -6,6 +6,7 @@ use App\Entity\Issue\Issue;
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
 use App\Entity\Sprint\SprintGoalIssue;
+use App\Enum\Issue\IssueTypeEnum;
 use App\Repository\QueryBuilder\QueryBuilder;
 use App\Service\Position\ReorderService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -35,11 +36,29 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
         $queryBuilder = $this->createQueryBuilder('sprintGoalIssue');
 
         $queryBuilder
+            ->join('sprintGoalIssue.issue', 'issue')
             ->where('sprintGoalIssue.sprintGoal = :sprintGoal')
             ->sqidParameter('sprintGoal', $sprintGoal->getId())
+            ->andWhere('issue.type <> :issueTypeId')
+            ->setParameter('issueTypeId', IssueTypeEnum::SubIssue->value)
             ->orderBy('sprintGoalIssue.goalOrder', 'ASC');
 
         return $queryBuilder;
+    }
+
+    /**
+     * @return SprintGoalIssue[]
+     */
+    public function findFeatureSubIssues(SprintGoalIssue $sprintGoalIssue): array
+    {
+        $ids = $sprintGoalIssue->getIssue()
+            ->getSubIssues()
+            ->map(fn(Issue $subIssue) => $subIssue->getId()->integerId())
+            ->toArray();
+
+        return $this->findBy([
+            'issue' => $ids
+        ]);
     }
 
     public function findCurrentSprintIssue(Issue $issue): ?SprintGoalIssue
@@ -61,6 +80,25 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
             ->sqidParameter('issue', $issue->getId());
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * @param string[] $issueIds
+     * @param Sprint $sprint
+     * @return SprintGoalIssue[]
+     */
+    public function findSprintIssues(array $issueIds, Sprint $sprint): array
+    {
+        $queryBuilder = $this->createQueryBuilder('sprintGoalIssue');
+
+        $queryBuilder
+            ->join('sprintGoalIssue.sprintGoal', 'sprintGoal')
+            ->where('sprintGoal.sprint = :sprint')
+            ->sqidParameter('sprint', $sprint->getId())
+            ->andWhere('sprintGoalIssue.issue in (:issueIds)')
+            ->sqidsParameter('issueIds', $issueIds);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function findLastOrder(SprintGoal $sprintGoal): int

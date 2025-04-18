@@ -12,12 +12,9 @@ use App\Factory\UserFactory;
 use App\Service\Issue\DependencyIssueEditor;
 use App\Service\Issue\DependencyIssueEditorFactory;
 use App\Tests\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
 
 class DependencyIssueEditorTest extends KernelTestCase
 {
-
-
 
     /** @test */
     public function issue_cannot_add_yourself_as_dependency()

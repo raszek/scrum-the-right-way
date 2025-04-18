@@ -52,7 +52,7 @@
                             issueCode: item.code
                         }) }}" class="list-group-item">
                             <div class="d-flex justify-content-between align-items-center">
-                                <a style="width: 90%" href="/projects/{{ project.id }}/backlog/issues/{{ item.code }}">{{ item.prefixCodeTitle }}</a>
+                                <a style="width: 90%" href="/projects/{{ project.id }}/backlog/issues/{{ item.code }}">{{ item.fullText }}</a>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-outline-primary"
                                             data-action="issue--modal#show"

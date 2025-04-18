@@ -6,6 +6,7 @@ use App\Entity\Issue\Issue;
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
 use App\Entity\Sprint\SprintGoalIssue;
+use App\Exception\Sprint\CannotAddSprintIssueException;
 use App\Exception\Sprint\CannotStartSprintException;
 use App\Form\Sprint\CreateSprintGoalForm;
 use App\Repository\Issue\IssueColumnRepository;
@@ -17,7 +18,6 @@ use RuntimeException;
 
 readonly class SprintEditor
 {
-
     public function __construct(
         private Sprint $sprint,
         private EntityManagerInterface $entityManager,
@@ -28,6 +28,11 @@ readonly class SprintEditor
     ) {
     }
 
+    /**
+     * @param Issue $issue
+     * @return void
+     * @throws CannotAddSprintIssueException
+     */
     public function addSprintIssue(Issue $issue): void
     {
         if ($issue->getProject()->getId() !== $this->sprint->getProject()->getId()) {
@@ -36,6 +41,10 @@ readonly class SprintEditor
 
         if ($issue->isSubIssue()) {
             throw new RuntimeException('Cannot add sub issue to sprint');
+        }
+
+        if ($issue->isFeature() && $issue->getSubIssues()->count() <= 0) {
+            throw new CannotAddSprintIssueException('Cannot add feature with no sub issues.');
         }
 
         if (!$this->sprint->isCurrent()) {
@@ -58,13 +67,19 @@ readonly class SprintEditor
 
         $issue->setIssueColumn($this->issueColumnRepository->toDoColumn());
 
+        $this->entityManager->persist($sprintGoalIssue);
+        $firstSprintGoal->addSprintGoalIssue($sprintGoalIssue);
+
         foreach ($issue->getSubIssues() as $subIssue) {
             $subIssue->setIssueColumn($this->issueColumnRepository->toDoColumn());
+            $sprintGoalSubIssue = new SprintGoalIssue(
+                sprintGoal: $firstSprintGoal,
+                issue: $subIssue,
+            );
+            $this->entityManager->persist($sprintGoalSubIssue);
+
+            $firstSprintGoal->addSprintGoalIssue($sprintGoalSubIssue);
         }
-
-        $this->entityManager->persist($sprintGoalIssue);
-
-        $firstSprintGoal->addSprintGoalIssue($sprintGoalIssue);
 
         $this->entityManager->flush();
     }
@@ -75,19 +90,18 @@ readonly class SprintEditor
             throw new RuntimeException('Cannot remove sub issue');
         }
 
-        $sprintGoalIssue = $this->sprintGoalIssueRepository->findSprintIssue($issue, $this->sprint);
-
-        if (!$sprintGoalIssue) {
-            throw new RuntimeException('Sprint goal issue not found');
-        }
-
         $issue->setIssueColumn($this->issueColumnRepository->backlogColumn());
 
+        $issueIds = [$issue->getId()];
         foreach ($issue->getSubIssues() as $subIssue) {
             $subIssue->setIssueColumn($this->issueColumnRepository->backlogColumn());
+            $issueIds[] = $subIssue->getId();
         }
 
-        $this->entityManager->remove($sprintGoalIssue);
+        $sprintGoalIssues = $this->sprintGoalIssueRepository->findSprintIssues($issueIds, $this->sprint);
+        foreach ($sprintGoalIssues as $sprintGoalIssue) {
+            $this->entityManager->remove($sprintGoalIssue);
+        }
 
         $this->entityManager->flush();
     }

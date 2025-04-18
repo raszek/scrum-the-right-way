@@ -22,7 +22,7 @@ class SprintControllerTest extends WebTestCase
 {
 
     /** @test */
-    public function user_can_view_current_sprint()
+    public function only_features_and_issues_are_visible_on_sprint_page()
     {
         $client = static::createClient();
         $client->followRedirects();
@@ -62,7 +62,7 @@ class SprintControllerTest extends WebTestCase
             'number' => 2,
         ]);
 
-        IssueFactory::createOne([
+        $subIssue = IssueFactory::createOne([
             'title' => 'Sub issue task',
             'project' => $project,
             'issueColumn' => $toDoColumn,
@@ -94,6 +94,11 @@ class SprintControllerTest extends WebTestCase
 
         SprintGoalIssueFactory::createOne([
             'issue' => $feature,
+            'sprintGoal' => $secondSprintGoal,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $subIssue,
             'sprintGoal' => $secondSprintGoal,
         ]);
 

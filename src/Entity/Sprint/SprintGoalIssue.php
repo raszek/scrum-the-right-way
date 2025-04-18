@@ -8,6 +8,7 @@ use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Service\Position\Positionable;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use RuntimeException;
 
 #[ORM\Entity(repositoryClass: SprintGoalIssueRepository::class)]
 class SprintGoalIssue implements Positionable
@@ -19,7 +20,7 @@ class SprintGoalIssue implements Positionable
     #[ORM\Column(type: 'sqid')]
     private ?Sqid $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $goalOrder = null;
 
     #[ORM\ManyToOne(inversedBy: 'sprintGoalIssues')]
@@ -36,11 +37,11 @@ class SprintGoalIssue implements Positionable
     public function __construct(
         SprintGoal $sprintGoal,
         Issue $issue,
-        int $goalOrder
+        ?int $goalOrder = null
     ) {
         $this->sprintGoal = $sprintGoal;
         $this->issue = $issue;
-        $this->goalOrder = $goalOrder;
+        $this->setOrder($goalOrder);
     }
 
     public function getId(): ?Sqid
@@ -68,8 +69,12 @@ class SprintGoalIssue implements Positionable
         return $this->goalOrder;
     }
 
-    public function setOrder(int $order): void
+    public function setOrder(?int $order): void
     {
+        if (!$this->issue->isSubIssue() && $order === null) {
+            throw new RuntimeException('Features and issues must set order');
+        }
+
         $this->goalOrder = $order;
     }
 

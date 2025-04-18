@@ -7,7 +7,9 @@ use App\Entity\Project\Project;
 use App\Entity\Project\ProjectMember;
 use App\Entity\Project\ProjectTag;
 use App\Entity\User\User;
+use App\Enum\Issue\IssueColumnEnum;
 use App\Repository\Issue\IssueRepository;
+use App\Service\Issue\IssueTypeStrategy\IssueTypeStrategy;
 use App\Service\Position\Positionable;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -175,6 +177,16 @@ class Issue implements Positionable
         return sprintf('[#%d] %s', $this->number, $this->title);
     }
 
+    public function fullText(): string
+    {
+        return sprintf(
+            '[#%d] [%s] %s',
+            $this->number,
+            $this->getType()->getLabel(),
+            $this->title
+        );
+    }
+
     public function getShortTitle($maxCharacterCount = 75): string
     {
         $words = explode(' ', $this->title);
@@ -209,6 +221,11 @@ class Issue implements Positionable
         $issueColumn = $this->getIssueColumn();
 
         return $issueColumn->isTest() || $issueColumn->isTested();
+    }
+
+    public function isOnColumn(IssueColumnEnum $columnEnum): bool
+    {
+        return $this->getIssueColumn()->getId() === $columnEnum->value;
     }
 
     public function setTitle(string $title): void
@@ -395,7 +412,6 @@ class Issue implements Positionable
     {
         $this->tags->removeElement($tag);
     }
-
 
     /**
      * @return Collection<int, IssueThreadMessage>

@@ -25,8 +25,7 @@ readonly class ProjectMemberEditorFactory
             user: $user,
             projectRoleRepository: $this->projectRoleRepository,
             entityManager: $this->entityManager,
-            project: $projectMember->getProject(),
-            eventPersisterFactory: $this->eventPersisterFactory
+            eventPersister: $this->eventPersisterFactory->create($projectMember->getProject(), $user)
         );
     }
 }

@@ -4,6 +4,8 @@ namespace App\Enum\Issue;
 
 enum IssueColumnEnum: int
 {
+    case Archived = 0;
+
     case Backlog = 1;
 
     case ToDo = 2;
@@ -17,8 +19,6 @@ enum IssueColumnEnum: int
     case Done = 6;
 
     case Closed = 7;
-
-    case Archived = 8;
 
     public function label(): string
     {

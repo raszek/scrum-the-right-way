@@ -3,7 +3,7 @@ services:
     image: postgres
     restart: always
     volumes:
-      - project-data:/var/lib/postgresql/data
+      - scrum-the-right-way-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: example
@@ -28,4 +28,4 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 volumes:
-  project-data:
+  scrum-the-right-way-data:

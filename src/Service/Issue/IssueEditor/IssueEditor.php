@@ -18,6 +18,7 @@ use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersister;
+use App\Service\Issue\FeatureEditorFactory;
 use App\Service\Position\Positioner;
 use Doctrine\ORM\EntityManagerInterface;
 use Jfcherng\Diff\DiffHelper;
@@ -35,14 +36,19 @@ readonly class IssueEditor
         private ProjectIssueEditorStrategy $projectIssueEditorStrategy,
         private EntityManagerInterface $entityManager,
         private ClockInterface $clock,
-        private EventPersister $eventPersister
+        private EventPersister $eventPersister,
+        private FeatureEditorFactory $featureEditorFactory
     ) {
     }
 
-    public function changeKanbanColumn(IssueColumnEnum $column): void
+    public function changeKanbanColumn(IssueColumnEnum $column, int $position): void
     {
         if ($this->issue->getIssueColumn()->getId() === $column->value) {
             return;
+        }
+
+        if ($this->issue->isFeature()) {
+            throw new RuntimeException('Cannot move features on kanban.');
         }
 
         if (!in_array($column, IssueColumnEnum::kanbanColumns())) {
@@ -51,11 +57,12 @@ readonly class IssueEditor
 
         $this->projectIssueEditorStrategy->changeKanbanColumn($column);
 
-        $this->setInProgressIssue($column);
-
         $this->issue->setIssueColumn($this->issueColumnRepository->fromEnum($column));
-
+        $this->updateParentFeature();
         $this->entityManager->flush();
+
+        $this->sort($position);
+        $this->moveBackInProgressIssue($column);
     }
 
     /**
@@ -113,7 +120,6 @@ readonly class IssueEditor
         $this->issue->setDescription($description);
         $this->issue->setUpdatedAt($this->clock->now());
 
-
         $newChanges = StringHelper::explodeNewLine($description);
 
         $jsonResult = DiffHelper::calculate($oldDescription, $newChanges, 'Json');
@@ -164,7 +170,7 @@ readonly class IssueEditor
         $this->entityManager->flush();
     }
 
-    private function setInProgressIssue(IssueColumnEnum $column): void
+    public function moveBackInProgressIssue(IssueColumnEnum $column): void
     {
         $inProgressIssue = $this->user->getInProgressIssue();
         if (!$inProgressIssue) {
@@ -186,5 +192,17 @@ readonly class IssueEditor
             $this->user->setInProgressIssue(null);
         }
 
+        $this->entityManager->flush();
+    }
+
+    private function updateParentFeature(): void
+    {
+        if (!$this->issue->isSubIssue()) {
+            return;
+        }
+
+        $featureEditor = $this->featureEditorFactory->create($this->issue->getParent(), $this->user);
+
+        $featureEditor->updateIssueColumn();
     }
 }

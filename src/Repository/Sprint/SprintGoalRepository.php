@@ -4,6 +4,7 @@ namespace App\Repository\Sprint;
 
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
+use App\Enum\Issue\IssueTypeEnum;
 use App\Repository\QueryBuilder\QueryBuilder;
 use App\Service\Position\ReorderService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -52,6 +53,11 @@ class SprintGoalRepository extends ServiceEntityRepository implements ReorderSer
             ->leftJoin('sprintGoalIssues.issue', 'issue')
             ->where('sprintGoal.sprint = :sprint')
             ->setParameter('sprint', $sprint->getId()->integerId())
+            ->andWhere($queryBuilder->expr()->orX(
+                $queryBuilder->expr()->neq('issue.type', ':issueTypeId'),
+                $queryBuilder->expr()->isNull('issue.type'),
+            ))
+            ->setParameter('issueTypeId', IssueTypeEnum::SubIssue->value)
             ->orderBy('sprintGoal.sprintOrder', 'ASC')
             ->addOrderBy('sprintGoalIssues.goalOrder', 'ASC');
 

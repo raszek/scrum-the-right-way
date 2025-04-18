@@ -10,7 +10,6 @@ enum IssueTypeEnum: int
 
     case SubIssue = 3;
 
-
     public function label(): string
     {
         return match ($this) {

@@ -8,6 +8,8 @@ use App\Entity\Project\Project;
 use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
 use App\Entity\Sprint\SprintGoalIssue;
+use App\Exception\Sprint\CannotAddSprintIssueException;
+use App\Exception\Sprint\CannotStartSprintException;
 use App\Form\Sprint\SprintGoalIssueMoveForm;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
@@ -47,7 +49,11 @@ class SprintGoalIssueController extends CommonIssueController
 
         $issue = $this->findIssue($issueCode, $project);
 
-        $sprintEditor->addSprintIssue($issue);
+        try {
+            $sprintEditor->addSprintIssue($issue);
+        } catch (CannotAddSprintIssueException $e) {
+            $this->errorFlash($e->getMessage());
+        }
 
         return $this->redirectToRoute('app_project_backlog', [
             'id'  => $project->getId(),

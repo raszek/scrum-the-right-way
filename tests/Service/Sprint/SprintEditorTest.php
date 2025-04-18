@@ -100,7 +100,9 @@ class SprintEditorTest extends KernelTestCase
         ]);
 
         $this->assertNotNull($updatedSprintGoal);
-        $this->assertCount(1, $updatedSprintGoal->getSprintGoalIssues());
+        $this->assertEquals('Feature', $updatedSprintGoal->getSprintGoalIssues()->get(0)->getIssue()->getTitle());
+        $this->assertEquals('Sub issue 1', $updatedSprintGoal->getSprintGoalIssues()->get(1)->getIssue()->getTitle());
+        $this->assertEquals('Sub issue 2', $updatedSprintGoal->getSprintGoalIssues()->get(2)->getIssue()->getTitle());
 
         $updatedIssues = $this->issueRepository()->findBy([
             'id' => [
@@ -166,6 +168,16 @@ class SprintEditorTest extends KernelTestCase
             'issueColumn' => $toDoColumn,
             'issueOrder' => 256,
             'project' => $project,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $subIssueOne,
+            'sprintGoal' => $sprintGoal,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $subIssueTwo,
+            'sprintGoal' => $sprintGoal,
         ]);
 
         $sprintEditor = $this->factory()->create($sprint);

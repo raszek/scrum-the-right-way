@@ -9,6 +9,7 @@ use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersisterFactory;
+use App\Service\Issue\FeatureEditorFactory;
 use App\Service\Sprint\SprintIssueEditorStrategy;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -22,6 +23,7 @@ readonly class IssueEditorFactory
         private ClockInterface $clock,
         private EventPersisterFactory $eventPersisterFactory,
         private SprintGoalIssueRepository $sprintGoalIssueRepository,
+        private FeatureEditorFactory $featureEditorFactory,
     ) {
     }
 
@@ -35,7 +37,8 @@ readonly class IssueEditorFactory
             projectIssueEditorStrategy: $this->getProjectIssueEditorStrategy($issue),
             entityManager: $this->entityManager,
             clock: $this->clock,
-            eventPersister: $this->eventPersisterFactory->create($issue->getProject(), $user)
+            eventPersister: $this->eventPersisterFactory->create($issue->getProject(), $user),
+            featureEditorFactory: $this->featureEditorFactory
         );
     }
 

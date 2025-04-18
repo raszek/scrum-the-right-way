@@ -22,6 +22,11 @@ class IssueColumnRepository extends ServiceEntityRepository
         return $this->getReference($enum->value);
     }
 
+    public function inProgressColumn(): IssueColumn
+    {
+        return $this->getReference(IssueColumnEnum::InProgress->value);
+    }
+
     public function backlogColumn(): IssueColumn
     {
         return $this->getReference(IssueColumnEnum::Backlog->value);
@@ -30,6 +35,11 @@ class IssueColumnRepository extends ServiceEntityRepository
     public function testColumn(): IssueColumn
     {
         return $this->getReference(IssueColumnEnum::Test->value);
+    }
+
+    public function inTestsColumn(): IssueColumn
+    {
+        return $this->getReference(IssueColumnEnum::InTests->value);
     }
 
     public function toDoColumn(): IssueColumn

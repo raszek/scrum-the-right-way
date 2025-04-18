@@ -8,6 +8,7 @@ use App\Enum\Issue\IssueColumnEnum;
 use App\Exception\Issue\CannotSetStoryPointsException;
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
+use App\Factory\Issue\IssueTypeFactory;
 use App\Factory\Project\ProjectFactory;
 use App\Factory\Sprint\SprintFactory;
 use App\Factory\Sprint\SprintGoalFactory;
@@ -216,7 +217,7 @@ class IssueEditorTest extends KernelTestCase
 
         $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
 
-        $issueEditor->changeKanbanColumn(IssueColumnEnum::Done);
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::Done, 1);
 
         $updatedIssue = $this->issueRepository()->findOneBy([
             'id' => $issue->getId()
@@ -265,7 +266,7 @@ class IssueEditorTest extends KernelTestCase
 
         $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
 
-        $issueEditor->changeKanbanColumn(IssueColumnEnum::ToDo);
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::ToDo, 1);
 
         $updatedIssue = $this->issueRepository()->findOneBy([
             'id' => $issue->getId()
@@ -305,12 +306,12 @@ class IssueEditorTest extends KernelTestCase
         $issueMovedToInProgress = IssueFactory::createOne([
             'project' => $project,
             'issueColumn' => $toDoColumn,
-            'number' => 1
+            'number' => 1,
         ]);
 
         $issueEditor = $this->getIssueEditor($issueMovedToInProgress->_real(), $user->_real());
 
-        $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress);
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress, 1);
 
         $updatedIssue = $this->issueRepository()->findOneBy([
             'id' => $issueMovedToInProgress->getId()
@@ -355,7 +356,7 @@ class IssueEditorTest extends KernelTestCase
 
         $issueEditor = $this->getIssueEditor($inProgressIssue->_real(), $user->_real());
 
-        $issueEditor->changeKanbanColumn(IssueColumnEnum::Test);
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::Test, 1);
 
         $updatedIssue = $this->issueRepository()->findOneBy([
             'id' => $inProgressIssue->getId()
@@ -384,31 +385,80 @@ class IssueEditorTest extends KernelTestCase
         $issue = IssueFactory::createOne([
             'project' => $project,
             'issueColumn' => IssueColumnFactory::todoColumn(),
-            'number' => 1
+            'number' => 1,
+            'issueOrder' => 1024
         ]);
 
         $user = UserFactory::createOne([
             'inProgressIssue' => null
         ]);
 
+        $issueId = $issue->getId();
+
+        $userId = $user->getId();
+
         $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
 
-        $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress);
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress, 1);
 
         $updatedIssue = $this->issueRepository()->findOneBy([
-            'id' => $issue->getId()
+            'id' => $issueId
         ]);
 
         $this->assertNotNull($updatedIssue);
         $this->assertEquals(IssueColumnEnum::InProgress->value, $updatedIssue->getIssueColumn()->getId());
 
         $updatedUser = $this->userRepository()->findOneBy([
-            'id' => $user->getId()
+            'id' => $userId
         ]);
 
         $this->assertNotNull($updatedUser);
         $this->assertNotNull($updatedUser->getInProgressIssue());
         $this->assertEquals($issue->getId(), $updatedUser->getInProgressIssue()->getId());
+    }
+
+    /** @test */
+    public function feature_is_in_progress_when_at_least_one_of_his_sub_issues_is_in_progress()
+    {
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        IssueColumnFactory::inProgressColumn();
+
+        IssueTypeFactory::subIssueType();
+
+        $toDoColumn = IssueColumnFactory::todoColumn();
+
+        $feature = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $toDoColumn,
+            'type' => IssueTypeFactory::featureType(),
+            'number' => 1,
+            'issueOrder' => 512,
+        ]);
+
+        $subIssue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $toDoColumn,
+            'number' => 2,
+            'issueOrder' => 1024,
+            'type' => IssueTypeFactory::subIssueType(),
+            'parent' => $feature
+        ]);
+
+        $user = UserFactory::createOne();
+
+        $issueEditor = $this->getIssueEditor($subIssue->_real(), $user->_real());
+
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress, 1);
+
+        $updatedFeature = $this->issueRepository()->findOneBy([
+            'id' => $feature->getId()
+        ]);
+
+        $this->assertNotNull($updatedFeature);
+        $this->assertEquals(IssueColumnEnum::InProgress->value, $updatedFeature->getIssueColumn()->getId());
     }
 
     private function issueRepository(): IssueRepository

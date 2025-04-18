@@ -98,9 +98,7 @@ class KanbanController extends CommonIssueController
 
         $column = IssueColumnEnum::fromKey($form->column);
 
-        $issueEditor->changeKanbanColumn($column);
-
-        $issueEditor->sort($form->position);
+        $issueEditor->changeKanbanColumn($column, $form->position);
 
         return new Response(status: 204);
     }
