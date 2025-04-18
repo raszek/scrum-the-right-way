@@ -3,12 +3,12 @@
 namespace App\Controller\Kanban;
 
 use App\Controller\Issue\CommonIssueController;
-use App\Entity\Issue\Issue;
 use App\Entity\Project\Project;
 use App\Enum\Issue\IssueColumnEnum;
 use App\Enum\Kanban\KanbanFilterEnum;
 use App\Form\Kanban\MoveIssueForm;
 use App\Helper\JsonHelper;
+use App\Helper\StimulusHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Security\Voter\KanbanVoter;
 use App\Service\Issue\IssueEditor\IssueEditorFactory;
@@ -52,6 +52,7 @@ class KanbanController extends CommonIssueController
             'columns' => $columns,
             'filter' => $filter,
             'currentIssue' => $this->getInProgressIssueData(),
+            'disabledSort' => $this->isDisabledSort($filter)
         ]);
     }
 
@@ -79,6 +80,7 @@ class KanbanController extends CommonIssueController
             'project' => $project,
             'columns' => $columns,
             'currentIssue' => $this->getInProgressIssueData(),
+            'disabledSort' => $this->isDisabledSort($filterEnum),
         ]);
     }
 
@@ -103,15 +105,20 @@ class KanbanController extends CommonIssueController
         return new Response(status: 204);
     }
 
+    private function isDisabledSort(KanbanFilterEnum $enum): string
+    {
+        return StimulusHelper::boolean($enum === KanbanFilterEnum::Big);
+    }
+
     private function getInProgressIssueData(): string
     {
         $inProgressIssue = $this->getLoggedInUser()->getInProgressIssue();
 
         if (!$inProgressIssue) {
-            return '{}';
+            return StimulusHelper::nullObject();
         }
 
-        return JsonHelper::encode([
+        return StimulusHelper::object([
             'id' => $inProgressIssue->getId()->get(),
             'url' => $this->generateUrl('app_project_issue_view', [
                 'id' => $inProgressIssue->getProject()->getId(),

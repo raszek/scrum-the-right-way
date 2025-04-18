@@ -6,7 +6,8 @@ import {Modal} from 'bootstrap';
 export default class extends Controller {
 
     static values = {
-        currentIssue: Object
+        currentIssue: Object,
+        disabled: Boolean,
     }
 
     static targets = [
@@ -32,6 +33,7 @@ export default class extends Controller {
 
             new Sortable(columnTarget, {
                 group: 'issue',
+                disabled: this.disabledValue,
                 animation: 150,
                 onUpdate: this.dragIssue.bind(this),
                 onAdd: this.dragIssue.bind(this),
