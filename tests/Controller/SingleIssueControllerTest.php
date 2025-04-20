@@ -11,6 +11,7 @@ use App\Factory\Project\ProjectMemberFactory;
 use App\Factory\Project\ProjectMemberRoleFactory;
 use App\Factory\Project\ProjectRoleFactory;
 use App\Factory\Project\ProjectTagFactory;
+use App\Factory\Sprint\SprintFactory;
 use App\Factory\UserFactory;
 use App\Repository\Event\EventRepository;
 use App\Repository\Issue\IssueRepository;
@@ -30,6 +31,11 @@ class SingleIssueControllerTest extends WebTestCase
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
+        ]);
+
+        SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
         ]);
 
         $memberDeveloper = ProjectMemberFactory::createOne([
@@ -81,6 +87,11 @@ class SingleIssueControllerTest extends WebTestCase
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
+        ]);
+
+        SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
         ]);
 
         $memberDeveloper = ProjectMemberFactory::createOne([
@@ -137,6 +148,11 @@ class SingleIssueControllerTest extends WebTestCase
 
         $project = ProjectFactory::createOne([
             'code' => 'SCP'
+        ]);
+
+        SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
         ]);
 
         $memberDeveloper = ProjectMemberFactory::createOne([

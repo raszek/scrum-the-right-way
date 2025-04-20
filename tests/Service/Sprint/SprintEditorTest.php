@@ -44,6 +44,58 @@ class SprintEditorTest extends KernelTestCase
     }
 
     /** @test */
+    public function to_start_sprint_every_sub_issue_and_issue_must_have_estimated_story_points()
+    {
+        $project = ProjectFactory::createOne();
+
+        $feature = IssueFactory::createOne([
+            'project' => $project,
+            'type' => IssueTypeFactory::featureType(),
+            'number' => 1,
+        ]);
+
+        $subIssue = IssueFactory::createOne([
+            'project' => $project,
+            'type' => IssueTypeFactory::subIssueType(),
+            'number' => 2,
+            'parent' => $feature,
+            'storyPoints' => null,
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'isCurrent' => true,
+            'project' => $project,
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'name' => 'Sprint goal name',
+            'sprint' => $sprint,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $feature,
+            'sprintGoal' => $sprintGoal,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $subIssue,
+            'sprintGoal' => $sprintGoal,
+        ]);
+
+        $sprintEditor = $this->factory()->create($sprint);
+
+        $error = null;
+        try {
+            $sprintEditor->start();
+        } catch (CannotStartSprintException $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertNotNull($error);
+        $this->assertEquals('Cannot start sprint. Every issue and feature sub issue must have story points estimation.', $error);
+    }
+
+    /** @test */
     public function when_feature_is_added_to_sprint_also_feature_sub_issues_are_added_to_sprint()
     {
         $project = ProjectFactory::createOne();

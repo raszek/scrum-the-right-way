@@ -1,0 +1,18 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Sprint ' ~ sprint.number %}
+
+{% block content %}
+    <div data-controller="confirm-modal sprint--sort sprint--edit-goal">
+        <div class="row">
+            <div class="col-12">
+                {% embed 'common/project_page_header.html.twig' %}
+                    {% block buttons %}
+                        <button type="submit" class="btn btn-primary">End sprint</button>
+                    {% endblock %}
+                {% endembed %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

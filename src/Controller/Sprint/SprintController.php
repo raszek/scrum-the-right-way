@@ -44,6 +44,12 @@ class SprintController extends CommonIssueController
         }
 
         $currentSprint = $this->getCurrentSprint($project);
+        if ($currentSprint->isStarted()) {
+            return $this->overview(
+                currentSprint: $currentSprint,
+                project: $project
+            );
+        }
 
         $sprintGoals = $this->sprintService->getSprintGoals($currentSprint);
 
@@ -83,7 +89,6 @@ class SprintController extends CommonIssueController
         try {
             $sprintEditor->start();
         } catch (CannotStartSprintException $e) {
-
             $this->errorFlash($e->getMessage());
 
             return $this->redirectToRoute('app_project_sprint_current_view', [
@@ -93,6 +98,14 @@ class SprintController extends CommonIssueController
 
         return $this->redirectToRoute('app_project_kanban', [
             'id' => $project->getId()
+        ]);
+    }
+
+    public function overview(Sprint $currentSprint, Project $project): Response
+    {
+        return $this->render('sprint/overview.html.twig', [
+            'project' => $project,
+            'sprint' => $currentSprint,
         ]);
     }
 

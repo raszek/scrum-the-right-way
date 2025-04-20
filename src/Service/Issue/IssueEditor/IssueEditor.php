@@ -97,9 +97,7 @@ readonly class IssueEditor
             );
         }
 
-        if (!$this->issue->isOnBacklogColumn()) {
-            throw new CannotSetIssueDescriptionException('Cannot change title outside of backlog');
-        }
+        $this->guardAgainstNonEditableIssue();
 
         $this->issue->setTitle($title);
         $this->issue->setUpdatedAt($this->clock->now());
@@ -109,9 +107,7 @@ readonly class IssueEditor
 
     public function updateDescription(?string $description): void
     {
-        if (!$this->issue->isOnBacklogColumn()) {
-            throw new CannotSetIssueDescriptionException('Cannot change description outside of backlog');
-        }
+        $this->guardAgainstNonEditableIssue();
 
         $oldDescription = $this->issue->getDescription()
             ? StringHelper::explodeNewLine($this->issue->getDescription())
@@ -140,18 +136,34 @@ readonly class IssueEditor
         ), $this->issue);
     }
 
+    public function getIssueEditableError(): ?string
+    {
+        return $this->projectIssueEditorStrategy->getIssueEditableError();
+    }
+
+    public function isIssueEditable(): bool
+    {
+        return $this->getIssueEditableError() === null;
+    }
+
     public function setStoryPoints(?int $storyPoints): void
     {
         if ($storyPoints !== null && $storyPoints <= 0) {
             throw new CannotSetStoryPointsException('Story points value must be bigger than 0');
         }
 
-        if (!$this->issue->isOnBacklogColumn()) {
-            throw new CannotSetStoryPointsException('Cannot change story points outside of backlog');
+        if ($this->issue->isFeature()) {
+            throw new RuntimeException('Cannot change story points for feature.');
         }
+
+        $this->guardAgainstNonEditableIssue();
 
         $this->issue->setStoryPoints($storyPoints);
         $this->issue->setUpdatedAt($this->clock->now());
+
+        if ($this->issue->isSubIssue()) {
+            $this->updateFeatureStoryPoints($this->issue->getParent());
+        }
 
         $this->entityManager->flush();
 
@@ -204,5 +216,23 @@ readonly class IssueEditor
         $featureEditor = $this->featureEditorFactory->create($this->issue->getParent(), $this->user);
 
         $featureEditor->updateIssueColumn();
+    }
+
+    private function updateFeatureStoryPoints(Issue $feature): void
+    {
+        $featureStoryPoints = $feature->getSubIssues()
+            ->filter(fn(Issue $issue) => $issue->getStoryPoints() !== null)
+            ->map(fn(Issue $issue) => $issue->getStoryPoints())
+            ->toArray();
+
+        $feature->setStoryPoints(array_sum($featureStoryPoints));
+    }
+
+    private function guardAgainstNonEditableIssue(): void
+    {
+        $issueEditableError = $this->getIssueEditableError();
+        if ($issueEditableError) {
+            throw new RuntimeException($issueEditableError);
+        }
     }
 }

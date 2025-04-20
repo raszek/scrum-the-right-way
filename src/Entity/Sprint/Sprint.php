@@ -25,6 +25,9 @@ class Sprint
     private ?DateTimeImmutable $startedAt = null;
 
     #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $estimatedEndDate = null;
+
+    #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $endedAt = null;
 
     #[ORM\Column]
@@ -106,5 +109,15 @@ class Sprint
     public function isCurrent(): bool
     {
         return $this->isCurrent;
+    }
+
+    public function getEstimatedEndDate(): ?DateTimeImmutable
+    {
+        return $this->estimatedEndDate;
+    }
+
+    public function setEstimatedEndDate(?DateTimeImmutable $estimatedEndDate): void
+    {
+        $this->estimatedEndDate = $estimatedEndDate;
     }
 }

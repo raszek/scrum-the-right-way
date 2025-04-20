@@ -15,6 +15,7 @@ use App\Repository\Issue\IssueThreadMessageRepository;
 use App\Repository\Project\ProjectMemberRepository;
 use App\Repository\Project\ProjectTagRepository;
 use App\Security\Voter\IssueVoter;
+use App\Service\Issue\IssueEditor\IssueEditorFactory;
 use App\Service\Issue\ProjectIssueEditorFactory;
 use App\Service\Issue\Session\IssueSessionSettings;
 use App\Service\Issue\StoryPointService;
@@ -39,7 +40,8 @@ class IssueController extends CommonIssueController
         private readonly IssueThreadMessageRepository $issueThreadMessageRepository,
         private readonly IssueSessionSettings $issueSessionSettings,
         private readonly ProjectTagRepository $projectTagRepository,
-        private readonly IssueDependencyRepository $issueDependencyRepository
+        private readonly IssueDependencyRepository $issueDependencyRepository,
+        private readonly IssueEditorFactory $issueEditorFactory,
     ) {
         parent::__construct($this->issueRepository);
     }
@@ -151,6 +153,8 @@ class IssueController extends CommonIssueController
 
         $loggedInMember = $issue->getProject()->member($this->getLoggedInUser());
 
+        $issueEditor = $this->issueEditorFactory->create($issue, $this->getLoggedInUser());
+
         return [
             'project' => $issue->getProject(),
             'issue' => $issue,
@@ -169,7 +173,8 @@ class IssueController extends CommonIssueController
             'messages' => $this->issueThreadMessageRepository->getIssueMessages($issue),
             'dependencies' => $dependencies,
             'isActivitiesVisible' => $this->issueSessionSettings->isActivitiesVisible() ? 'true' : 'false',
-            'subIssues' => $subIssues
+            'subIssues' => $subIssues,
+            'isIssueEditable' => $issueEditor->isIssueEditable()
         ];
     }
 

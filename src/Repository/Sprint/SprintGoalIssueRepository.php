@@ -46,6 +46,23 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
         return $queryBuilder;
     }
 
+    public function countNonEstimatedStoryPointsIssues(Sprint $sprint): int
+    {
+        $queryBuilder = $this->createQueryBuilder('sprintGoalIssue');
+
+        $queryBuilder
+            ->select('count(sprintGoalIssue.id)')
+            ->join('sprintGoalIssue.sprintGoal', 'sprintGoal')
+            ->join('sprintGoalIssue.issue', 'issue')
+            ->where('issue.type in (:typeIds)')
+            ->setParameter('typeIds', [IssueTypeEnum::Issue->value, IssueTypeEnum::SubIssue->value])
+            ->andWhere('sprintGoal.sprint = :sprint')
+            ->sqidParameter('sprint', $sprint->getId())
+            ->andWhere('issue.storyPoints is null');
+
+        return $queryBuilder->getQuery()->getSingleScalarResult() ?? 0;
+    }
+
     /**
      * @return SprintGoalIssue[]
      */

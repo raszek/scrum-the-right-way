@@ -22,6 +22,7 @@ use App\Service\Issue\IssueEditor\IssueEditor;
 use App\Service\Issue\IssueEditor\IssueEditorFactory;
 use App\Tests\KernelTestCase;
 use Carbon\CarbonImmutable;
+use RuntimeException;
 
 class IssueEditorTest extends KernelTestCase
 {
@@ -184,6 +185,75 @@ class IssueEditorTest extends KernelTestCase
 
         $this->assertNotNull($errorMessage);
         $this->assertEquals('Story points value must be bigger than 0', $errorMessage);
+    }
+
+    /** @test */
+    public function cannot_change_story_points_for_feature_issue()
+    {
+        $user = UserFactory::createOne();
+
+        $issue = IssueFactory::createOne([
+            'type' => IssueTypeFactory::featureType()
+        ]);
+
+        $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
+
+        $errorMessage = null;
+        try {
+            $issueEditor->setStoryPoints(8);
+        } catch (RuntimeException $e) {
+            $errorMessage = $e->getMessage();
+        }
+
+        $this->assertNotNull($errorMessage);
+        $this->assertEquals('Cannot change story points for feature.', $errorMessage);
+
+    }
+
+    /** @test */
+    public function estimating_story_points_for_sub_issues_adds_points_to_parent_feature()
+    {
+        $user = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne();
+
+        SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        $feature = IssueFactory::createOne([
+            'number' => 1,
+            'type' => IssueTypeFactory::featureType(),
+            'project' => $project,
+            'storyPoints' => 5,
+        ]);
+
+        $subIssueType = IssueTypeFactory::subIssueType();
+
+        IssueFactory::createOne([
+            'number' => 2,
+            'type' => $subIssueType,
+            'parent' => $feature,
+            'project' => $project,
+            'storyPoints' => 5
+        ]);
+
+        $subIssue = IssueFactory::createOne([
+            'number' => 3,
+            'type' => $subIssueType,
+            'parent' => $feature,
+            'project' => $project,
+            'storyPoints' => null
+        ]);
+
+        $issueEditor = $this->getIssueEditor($subIssue->_real(), $user->_real());
+
+        $issueEditor->setStoryPoints(8);
+
+        $feature->_refresh();
+
+        $this->assertEquals(13, $feature->getStoryPoints());
     }
 
     /** @test */

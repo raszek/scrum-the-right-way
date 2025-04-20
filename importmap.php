@@ -127,4 +127,10 @@ return [
         'version' => '3.3.0',
         'type' => 'css',
     ],
+    'chart.js' => [
+        'version' => '4.4.9',
+    ],
+    '@kurkle/color' => [
+        'version' => '0.3.4',
+    ],
 ];

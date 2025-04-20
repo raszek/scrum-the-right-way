@@ -8,7 +8,7 @@
 >
     <div class="card-header d-flex justify-content-between align-items-center">
         Story points
-        {% if is_granted('STORY_POINTS_SET', project) %}
+        {% if isIssueEditable and issue.canEditStoryPoints and is_granted('STORY_POINTS_SET', project) %}
             <button class="btn btn-primary"
                     data-story-points-target="button"
                     data-action="story-points#toggle"

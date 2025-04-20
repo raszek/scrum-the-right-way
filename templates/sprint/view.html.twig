@@ -6,17 +6,16 @@
     <div data-controller="confirm-modal sprint--sort sprint--edit-goal">
         <div class="row">
             <div class="col-12">
-                {% embed 'common/project_page_header.html.twig' %}
-                    {% block buttons %}
-                        <form action="{{ path('app_project_sprint_current_start', {
-                            id: project.id
-                        }) }}"
-                              method="post"
-                        >
-                            <button type="submit" class="btn btn-primary">Start sprint</button>
-                        </form>
-                    {% endblock %}
-                {% endembed %}
+                {% include 'common/project_page_header.html.twig' %}
+                <div>
+                    <form action="{{ path('app_project_sprint_current_start', {
+                        id: project.id
+                    }) }}"
+                          method="post"
+                    >
+                        <button type="submit" class="btn btn-primary">Start sprint</button>
+                    </form>
+                </div>
 
                 <ul class="list-group mt-3" data-sprint--sort-target="goals">
                     {% for goal in sprintGoals %}

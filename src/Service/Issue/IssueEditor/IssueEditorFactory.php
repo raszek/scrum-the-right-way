@@ -7,6 +7,7 @@ use App\Entity\User\User;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
+use App\Repository\Sprint\SprintRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Event\EventPersisterFactory;
 use App\Service\Issue\FeatureEditorFactory;
@@ -19,10 +20,11 @@ readonly class IssueEditorFactory
     public function __construct(
         private IssueRepository $issueRepository,
         private IssueColumnRepository $issueColumnRepository,
+        private SprintRepository $sprintRepository,
+        private SprintGoalIssueRepository $sprintGoalIssueRepository,
         private EntityManagerInterface $entityManager,
         private ClockInterface $clock,
         private EventPersisterFactory $eventPersisterFactory,
-        private SprintGoalIssueRepository $sprintGoalIssueRepository,
         private FeatureEditorFactory $featureEditorFactory,
     ) {
     }
@@ -47,6 +49,7 @@ readonly class IssueEditorFactory
         return new SprintIssueEditorStrategy(
             issue: $issue,
             sprintGoalIssueRepository: $this->sprintGoalIssueRepository,
+            sprintRepository: $this->sprintRepository,
             clock: $this->clock,
         );
     }

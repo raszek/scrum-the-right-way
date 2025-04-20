@@ -16,7 +16,7 @@
                 )
             </small>
         </span>
-        {% if is_granted('UPDATE_ISSUE_DESCRIPTION', project) %}
+        {% if isIssueEditable and is_granted('UPDATE_ISSUE_DESCRIPTION', project) %}
             <div data-editor-update-target="editButtons" style="display: none;">
                 <button data-action="editor-update#cancel" class="btn btn-primary me-3" title="Cancel"><i class="bi bi-x"></i></button>
                 <button data-action="editor-update#save" class="btn btn-primary" title="Save"><i class="bi bi-save"></i></button>

@@ -9,4 +9,5 @@ interface ProjectIssueEditorStrategy
 
     public function changeKanbanColumn(IssueColumnEnum $column): void;
 
+    public function getIssueEditableError(): ?string;
 }

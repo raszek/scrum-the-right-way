@@ -279,6 +279,7 @@ class SprintControllerTest extends WebTestCase
 
         $issue = IssueFactory::createOne([
             'project' => $project,
+            'storyPoints' => 3
         ]);
 
         $sprint = SprintFactory::createOne([

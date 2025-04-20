@@ -9,7 +9,6 @@ use App\Entity\Project\ProjectTag;
 use App\Entity\User\User;
 use App\Enum\Issue\IssueColumnEnum;
 use App\Repository\Issue\IssueRepository;
-use App\Service\Issue\IssueTypeStrategy\IssueTypeStrategy;
 use App\Service\Position\Positionable;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -136,7 +135,6 @@ class Issue implements Positionable
         ?Issue $parent = null,
         ?int $issueOrder = null
     ) {
-
         $this->number = $number;
         $this->title = $title;
         $this->columnOrder = $columnOrder;
@@ -145,9 +143,9 @@ class Issue implements Positionable
         $this->createdBy = $createdBy;
         $this->createdAt = $createdAt;
         $this->updatedAt = $createdAt;
-        $this->parent = $parent;
         $this->setType($type);
         $this->setIssueOrder($issueOrder);
+        $this->setParent($parent);
         $this->descriptionHistories = new ArrayCollection();
         $this->attachments = new ArrayCollection();
         $this->issueObservers = new ArrayCollection();
@@ -207,20 +205,6 @@ class Issue implements Positionable
     public function isOnBacklogColumn(): bool
     {
         return $this->getIssueColumn()->isBacklog();
-    }
-
-    public function isOnDeveloperColumn(): bool
-    {
-        $issueColumn = $this->getIssueColumn();
-
-        return $issueColumn->isToDo() || $issueColumn->isInProgress();
-    }
-
-    public function isOnTesterColumn(): bool
-    {
-        $issueColumn = $this->getIssueColumn();
-
-        return $issueColumn->isTest() || $issueColumn->isTested();
     }
 
     public function isOnColumn(IssueColumnEnum $columnEnum): bool
@@ -335,10 +319,6 @@ class Issue implements Positionable
 
     public function setType(IssueType $type): void
     {
-        if ($type->isSubIssue() && $this->parent === null) {
-            throw new RuntimeException('Invalid sub issue type. Sub issue must have parent issue.');
-        }
-
         $this->type = $type;
     }
 
@@ -510,5 +490,20 @@ class Issue implements Positionable
     public function getOrderSpace(): int
     {
         return self::DEFAULT_ORDER_SPACE;
+    }
+
+    private function setParent(?Issue $parent): void
+    {
+        if ($this->isSubIssue() && $parent === null) {
+            throw new RuntimeException('Sub issue must have parent issue.');
+        }
+
+        $this->parent = $parent;
+    }
+
+
+    public function canEditStoryPoints(): bool
+    {
+        return !$this->isFeature();
     }
 }

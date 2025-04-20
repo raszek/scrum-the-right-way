@@ -3,6 +3,7 @@
 namespace App\Factory\Issue;
 
 use App\Entity\Issue\Issue;
+use App\Enum\Issue\IssueTypeEnum;
 use App\Factory\Project\ProjectFactory;
 use App\Factory\UserFactory;
 use DateTimeImmutable;
@@ -39,6 +40,12 @@ final class IssueFactory extends PersistentProxyObjectFactory
      */
     protected function initialize(): static
     {
-        return $this;
+        return $this->beforeInstantiate(function (array $parameters) {
+            if ($parameters['type']->getId() === IssueTypeEnum::SubIssue->value && !isset($parameters['issueOrder'])) {
+                $parameters['issueOrder'] = 128;
+            }
+
+            return $parameters;
+        });
     }
 }

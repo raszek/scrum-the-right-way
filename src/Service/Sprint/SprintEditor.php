@@ -150,6 +150,13 @@ readonly class SprintEditor
             }
         }
 
+        $count = $this->sprintGoalIssueRepository->countNonEstimatedStoryPointsIssues($this->sprint);
+        if ($count > 0) {
+            throw new CannotStartSprintException(
+                'Cannot start sprint. Every issue and feature sub issue must have story points estimation.'
+            );
+        }
+
         $this->sprint->setStartedAt($this->clock->now());
 
         $this->entityManager->flush();
