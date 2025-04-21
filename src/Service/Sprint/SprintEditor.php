@@ -9,6 +9,7 @@ use App\Entity\Sprint\SprintGoalIssue;
 use App\Exception\Sprint\CannotAddSprintIssueException;
 use App\Exception\Sprint\CannotStartSprintException;
 use App\Form\Sprint\CreateSprintGoalForm;
+use App\Form\Sprint\StartSprintForm;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
@@ -132,7 +133,7 @@ readonly class SprintEditor
         $this->entityManager->flush();
     }
 
-    public function start(): void
+    public function start(StartSprintForm $form): void
     {
         if (!$this->sprint->isCurrent()) {
             throw new RuntimeException('Only current sprint can be started');
@@ -158,6 +159,7 @@ readonly class SprintEditor
         }
 
         $this->sprint->setStartedAt($this->clock->now());
+        $this->sprint->setEstimatedEndDate($form->estimatedEndDate);
 
         $this->entityManager->flush();
     }

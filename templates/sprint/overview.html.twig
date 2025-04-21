@@ -3,7 +3,7 @@
 {% set page_title = 'Sprint ' ~ sprint.number %}
 
 {% block content %}
-    <div data-controller="confirm-modal sprint--sort sprint--edit-goal">
+    <div>
         <div class="row">
             <div class="col-12">
                 {% embed 'common/project_page_header.html.twig' %}
@@ -11,7 +11,12 @@
                         <button type="submit" class="btn btn-primary">End sprint</button>
                     {% endblock %}
                 {% endembed %}
-
+            </div>
+            <div class="col-8">
+                <canvas data-controller="sprint--burndown-chart"
+                     data-sprint--burndown-chart-records-value="{{ chartRecords }}"
+                >
+                </canvas>
             </div>
         </div>
     </div>

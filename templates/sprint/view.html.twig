@@ -7,16 +7,17 @@
         <div class="row">
             <div class="col-12">
                 {% include 'common/project_page_header.html.twig' %}
-                <div>
-                    <form action="{{ path('app_project_sprint_current_start', {
-                        id: project.id
-                    }) }}"
-                          method="post"
-                    >
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ form_start(startSprintForm) }}
+                        {{ form_row(startSprintForm.estimatedEndDate) }}
                         <button type="submit" class="btn btn-primary">Start sprint</button>
-                    </form>
+                        {{ form_end(startSprintForm) }}
+                    </div>
                 </div>
 
+                <hr>
+                <h4>Sprint goals</h4>
                 <ul class="list-group mt-3" data-sprint--sort-target="goals">
                     {% for goal in sprintGoals %}
                         <li class="list-group-item bg-body-tertiary"
@@ -70,12 +71,22 @@
                                         }) }}"
                                         class="list-group-item d-flex justify-content-between align-items-center"
                                     >
-                                        <a href="{{ path('app_project_issue_view', {
-                                            id: project.id,
-                                            issueCode: goalIssue.issue.code
-                                        }) }}">
-                                            {{ goalIssue.issue.fullText }}
-                                        </a>
+                                        <div>
+                                            <p class="mb-0">
+                                                <a href="{{ path('app_project_issue_view', {
+                                                    id: project.id,
+                                                    issueCode: goalIssue.issue.code
+                                                }) }}">
+                                                    {{ goalIssue.issue.fullText }}
+                                                </a>
+                                                &nbsp;
+                                                <span class="{{ goalIssue.issue.isEstimated ? 'text-success' : 'text-danger' }}"
+                                                      title="{{ goalIssue.issue.countEstimated }} issues estimated"
+                                                >
+                                                    [{{ goalIssue.issue.storyPoints ? goalIssue.issue.storyPoints ~ ' story points' : 'not estimated' }}]
+                                                </span>
+                                            </p>
+                                        </div>
                                         {% if is_granted('REMOVE_CURRENT_SPRINT_ISSUE', project) %}
                                             <button type="submit"
                                                     class="btn btn-danger"

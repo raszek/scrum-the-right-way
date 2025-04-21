@@ -7,12 +7,17 @@ use App\Entity\Project\Project;
 use App\Entity\Sprint\Sprint;
 use App\Exception\Sprint\CannotStartSprintException;
 use App\Form\Sprint\SprintGoalFormType;
+use App\Form\Sprint\StartSprintForm;
+use App\Form\Sprint\StartSprintType;
+use App\Helper\StimulusHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintRepository;
 use App\Security\Voter\SprintVoter;
+use App\Service\Sprint\BurndownChartService\BurndownChartService;
 use App\Service\Sprint\SprintAccess;
 use App\Service\Sprint\SprintEditorFactory;
 use App\Service\Sprint\SprintService;
+use Carbon\CarbonImmutable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,6 +33,7 @@ class SprintController extends CommonIssueController
         private readonly IssueRepository $issueRepository,
         private readonly SprintRepository $sprintRepository,
         private readonly SprintService $sprintService,
+        private readonly BurndownChartService $burndownChartService,
     ) {
         parent::__construct($this->issueRepository);
     }
@@ -53,8 +59,15 @@ class SprintController extends CommonIssueController
 
         $sprintGoals = $this->sprintService->getSprintGoals($currentSprint);
 
-        $sprintGoalForm = $this->createForm(SprintGoalFormType::class);
+        $startSprintForm = $this->createForm(StartSprintType::class, new StartSprintForm(
+            estimatedEndDate: CarbonImmutable::now()->addWeeks(2),
+        ));
+        $startSprintForm->handleRequest($request);
+        if ($startSprintForm->isSubmitted() && $startSprintForm->isValid()) {
+            return $this->start($project, $startSprintForm->getData());
+        }
 
+        $sprintGoalForm = $this->createForm(SprintGoalFormType::class);
         $sprintGoalForm->handleRequest($request);
         if ($sprintGoalForm->isSubmitted() && $sprintGoalForm->isValid()) {
 
@@ -74,11 +87,23 @@ class SprintController extends CommonIssueController
             'sprint' => $currentSprint,
             'sprintGoals' => $sprintGoals,
             'sprintGoalForm' => $sprintGoalForm,
+            'startSprintForm' => $startSprintForm,
         ]);
     }
 
-    #[Route('/sprints/current/start', 'app_project_sprint_current_start', methods: ['POST'])]
-    public function start(Project $project): Response
+
+    public function overview(Sprint $currentSprint, Project $project): Response
+    {
+        $chartRecords = $this->burndownChartService->getChartData($currentSprint);
+
+        return $this->render('sprint/overview.html.twig', [
+            'project' => $project,
+            'sprint' => $currentSprint,
+            'chartRecords' => StimulusHelper::object($chartRecords),
+        ]);
+    }
+
+    private function start(Project $project, StartSprintForm $form): Response
     {
         $this->denyAccessUnlessGranted(SprintVoter::START_CURRENT_SPRINT, $project);
 
@@ -87,7 +112,7 @@ class SprintController extends CommonIssueController
         $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
 
         try {
-            $sprintEditor->start();
+            $sprintEditor->start($form);
         } catch (CannotStartSprintException $e) {
             $this->errorFlash($e->getMessage());
 
@@ -98,14 +123,6 @@ class SprintController extends CommonIssueController
 
         return $this->redirectToRoute('app_project_kanban', [
             'id' => $project->getId()
-        ]);
-    }
-
-    public function overview(Sprint $currentSprint, Project $project): Response
-    {
-        return $this->render('sprint/overview.html.twig', [
-            'project' => $project,
-            'sprint' => $currentSprint,
         ]);
     }
 

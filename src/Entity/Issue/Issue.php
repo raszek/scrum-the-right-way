@@ -9,6 +9,9 @@ use App\Entity\Project\ProjectTag;
 use App\Entity\User\User;
 use App\Enum\Issue\IssueColumnEnum;
 use App\Repository\Issue\IssueRepository;
+use App\Service\Issue\IssueTypeStrategy\DefaultStrategy;
+use App\Service\Issue\IssueTypeStrategy\FeatureStrategy;
+use App\Service\Issue\IssueTypeStrategy\IssueTypeStrategy;
 use App\Service\Position\Positionable;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -122,6 +125,8 @@ class Issue implements Positionable
      */
     #[ORM\OneToMany(targetEntity: Issue::class, mappedBy: 'parent')]
     private Collection $subIssues;
+
+    private ?IssueTypeStrategy $typeStrategy = null;
 
     public function __construct(
         int               $number,
@@ -276,6 +281,16 @@ class Issue implements Positionable
     public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    public function isEstimated(): bool
+    {
+        return $this->getTypeStrategy()->isEstimated();
+    }
+
+    public function countEstimated(): string
+    {
+        return $this->getTypeStrategy()->countEstimated();
     }
 
     public function setUpdatedAt(DateTimeImmutable $updatedAt): static
@@ -492,6 +507,11 @@ class Issue implements Positionable
         return self::DEFAULT_ORDER_SPACE;
     }
 
+    public function canEditStoryPoints(): bool
+    {
+        return !$this->isFeature();
+    }
+
     private function setParent(?Issue $parent): void
     {
         if ($this->isSubIssue() && $parent === null) {
@@ -501,9 +521,21 @@ class Issue implements Positionable
         $this->parent = $parent;
     }
 
-
-    public function canEditStoryPoints(): bool
+    private function generateTypeStrategy(): IssueTypeStrategy
     {
-        return !$this->isFeature();
+        if ($this->isFeature()) {
+            return new FeatureStrategy($this);
+        }
+
+        return new DefaultStrategy($this);
+    }
+
+    private function getTypeStrategy(): IssueTypeStrategy
+    {
+        if ($this->typeStrategy === null) {
+            $this->typeStrategy = $this->generateTypeStrategy();
+        }
+
+        return $this->typeStrategy;
     }
 }
