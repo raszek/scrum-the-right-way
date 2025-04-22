@@ -5,9 +5,7 @@ namespace App\Service\Sprint\BurndownChartService;
 use App\Entity\Sprint\Sprint;
 use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Service\Common\ClockInterface;
-use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
-use function PHPUnit\Framework\lessThan;
 
 readonly class BurndownChartService
 {
@@ -56,10 +54,11 @@ readonly class BurndownChartService
         ];
 
         foreach ($records as $record) {
+            $sprintStoryPoints -= $record['storyPoints'];
             $chartData[] = new BurndownChartRecord(
                 date: $record['date'],
                 storyPoints: isset($record['storyPoints'])
-                    ? $sprintStoryPoints - $record['storyPoints']
+                    ? $sprintStoryPoints
                     : null,
             );
         }

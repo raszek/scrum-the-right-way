@@ -61,11 +61,4 @@ class ProjectMemberRole
     {
         return $this->projectMember;
     }
-
-    public function setProjectMember(?ProjectMember $projectMember): static
-    {
-        $this->projectMember = $projectMember;
-
-        return $this;
-    }
 }

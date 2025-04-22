@@ -16,7 +16,9 @@ use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Repository\Sprint\SprintRepository;
+use App\Service\Common\ClockInterface;
 use App\Tests\Controller\WebTestCase;
+use Carbon\CarbonImmutable;
 
 class SprintControllerTest extends WebTestCase
 {
@@ -258,6 +260,16 @@ class SprintControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->followRedirects();
+        $client->disableReboot();
+
+        $mockClock = new class implements ClockInterface {
+            public function now(): CarbonImmutable
+            {
+                return CarbonImmutable::create(2012, 12, 12);
+            }
+        };
+
+        $this->mockService(ClockInterface::class, $mockClock);
 
         $developer = UserFactory::createOne();
 
@@ -302,11 +314,17 @@ class SprintControllerTest extends WebTestCase
         $this->loginAsUser($developer);
 
         $uri = sprintf(
-            '/projects/%s/sprints/current/start',
+            '/projects/%s/sprints/current',
             $project->getId(),
         );
 
-        $client->request('POST', $uri);
+        $crawler = $this->goToPageSafe($uri);
+
+        $form = $crawler->selectButton('Start sprint')->form();
+
+        $client->submit($form, [
+            'start_sprint[estimatedEndDate]' => CarbonImmutable::create(2012, 12, 19)->format('Y-m-d')
+        ]);
 
         $this->assertResponseIsSuccessful();
 

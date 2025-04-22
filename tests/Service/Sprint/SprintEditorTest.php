@@ -10,10 +10,12 @@ use App\Factory\Sprint\SprintFactory;
 use App\Factory\Sprint\SprintGoalFactory;
 use App\Factory\Project\ProjectFactory;
 use App\Factory\Sprint\SprintGoalIssueFactory;
+use App\Form\Sprint\StartSprintForm;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Service\Sprint\SprintEditorFactory;
 use App\Tests\KernelTestCase;
+use Carbon\CarbonImmutable;
 
 class SprintEditorTest extends KernelTestCase
 {
@@ -34,7 +36,9 @@ class SprintEditorTest extends KernelTestCase
 
         $error = null;
         try {
-            $sprintEditor->start();
+            $sprintEditor->start(new StartSprintForm(
+                estimatedEndDate: CarbonImmutable::create(2012, 12, 12)
+            ));
         } catch (CannotStartSprintException $e) {
             $error = $e->getMessage();
         }
@@ -86,7 +90,9 @@ class SprintEditorTest extends KernelTestCase
 
         $error = null;
         try {
-            $sprintEditor->start();
+            $sprintEditor->start(new StartSprintForm(
+                estimatedEndDate: CarbonImmutable::create(2012, 12, 12)
+            ));
         } catch (CannotStartSprintException $e) {
             $error = $e->getMessage();
         }

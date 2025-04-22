@@ -82,6 +82,7 @@ class SprintController extends CommonIssueController
             ]);
         }
 
+
         return $this->render('sprint/view.html.twig', [
             'project' => $project,
             'sprint' => $currentSprint,

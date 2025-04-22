@@ -102,10 +102,12 @@
             <div class="row">
                 <div class="col-12 d-flex justify-content-between align-items-start">
                     {{ knp_pagination_render(pagination) }}
-                    <a href="{{ path('app_project_backlog', {
-                        id: project.id,
-                        showAll: '1'
-                    }) }}" class="btn btn-primary">Show all</a>
+                    {% if pagination.totalItemCount > pagination.itemNumberPerPage %}
+                        <a href="{{ path('app_project_backlog', {
+                            id: project.id,
+                            showAll: '1'
+                        }) }}" class="btn btn-primary">Show all</a>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}

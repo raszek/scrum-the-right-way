@@ -26,7 +26,7 @@ readonly class ProjectService
 
         $this->entityManager->persist($createdProject);
         $projectEditor = $this->projectEditorFactory->create($createdProject, $user);
-        $projectEditor->addMember($user);
+        $projectEditor->addMemberAdmin($user);
         $projectEditor->createSprint();
 
         $this->entityManager->flush();

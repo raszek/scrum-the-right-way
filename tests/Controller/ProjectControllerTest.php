@@ -6,16 +6,14 @@ use App\Entity\Sprint\Sprint;
 use App\Enum\Project\ProjectTypeEnum;
 use App\Factory\Project\ProjectFactory;
 use App\Factory\Project\ProjectMemberFactory;
+use App\Factory\Project\ProjectRoleFactory;
 use App\Factory\Project\ProjectTypeFactory;
 use App\Factory\UserFactory;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectTypeRepository;
-use Zenstruck\Foundry\Test\Factories;
 
 class ProjectControllerTest extends WebTestCase
 {
-
-
 
     /** @test */
     public function user_can_create_sprint_project()
@@ -26,6 +24,8 @@ class ProjectControllerTest extends WebTestCase
         $user = UserFactory::createOne();
 
         ProjectTypeFactory::createProjectTypes();
+
+        ProjectRoleFactory::adminRole();
 
         $this->loginAsUser($user);
 
@@ -52,10 +52,13 @@ class ProjectControllerTest extends WebTestCase
         $this->assertNotNull($createdProject);
         $this->assertEquals('NPN', $createdProject->getCode());
         $this->assertEquals($createdProject->getType()->getId(), ProjectTypeEnum::Scrum->value);
-        $this->assertTrue($createdProject->hasMember($user));
+
+        $addedMemberToProject = $createdProject->findMember($user);
+
+        $this->assertNotNull($addedMemberToProject);
+        $this->assertTrue($addedMemberToProject->isAdmin());
 
         $this->assertEquals(1, $createdProject->getSprints()->count());
-
         /**
          * @var Sprint $firstSprint
          */

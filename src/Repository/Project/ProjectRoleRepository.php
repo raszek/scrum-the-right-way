@@ -19,15 +19,17 @@ class ProjectRoleRepository extends ServiceEntityRepository
 
     public function adminRole(): ProjectRole
     {
-        return $this->findOneBy([
-            'id' => ProjectRoleEnum::Admin->value
-        ]);
+        return $this->getReference(ProjectRoleEnum::Admin);
     }
 
     public function developerRole(): ProjectRole
     {
-        return $this->findOneBy([
-            'id' => ProjectRoleEnum::Developer->value
-        ]);
+        return $this->getReference(ProjectRoleEnum::Developer);
+    }
+
+    public function getReference(ProjectRoleEnum $enum): ProjectRole
+    {
+        return $this->getEntityManager()
+            ->getReference(ProjectRole::class, $enum->value);
     }
 }
