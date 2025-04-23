@@ -33,7 +33,7 @@ readonly class BurndownChartService
         $records = [];
         foreach ($period as $date) {
             $records[$date->format('Y-m-d')] = [
-                'date' => $date->format('Y-m-d'),
+                'date' => $date->format('d.m'),
                 'storyPoints' => $date->greaterThan($now) ? null : 0,
             ];
         }

@@ -31,13 +31,7 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
         $scrumProject = ProjectFactory::createOne([
             'name' => 'scrum project',
             'code' => 'SCP',
-            'type' => $this->projectTypeRepository->findScrum()
-        ]);
-
-        $kanbanProject = ProjectFactory::createOne([
-            'name' => 'kanban project',
-            'code' => 'KBP',
-            'type' => $this->projectTypeRepository->findKanban()
+            'type' => $this->projectTypeRepository->scrumType()
         ]);
 
         foreach ($users as $user) {
@@ -47,13 +41,6 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
             ]);
 
             $this->assignRole($scrumMember);
-
-            $kanbanMember = ProjectMemberFactory::createOne([
-                'user' => $user,
-                'project' => $kanbanProject
-            ]);
-
-            $this->assignRole($kanbanMember);
         }
     }
 

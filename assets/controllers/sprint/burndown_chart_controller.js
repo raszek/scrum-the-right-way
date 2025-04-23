@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
-import {Chart, registerables} from 'chart.js';
+import {Chart} from 'chart.js';
 
 export default class extends Controller {
 
@@ -11,7 +11,7 @@ export default class extends Controller {
         const data = {
             labels: this.getLabels(),
             datasets: [{
-                label: 'Burndown Chart',
+                label: 'Burndown line',
                 data: this.getValues(),
                 fill: false,
                 borderColor: 'rgb(75, 192, 192)',
@@ -26,8 +26,6 @@ export default class extends Controller {
                 }
             }
         };
-
-        Chart.register(...registerables);
 
         new Chart(this.element, {
             type: 'line',

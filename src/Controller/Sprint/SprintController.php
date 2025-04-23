@@ -82,7 +82,6 @@ class SprintController extends CommonIssueController
             ]);
         }
 
-
         return $this->render('sprint/view.html.twig', [
             'project' => $project,
             'sprint' => $currentSprint,
@@ -101,6 +100,7 @@ class SprintController extends CommonIssueController
             'project' => $project,
             'sprint' => $currentSprint,
             'chartRecords' => StimulusHelper::object($chartRecords),
+            'latestDoneIssues' => $this->sprintService->getLatestDoneIssues($currentSprint),
         ]);
     }
 

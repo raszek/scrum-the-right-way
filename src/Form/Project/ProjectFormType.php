@@ -3,6 +3,7 @@
 namespace App\Form\Project;
 
 use App\Entity\Project\ProjectType;
+use App\Repository\Project\ProjectTypeRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -10,6 +11,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProjectFormType extends AbstractType
 {
+
+    public function __construct(
+        private readonly ProjectTypeRepository $projectTypeRepository
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -18,6 +25,7 @@ class ProjectFormType extends AbstractType
             ->add('type', EntityType::class, [
                 'class' => ProjectType::class,
                 'choice_label' => 'label',
+                'choices' => $this->getTypes()
             ])
         ;
     }
@@ -27,5 +35,12 @@ class ProjectFormType extends AbstractType
         $resolver->setDefaults([
             'data_class' => ProjectForm::class,
         ]);
+    }
+
+    private function getTypes(): array
+    {
+        return [
+            $this->projectTypeRepository->scrumType()
+        ];
     }
 }

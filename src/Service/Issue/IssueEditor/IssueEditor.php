@@ -8,7 +8,6 @@ use App\Entity\User\User;
 use App\Enum\Issue\IssueColumnEnum;
 use App\Event\Issue\Event\SetIssueDescriptionEvent;
 use App\Event\Issue\Event\SetIssueStoryPointsEvent;
-use App\Exception\Issue\CannotSetIssueDescriptionException;
 use App\Exception\Issue\CannotSetIssueTitleException;
 use App\Exception\Issue\CannotSetStoryPointsException;
 use App\Exception\Issue\OutOfBoundPositionException;

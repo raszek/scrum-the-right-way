@@ -17,17 +17,18 @@ class ProjectTypeRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectType::class);
     }
 
-    public function findScrum(): ProjectType
+    public function scrumType(): ProjectType
     {
-        return $this->findOneBy([
-            'id' => ProjectTypeEnum::Scrum->value
-        ]);
+        return $this->getReference(ProjectTypeEnum::Scrum);
     }
 
-    public function findKanban(): ProjectType
+    public function kanbanType(): ProjectType
     {
-        return $this->findOneBy([
-            'id' => ProjectTypeEnum::Kanban->value
-        ]);
+        return $this->getReference(ProjectTypeEnum::Kanban);
+    }
+
+    public function getReference(ProjectTypeEnum $enum): ProjectType
+    {
+        return $this->getEntityManager()->getReference(ProjectType::class, $enum->value);
     }
 }

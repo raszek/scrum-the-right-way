@@ -9,12 +9,17 @@ use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
 use App\Factory\Project\ProjectFactory;
+use App\Factory\Project\ProjectTypeFactory;
+use App\Factory\Sprint\SprintFactory;
+use App\Factory\Sprint\SprintGoalFactory;
+use App\Factory\Sprint\SprintGoalIssueFactory;
 use App\Factory\UserFactory;
 use App\Form\Issue\SubIssueForm;
 use App\Repository\Issue\IssueRepository;
 use App\Service\Issue\FeatureEditor;
 use App\Service\Issue\FeatureEditorFactory;
 use App\Tests\KernelTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 
 class FeatureEditorTest extends KernelTestCase
 {
@@ -157,6 +162,75 @@ class FeatureEditorTest extends KernelTestCase
         $featureStrategy->updateIssueColumn();
 
         $this->assertTrue($realFeature->getIssueColumn()->isInProgress());
+    }
+
+    /** @test */
+    public function when_feature_is_automatically_moved_to_column_done_it_is_also_marked_as_finished()
+    {
+        $user = UserFactory::createOne();
+
+        $scrumType = ProjectTypeFactory::scrumType();
+
+        $project = ProjectFactory::new()->create([
+            'code' => 'SCP',
+            'type' => $scrumType
+        ]);
+
+        $doneColumn = IssueColumnFactory::doneColumn();
+        $inTestsColumn = IssueColumnFactory::inTestsColumn();
+
+        $subIssueType = IssueTypeFactory::subIssueType();
+
+        $feature = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $inTestsColumn,
+            'type' => IssueTypeFactory::featureType(),
+            'number' => 1,
+            'issueOrder' => 512
+        ]);
+
+        IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $doneColumn,
+            'number' => 2,
+            'issueOrder' => 1024,
+            'type' => $subIssueType,
+            'parent' => $feature
+        ]);
+
+        IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $doneColumn,
+            'number' => 3,
+            'issueOrder' => 2048,
+            'type' => $subIssueType,
+            'parent' => $feature
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+        ]);
+
+        $sprintGoalFeature = SprintGoalIssueFactory::createOne([
+            'issue' => $feature,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => null
+        ]);
+
+        $featureStrategy = $this->create($feature, $user);
+
+        $featureStrategy->updateIssueColumn();
+
+        $this->entityManager()->flush();
+
+        $this->assertTrue($feature->getIssueColumn()->isDone());
+
+        $this->assertNotNull($sprintGoalFeature->getFinishedAt());
     }
 
     private function issueRepository(): IssueRepository

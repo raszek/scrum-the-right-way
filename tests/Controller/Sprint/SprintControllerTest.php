@@ -336,6 +336,66 @@ class SprintControllerTest extends WebTestCase
         $this->assertNotNull($updatedSprint->getStartedAt());
     }
 
+    /** @test */
+    public function user_can_view_sprint_overview()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+        $client->disableReboot();
+
+        $user = UserFactory::createOne();
+
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create([
+                'code' => 'SCP'
+            ]);
+
+        ProjectMemberFactory::createOne([
+            'user' => $user,
+            'project' => $project
+        ]);
+
+        $issue = IssueFactory::createOne([
+            'title' => 'Super issue',
+            'project' => $project,
+            'storyPoints' => 3,
+            'issueColumn' => IssueColumnFactory::doneColumn(),
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
+            'number' => 1,
+            'startedAt' => CarbonImmutable::create(2012, 12, 12),
+            'estimatedEndDate' => CarbonImmutable::create(2012, 12, 19),
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'name' => 'Some sprint name',
+            'sprint' => $sprint
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $issue,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 14)
+        ]);
+
+        $this->loginAsUser($user);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current',
+            $project->getId(),
+        );
+
+        $this->goToPage($uri);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseHasText('Super issue');
+    }
+
     private function sprintGoalRepository(): SprintGoalRepository
     {
         return $this->getService(SprintGoalRepository::class);

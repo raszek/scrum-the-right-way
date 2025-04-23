@@ -36,7 +36,7 @@ class ProjectControllerTest extends WebTestCase
         $client->submit($form, [
             'project_form[name]' => 'new project name',
             'project_form[code]' => 'NPN',
-            'project_form[type]' => $this->projectTypeRepository()->findScrum()->getId(),
+            'project_form[type]' => $this->projectTypeRepository()->scrumType()->getId(),
         ]);
 
         $this->assertResponseIsSuccessful();

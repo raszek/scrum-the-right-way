@@ -2,6 +2,7 @@
 
 namespace App\Tests;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Zenstruck\Foundry\Test\Factories;
 
 class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
@@ -22,5 +23,10 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
     public function mockService(string $className, mixed $mockObject): void
     {
         self::getContainer()->set($className, $mockObject);
+    }
+
+    public function entityManager(): EntityManagerInterface
+    {
+        return $this->getService(EntityManagerInterface::class);
     }
 }

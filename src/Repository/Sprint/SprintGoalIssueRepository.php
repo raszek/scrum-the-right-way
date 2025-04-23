@@ -33,6 +33,26 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
             ->from($this->getEntityName(), $alias, $indexBy);
     }
 
+    /**
+     * @return SprintGoalIssue[]
+     */
+    public function getLatestDoneIssues(Sprint $sprint): array
+    {
+        $queryBuilder = $this->createQueryBuilder('sprintGoalIssue');
+
+        $queryBuilder
+            ->addSelect('issue')
+            ->join('sprintGoalIssue.issue', 'issue')
+            ->join('sprintGoalIssue.sprintGoal', 'sprintGoal')
+            ->where('sprintGoal.sprint = :sprint')
+            ->sqidParameter('sprint', $sprint->getId())
+            ->andWhere('sprintGoalIssue.finishedAt is not null')
+            ->orderBy('sprintGoalIssue.finishedAt', 'DESC')
+            ->setMaxResults(5);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     public function getSprintStoryPoints(Sprint $sprint): int
     {
         $queryBuilder = $this->createQueryBuilder('sprintGoalIssue');

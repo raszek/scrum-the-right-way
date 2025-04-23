@@ -11,6 +11,7 @@ use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Issue\IssueTypeRepository;
 use App\Service\Common\ClockInterface;
+use App\Service\Issue\IssueEditor\ProjectIssueEditorStrategy;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 
@@ -25,6 +26,7 @@ readonly class FeatureEditor
         private IssueColumnRepository $issueColumnRepository,
         private IssueTypeRepository $issueTypeRepository,
         private ClockInterface $clock,
+        private ProjectIssueEditorStrategy $projectIssueEditorStrategy,
     ) {
         $this->validateService();
     }
@@ -77,6 +79,8 @@ readonly class FeatureEditor
             $this->isInTests() => $this->issueColumnRepository->inTestsColumn(),
             default => $this->getMinimumColumn()
         };
+
+        $this->projectIssueEditorStrategy->changeKanbanColumn($column->getEnum());
 
         $this->issue->setIssueColumn($column);
     }

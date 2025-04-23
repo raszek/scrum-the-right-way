@@ -31,7 +31,12 @@ class IssueColumn
 
     public function getKey(): string
     {
-        return IssueColumnEnum::tryFrom($this->getId())->key();
+        return $this->getEnum()->key();
+    }
+
+    public function getEnum(): IssueColumnEnum
+    {
+        return IssueColumnEnum::tryFrom($this->getId());
     }
 
     public function getLabel(): ?string

@@ -12,11 +12,39 @@
                     {% endblock %}
                 {% endembed %}
             </div>
-            <div class="col-8">
-                <canvas data-controller="sprint--burndown-chart"
-                     data-sprint--burndown-chart-records-value="{{ chartRecords }}"
-                >
-                </canvas>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        Burndown chart
+                    </div>
+                    <div class="card-body">
+                        <canvas data-controller="sprint--burndown-chart"
+                                data-sprint--burndown-chart-records-value="{{ chartRecords }}"
+                        >
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        Latest done issues
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for sprintGoalIssue in latestDoneIssues %}
+                                <li class="list-group-item">
+                                    <a href="{{ path('app_project_issue_view', {
+                                        id: project.id,
+                                        issueCode: sprintGoalIssue.issue.code
+                                    }) }}">
+                                        {{ sprintGoalIssue.issue.fullText }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
