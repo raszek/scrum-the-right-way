@@ -3,6 +3,9 @@
 namespace App\Tests\Controller\Sprint;
 
 
+use App\Factory\Issue\IssueColumnFactory;
+use App\Factory\Issue\IssueFactory;
+use App\Factory\Issue\IssueTypeFactory;
 use App\Factory\Project\ProjectFactory;
 use App\Factory\Project\ProjectMemberFactory;
 use App\Factory\Project\ProjectMemberRoleFactory;
@@ -98,6 +101,35 @@ class SprintGoalControllerTest extends WebTestCase
             'role' => $developerRole
         ]);
 
+        $issueType = IssueTypeFactory::issueType();
+        $featureType = IssueTypeFactory::featureType();
+        $subIssueType = IssueTypeFactory::subIssueType();
+
+        IssueColumnFactory::backlogColumn();
+        $todoColumn = IssueColumnFactory::todoColumn();
+
+        $issue = IssueFactory::createOne([
+            'number' => 1,
+            'project' => $project,
+            'issueColumn' => $todoColumn,
+            'type' => $issueType,
+        ]);
+
+        $feature = IssueFactory::createOne([
+            'number' => 2,
+            'project' => $project,
+            'issueColumn' => $todoColumn,
+            'type' => $featureType,
+        ]);
+
+        $subIssue = IssueFactory::createOne([
+            'number' => 3,
+            'project' => $project,
+            'issueColumn' => $todoColumn,
+            'type' => $subIssueType,
+            'parent' => $feature
+        ]);
+
         $sprint = SprintFactory::createOne([
             'project' => $project,
             'isCurrent' => true,
@@ -115,10 +147,17 @@ class SprintGoalControllerTest extends WebTestCase
         ]);
 
         SprintGoalIssueFactory::createOne([
+            'issue' => $issue,
             'sprintGoal' => $sprintGoalToBeRemoved,
         ]);
 
         SprintGoalIssueFactory::createOne([
+            'issue' => $feature,
+            'sprintGoal' => $sprintGoalToBeRemoved,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $subIssue,
             'sprintGoal' => $sprintGoalToBeRemoved,
         ]);
 
@@ -141,6 +180,10 @@ class SprintGoalControllerTest extends WebTestCase
         $this->assertNull($removedSprintGoal);
 
         $this->assertCount(0, $this->sprintGoalIssueRepository()->findAll());
+
+        $this->assertTrue($issue->getIssueColumn()->isBacklog());
+        $this->assertTrue($feature->getIssueColumn()->isBacklog());
+        $this->assertTrue($subIssue->getIssueColumn()->isBacklog());
     }
 
     /** @test */

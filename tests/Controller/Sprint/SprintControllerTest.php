@@ -385,7 +385,7 @@ class SprintControllerTest extends WebTestCase
         $this->loginAsUser($user);
 
         $uri = sprintf(
-            '/projects/%s/home',
+            '/projects/%s/scrum/home',
             $project->getId(),
         );
 

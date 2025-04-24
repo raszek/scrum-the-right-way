@@ -127,6 +127,8 @@ readonly class SprintEditor
     public function removeSprintGoal(SprintGoal $sprintGoal): void
     {
         foreach ($sprintGoal->getSprintGoalIssues() as $goalIssue) {
+            $goalIssue->getIssue()->setIssueColumn($this->issueColumnRepository->backlogColumn());
+
             $this->entityManager->remove($goalIssue);
         }
 

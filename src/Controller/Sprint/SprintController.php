@@ -109,7 +109,7 @@ class SprintController extends CommonIssueController
 
         $sprintEditor->finish();
 
-        return $this->redirectToRoute('app_project_sprint_home', [
+        return $this->redirectToRoute('app_project_scrum_home', [
             'id' => $project->getId(),
         ]);
     }
