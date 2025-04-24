@@ -8,7 +8,11 @@
             <div class="col-12">
                 {% embed 'common/project_page_header.html.twig' %}
                     {% block buttons %}
-                        <button type="submit" class="btn btn-primary">End sprint</button>
+                        <form action="{{ path('app_project_sprint_current_finish', {
+                            id: project.id
+                        }) }}">
+                            <button type="submit" class="btn btn-primary">End sprint</button>
+                        </form>
                     {% endblock %}
                 {% endembed %}
             </div>

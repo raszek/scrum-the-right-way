@@ -5,6 +5,7 @@ namespace App\Service\Project;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Form\Project\ProjectForm;
+use App\Service\Sprint\SprintService;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class ProjectService
@@ -13,6 +14,7 @@ readonly class ProjectService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ProjectEditorFactory $projectEditorFactory,
+        private SprintService $sprintService,
     ) {
     }
 
@@ -27,7 +29,7 @@ readonly class ProjectService
         $this->entityManager->persist($createdProject);
         $projectEditor = $this->projectEditorFactory->create($createdProject, $user);
         $projectEditor->addMemberAdmin($user);
-        $projectEditor->createSprint();
+        $this->sprintService->createSprint($createdProject);
 
         $this->entityManager->flush();
 

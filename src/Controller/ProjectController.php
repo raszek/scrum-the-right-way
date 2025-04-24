@@ -6,9 +6,9 @@ use App\Entity\Project\Project;
 use App\Form\Project\ProjectFormType;
 use App\Repository\Project\ProjectRepository;
 use App\Service\Project\ProjectService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -50,5 +50,17 @@ class ProjectController extends Controller
         return $this->render('project/create.html.twig', [
             'form' => $form
         ]);
+    }
+
+    #[Route('/projects/{id}/home', name: 'app_project_home')]
+    public function home(Project $project): Response
+    {
+        if ($project->isScrum()) {
+            return $this->redirectToRoute('app_project_scrum_home', [
+                'id' => $project->getId()
+            ]);
+        }
+
+        throw new NotFoundHttpException('Not implemented project type home');
     }
 }

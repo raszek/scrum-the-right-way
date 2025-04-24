@@ -48,6 +48,9 @@ class Issue implements Positionable
     #[ORM\Column(nullable: true)]
     private ?int $storyPoints = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $previousStoryPoints = null;
+
     #[ORM\Column()]
     private int $columnOrder;
 
@@ -345,6 +348,20 @@ class Issue implements Positionable
     public function setStoryPoints(?int $storyPoints): void
     {
         $this->storyPoints = $storyPoints;
+    }
+
+    public function getPreviousStoryPoints(): ?int
+    {
+        return $this->previousStoryPoints;
+    }
+
+    public function setPreviousStoryPoints(?int $previousStoryPoints): void
+    {
+        if ($this->isFeature()) {
+            return;
+        }
+
+        $this->previousStoryPoints = $previousStoryPoints;
     }
 
     /**

@@ -385,7 +385,7 @@ class SprintControllerTest extends WebTestCase
         $this->loginAsUser($user);
 
         $uri = sprintf(
-            '/projects/%s/sprints/current',
+            '/projects/%s/home',
             $project->getId(),
         );
 
@@ -394,6 +394,199 @@ class SprintControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertResponseHasText('Super issue');
+    }
+
+    /** @test */
+    public function developer_can_finish_sprint()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $issueType = IssueTypeFactory::issueType();
+        $featureType = IssueTypeFactory::featureType();
+        $subIssueType = IssueTypeFactory::subIssueType();
+
+        $inProgressColumn = IssueColumnFactory::inProgressColumn();
+        $doneColumn = IssueColumnFactory::doneColumn();
+        $finishedColumn = IssueColumnFactory::finishedColumn();
+
+        $inProgressIssue = IssueFactory::createOne([
+            'number' => 1,
+            'project' => $project,
+            'type' => $issueType,
+            'storyPoints' => 5,
+            'issueColumn' => $inProgressColumn
+        ]);
+
+        $doneIssue = IssueFactory::createOne([
+            'number' => 2,
+            'project' => $project,
+            'type' => $issueType,
+            'storyPoints' => 3,
+            'issueColumn' => $doneColumn
+        ]);
+
+        $doneFeature = IssueFactory::createOne([
+            'number' => 3,
+            'project' => $project,
+            'type' => $featureType,
+            'storyPoints' => 5,
+            'issueColumn' => $doneColumn
+        ]);
+
+        $doneSubIssue = IssueFactory::createOne([
+            'number' => 4,
+            'project' => $project,
+            'type' => $subIssueType,
+            'storyPoints' => 5,
+            'issueColumn' => $doneColumn,
+            'parent' => $doneFeature
+        ]);
+
+        $partiallyDoneFeature = IssueFactory::createOne([
+            'number' => 5,
+            'project' => $project,
+            'type' => $featureType,
+            'storyPoints' => 8,
+            'issueColumn' => $inProgressColumn
+        ]);
+
+        $partiallyDoneSubIssue = IssueFactory::createOne([
+            'number' => 6,
+            'project' => $project,
+            'type' => $subIssueType,
+            'storyPoints' => 3,
+            'issueColumn' => $doneColumn,
+            'parent' => $partiallyDoneFeature
+        ]);
+
+        $partiallyInProgressSubIssue = IssueFactory::createOne([
+            'number' => 7,
+            'project' => $project,
+            'type' => $subIssueType,
+            'storyPoints' => 5,
+            'issueColumn' => $inProgressColumn,
+            'parent' => $partiallyDoneFeature
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
+            'number' => 1,
+            'startedAt' => CarbonImmutable::create(2012, 12, 12),
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'name' => 'Some sprint name',
+            'sprint' => $sprint
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $doneIssue,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 12),
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $inProgressIssue,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => null,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $doneFeature,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 12),
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $doneSubIssue,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 12),
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $partiallyDoneFeature,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => null,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $partiallyDoneSubIssue,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 12),
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $partiallyInProgressSubIssue,
+            'sprintGoal' => $sprintGoal,
+            'finishedAt' => null
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current/finish',
+            $project->getId(),
+        );
+
+        $client->request('POST', $uri);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertFalse($sprint->isCurrent());
+        $this->assertNotNull($sprint->getEndedAt());
+
+        $createdSprint = $this->sprintRepository()->findOneBy([
+            'project' => $project->getId(),
+            'isCurrent' => true,
+            'number' => 2
+        ]);
+
+        $this->assertNotNull($createdSprint);
+        $this->assertCount(1, $createdSprint->getSprintGoals());
+
+        $this->assertTrue($inProgressIssue->getIssueColumn()->isBacklog());
+        $this->assertNull($inProgressIssue->getStoryPoints());
+        $this->assertEquals(5 ,$inProgressIssue->getPreviousStoryPoints());
+
+        $this->assertTrue($partiallyDoneFeature->getIssueColumn()->isBacklog());;
+        $this->assertNull($partiallyDoneFeature->getStoryPoints());
+        $this->assertNull($partiallyDoneFeature->getPreviousStoryPoints());
+
+        $this->assertTrue($partiallyInProgressSubIssue->getIssueColumn()->isBacklog());;
+        $this->assertNull($partiallyInProgressSubIssue->getStoryPoints());
+        $this->assertEquals(5 ,$partiallyInProgressSubIssue->getPreviousStoryPoints());
+
+        $doneIssues = $this->issueRepository()->findBy([
+            'id' => [
+                $doneIssue->getId()->integerId(),
+                $doneFeature->getId()->integerId(),
+                $doneSubIssue->getId()->integerId(),
+                $partiallyDoneSubIssue->getId()->integerId(),
+            ],
+            'issueColumn' => $finishedColumn->getId(),
+        ]);
+
+        $this->assertCount(4, $doneIssues);
     }
 
     private function sprintGoalRepository(): SprintGoalRepository

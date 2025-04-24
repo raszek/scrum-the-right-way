@@ -111,6 +111,11 @@ class Sprint
         return $this->isCurrent;
     }
 
+    public function setIsCurrent(bool $isCurrent): void
+    {
+        $this->isCurrent = $isCurrent;
+    }
+
     public function getEstimatedEndDate(): ?DateTimeImmutable
     {
         return $this->estimatedEndDate;

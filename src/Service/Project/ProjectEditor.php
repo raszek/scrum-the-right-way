@@ -5,16 +5,12 @@ namespace App\Service\Project;
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectMember;
 use App\Entity\Project\ProjectMemberRole;
-use App\Entity\Sprint\Sprint;
-use App\Entity\Sprint\SprintGoal;
 use App\Entity\User\User;
 use App\Event\Project\Event\AddMemberEvent;
 use App\Event\Project\Event\RemoveMemberEvent;
 use App\Exception\Project\CannotAddProjectMemberException;
 use App\Exception\Project\CannotRemoveProjectMemberException;
-use App\Repository\Project\ProjectMemberRoleRepository;
 use App\Repository\Project\ProjectRoleRepository;
-use App\Repository\Sprint\SprintRepository;
 use App\Service\Event\EventPersister;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -25,7 +21,6 @@ readonly class ProjectEditor
         private Project $project,
         private EntityManagerInterface $entityManager,
         private EventPersister $eventPersister,
-        private SprintRepository $sprintRepository,
         private ProjectRoleRepository $projectRoleRepository,
     ) {
     }
@@ -57,28 +52,6 @@ readonly class ProjectEditor
         $this->eventPersister->create(new AddMemberEvent(
             userId: $newMember->getId()
         ));
-    }
-
-    public function createSprint(): void
-    {
-        $nextSprintNumber = $this->sprintRepository->getNextSprintNumber($this->project);
-
-        $sprint = new Sprint(
-            number: $nextSprintNumber,
-            isCurrent: true,
-            project: $this->project
-        );
-
-        $sprintGoal = new SprintGoal(
-            name: 'Define your sprint goal',
-            sprintOrder: SprintGoal::DEFAULT_ORDER_SPACE,
-            sprint: $sprint
-        );
-
-        $this->entityManager->persist($sprint);
-        $this->entityManager->persist($sprintGoal);
-
-        $this->entityManager->flush();
     }
 
     public function removeMember(ProjectMember $projectMember): void

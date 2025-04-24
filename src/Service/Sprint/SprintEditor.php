@@ -14,6 +14,7 @@ use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Service\Common\ClockInterface;
+use App\Service\Project\ProjectEditorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 
@@ -26,6 +27,7 @@ readonly class SprintEditor
         private SprintGoalIssueRepository $sprintGoalIssueRepository,
         private SprintGoalRepository $sprintGoalRepository,
         private ClockInterface $clock,
+        private SprintService $sprintService,
     ) {
     }
 
@@ -37,25 +39,25 @@ readonly class SprintEditor
     public function addSprintIssue(Issue $issue): void
     {
         if ($issue->getProject()->getId() !== $this->sprint->getProject()->getId()) {
-            throw new RuntimeException('Issue is from other project');
+            throw new CannotAddSprintIssueException('Issue is from other project');
+        }
+
+        if (!$issue->getIssueColumn()->isBacklog()) {
+            throw new CannotAddSprintIssueException('You can add only issues from backlog column');
         }
 
         if ($issue->isSubIssue()) {
-            throw new RuntimeException('Cannot add sub issue to sprint');
-        }
-
-        if ($issue->isFeature() && $issue->getSubIssues()->count() <= 0) {
-            throw new CannotAddSprintIssueException('Cannot add feature with no sub issues.');
+            throw new CannotAddSprintIssueException('Cannot add sub issue to sprint');
         }
 
         if (!$this->sprint->isCurrent()) {
-            throw new RuntimeException('Issue can be added only to current sprint');
+            throw new CannotAddSprintIssueException('Issue can be added only to current sprint');
         }
 
         $firstSprintGoal = $this->sprint->getSprintGoals()->get(0);
 
         if (!$firstSprintGoal) {
-            throw new RuntimeException('Sprint must have at least one sprint goal');
+            throw new CannotAddSprintIssueException('Sprint must have at least one sprint goal');
         }
 
         $lastOrder = $this->sprintGoalIssueRepository->findLastOrder($firstSprintGoal);
@@ -162,6 +164,40 @@ readonly class SprintEditor
         $this->sprint->setEstimatedEndDate($form->estimatedEndDate);
 
         $this->entityManager->flush();
+    }
+
+    public function finish(): void
+    {
+        if (!$this->sprint->isCurrent()) {
+            throw new RuntimeException('Only current sprint can be finished');
+        }
+
+        if (!$this->sprint->isStarted()) {
+            throw new RuntimeException('Cannot finish sprint. Sprint is not started');
+        }
+
+        $this->sprint->setIsCurrent(false);
+        $this->sprint->setEndedAt($this->clock->now());
+
+        $this->finishSprintIssues();
+
+        $this->sprintService->createSprint($this->sprint->getProject());
+    }
+
+    private function finishSprintIssues(): void
+    {
+        $sprintGoalIssues = $this->sprintGoalIssueRepository->findAllSprintIssues($this->sprint);
+
+        foreach ($sprintGoalIssues as $sprintGoalIssue) {
+            $issue = $sprintGoalIssue->getIssue();
+            if ($sprintGoalIssue->getFinishedAt() !== null) {
+                $issue->setIssueColumn($this->issueColumnRepository->finishedColumn());
+            } else {
+                $issue->setPreviousStoryPoints($issue->getStoryPoints());
+                $issue->setIssueColumn($this->issueColumnRepository->backlogColumn());
+                $issue->setStoryPoints(null);
+            }
+        }
     }
 
 }

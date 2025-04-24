@@ -18,47 +18,52 @@ enum IssueColumnEnum: int
 
     case Done = 6;
 
-    case Closed = 7;
+    case Finished = 7;
+
+    case Closed = 8;
 
     public function label(): string
     {
         return match ($this) {
+            IssueColumnEnum::Archived => 'Archived',
             IssueColumnEnum::Backlog => 'Backlog',
             IssueColumnEnum::ToDo => 'To do',
             IssueColumnEnum::InProgress => 'In progress',
             IssueColumnEnum::Test => 'Test',
             IssueColumnEnum::InTests => 'In tests',
             IssueColumnEnum::Done => 'Done',
+            IssueColumnEnum::Finished => 'Finished',
             IssueColumnEnum::Closed => 'Closed',
-            IssueColumnEnum::Archived => 'Archived',
         };
     }
 
     public function key(): string
     {
         return match ($this) {
+            IssueColumnEnum::Archived => 'archived',
             IssueColumnEnum::Backlog => 'backlog',
             IssueColumnEnum::ToDo => 'to-do',
             IssueColumnEnum::InProgress => 'in-progress',
             IssueColumnEnum::Test => 'test',
             IssueColumnEnum::InTests => 'in-tests',
             IssueColumnEnum::Done => 'done',
+            IssueColumnEnum::Finished => 'finished',
             IssueColumnEnum::Closed => 'closed',
-            IssueColumnEnum::Archived => 'archived',
         };
     }
 
     public static function fromKey(string $key): IssueColumnEnum
     {
         return match ($key) {
+            'archived' => IssueColumnEnum::Archived,
             'backlog' => IssueColumnEnum::Backlog,
             'to-do' => IssueColumnEnum::ToDo,
             'in-progress' => IssueColumnEnum::InProgress,
             'test' => IssueColumnEnum::Test,
             'in-tests' => IssueColumnEnum::InTests,
             'done' => IssueColumnEnum::Done,
+            'finished' => IssueColumnEnum::Finished,
             'closed' => IssueColumnEnum::Closed,
-            'archived' => IssueColumnEnum::Archived,
         };
     }
 

@@ -17,6 +17,7 @@ readonly class SprintEditorFactory
         private IssueColumnRepository $issueColumnRepository,
         private SprintGoalIssueRepository $sprintGoalIssueRepository,
         private SprintGoalRepository $sprintGoalRepository,
+        private SprintService $sprintService,
         private ClockInterface $clock,
     ) {
     }
@@ -30,6 +31,7 @@ readonly class SprintEditorFactory
             sprintGoalIssueRepository: $this->sprintGoalIssueRepository,
             sprintGoalRepository: $this->sprintGoalRepository,
             clock: $this->clock,
+            sprintService: $this->sprintService,
         );
     }
 }

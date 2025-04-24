@@ -9,6 +9,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class SprintVoter extends Voter
 {
+    public const SPRINT_HOME = 'SPRINT_HOME';
+
     public const ADD_CURRENT_SPRINT_ISSUE = 'ADD_CURRENT_SPRINT_ISSUE';
 
     public const REMOVE_CURRENT_SPRINT_ISSUE = 'REMOVE_CURRENT_SPRINT_ISSUE';
@@ -25,10 +27,12 @@ class SprintVoter extends Voter
 
     public const START_CURRENT_SPRINT = 'START_CURRENT_SPRINT';
 
+    public const FINISH_CURRENT_SPRINT = 'FINISH_CURRENT_SPRINT';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         $attributes = [
+            self::SPRINT_HOME,
             self::ADD_CURRENT_SPRINT_ISSUE,
             self::VIEW_CURRENT_SPRINT,
             self::REMOVE_CURRENT_SPRINT_ISSUE,
@@ -37,6 +41,7 @@ class SprintVoter extends Voter
             self::MOVE_CURRENT_SPRINT_ISSUE,
             self::SORT_SPRINT_GOAL,
             self::START_CURRENT_SPRINT,
+            self::FINISH_CURRENT_SPRINT,
         ];
 
         return in_array($attribute, $attributes) && $subject instanceof Project;
@@ -80,7 +85,8 @@ class SprintVoter extends Voter
             self::EDIT_SPRINT_GOAL,
             self::MOVE_CURRENT_SPRINT_ISSUE,
             self::SORT_SPRINT_GOAL,
-            self::START_CURRENT_SPRINT
+            self::START_CURRENT_SPRINT,
+            self::FINISH_CURRENT_SPRINT,
         ];
     }
 }

@@ -14,7 +14,6 @@ use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintRepository;
 use App\Security\Voter\SprintVoter;
 use App\Service\Sprint\BurndownChartService\BurndownChartService;
-use App\Service\Sprint\SprintAccess;
 use App\Service\Sprint\SprintEditorFactory;
 use App\Service\Sprint\SprintService;
 use Carbon\CarbonImmutable;
@@ -38,23 +37,31 @@ class SprintController extends CommonIssueController
         parent::__construct($this->issueRepository);
     }
 
+    #[Route('/scrum/home', 'app_project_scrum_home')]
+    public function home(Project $project): Response
+    {
+        $this->denyAccessUnlessGranted(SprintVoter::SPRINT_HOME, $project);
+
+        $currentSprint = $this->getCurrentSprint($project);
+
+        if ($currentSprint->isStarted()) {
+            return $this->overview($currentSprint, $project);
+        }
+
+        return $this->render('sprint/home.html.twig', [
+            'project' => $project,
+        ]);
+    }
+
 
     #[Route('/sprints/current', 'app_project_sprint_current_view')]
-    public function viewCurrent(Project $project, Request $request, SprintAccess $sprintAccess): Response
+    public function viewCurrent(Project $project, Request $request): Response
     {
         $this->denyAccessUnlessGranted(SprintVoter::VIEW_CURRENT_SPRINT, $project);
 
-        $error = $sprintAccess->sprintViewAccessError($project);
-        if ($error) {
-            throw new BadRequestHttpException($error);
-        }
-
         $currentSprint = $this->getCurrentSprint($project);
         if ($currentSprint->isStarted()) {
-            return $this->overview(
-                currentSprint: $currentSprint,
-                project: $project
-            );
+            throw new BadRequestHttpException('Sprint is already started. Cannot access sprint planning.');
         }
 
         $sprintGoals = $this->sprintService->getSprintGoals($currentSprint);
@@ -91,6 +98,21 @@ class SprintController extends CommonIssueController
         ]);
     }
 
+    #[Route('/sprints/current/finish', 'app_project_sprint_current_finish')]
+    public function finish(Project $project): Response
+    {
+        $this->denyAccessUnlessGranted(SprintVoter::FINISH_CURRENT_SPRINT, $project);
+
+        $currentSprint = $this->getCurrentSprint($project);
+
+        $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
+
+        $sprintEditor->finish();
+
+        return $this->redirectToRoute('app_project_sprint_home', [
+            'id' => $project->getId(),
+        ]);
+    }
 
     public function overview(Sprint $currentSprint, Project $project): Response
     {

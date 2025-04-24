@@ -4,14 +4,12 @@ namespace App\Service\Menu;
 
 use App\Entity\Project\Project;
 use App\Service\Kanban\KanbanAccess;
-use App\Service\Sprint\SprintAccess;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class ProjectMenuDataProvider
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
-        private SprintAccess $sprintAccess,
         private KanbanAccess $kanbanAccess
     ) {
     }
@@ -35,7 +33,16 @@ readonly class ProjectMenuDataProvider
 
     private function getMenuLinks(Project $project): array
     {
+        $kanbanAccessible = $this->kanbanAccess->isKanbanViewAccessible($project);
+
         return [
+            [
+                'url' => $this->urlGenerator->generate('app_project_scrum_home', [
+                    'id' => $project->getId()
+                ]),
+                'label' => 'Home',
+                'icon' => 'iconoir-home',
+            ],
             [
                 'url' => $this->urlGenerator->generate('app_project_backlog', [
                     'id' => $project->getId()
@@ -49,7 +56,7 @@ readonly class ProjectMenuDataProvider
                 ]),
                 'label' => 'Sprint',
                 'icon' => 'iconoir-running',
-                'canBeAccessed' => $this->sprintAccess->isSprintViewAccessible($project),
+                'canBeAccessed' => !$kanbanAccessible,
             ],
             [
                 'url' => $this->urlGenerator->generate('app_project_kanban', [
@@ -57,7 +64,7 @@ readonly class ProjectMenuDataProvider
                 ]),
                 'label' => 'Kanban',
                 'icon' => 'bi-kanban',
-                'canBeAccessed' => $this->kanbanAccess->isKanbanViewAccessible($project),
+                'canBeAccessed' => $kanbanAccessible,
             ],
             [
                 'url' => $this->urlGenerator->generate('app_project_thread_list', [
