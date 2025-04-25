@@ -341,7 +341,6 @@ class SprintControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->followRedirects();
-        $client->disableReboot();
 
         $user = UserFactory::createOne();
 
@@ -587,6 +586,58 @@ class SprintControllerTest extends WebTestCase
         ]);
 
         $this->assertCount(4, $doneIssues);
+    }
+
+    /** @test */
+    public function project_member_can_view_sprint_list()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $user = UserFactory::createOne();
+
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create([
+                'code' => 'SCP'
+            ]);
+
+        ProjectMemberFactory::createOne([
+            'user' => $user,
+            'project' => $project
+        ]);
+
+        SprintFactory::createOne([
+            'project' => $project,
+            'number' => 1,
+            'startedAt' => CarbonImmutable::create(2012, 12, 12),
+            'estimatedEndDate' => CarbonImmutable::create(2012, 12, 19),
+        ]);
+
+        SprintFactory::createOne([
+            'project' => $project,
+            'number' => 2,
+            'isCurrent' => true,
+            'startedAt' => CarbonImmutable::create(2012, 12, 19),
+        ]);
+
+        $this->loginAsUser($user);
+
+        $uri = sprintf(
+            '/projects/%s/sprints',
+            $project->getId(),
+        );
+
+        $this->goToPage($uri);
+
+        $this->assertResponseIsSuccessful();
+
+        $table = $this->readTable('table');
+
+        $this->assertCount(3, $table);
+
+        $this->assertEquals('Sprint 2', $table[1][0]);
+        $this->assertEquals('Sprint 1', $table[2][0]);
     }
 
     private function sprintGoalRepository(): SprintGoalRepository

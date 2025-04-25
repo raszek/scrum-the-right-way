@@ -1,0 +1,15 @@
+{% extends 'layout/project_layout.html.twig' %}
+
+{% set page_title = 'Sprint list' %}
+
+{% block content %}
+    <div>
+        <div class="row">
+            <div class="col-12">
+                {% include 'common/project_page_header.html.twig' %}
+
+                {% include 'common/table.html.twig' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

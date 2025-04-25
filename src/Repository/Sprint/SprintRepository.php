@@ -19,6 +19,13 @@ class SprintRepository extends ServiceEntityRepository
         parent::__construct($registry, Sprint::class);
     }
 
+    public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
+    {
+        return (new QueryBuilder($this->getEntityManager()))
+            ->select($alias)
+            ->from($this->getEntityName(), $alias, $indexBy);
+    }
+
     public function getCurrentSprint(Project $project): Sprint
     {
         $currentSprint = $this->findOneBy([
@@ -31,13 +38,6 @@ class SprintRepository extends ServiceEntityRepository
         }
 
         return $currentSprint;
-    }
-
-    public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
-    {
-        return (new QueryBuilder($this->getEntityManager()))
-            ->select($alias)
-            ->from($this->getEntityName(), $alias, $indexBy);
     }
 
     public function getNextSprintNumber(Project $project): int
@@ -58,6 +58,18 @@ class SprintRepository extends ServiceEntityRepository
         }
 
         return $maxSprintNumberInProject + 1;
+    }
+
+    public function listQuery(Project $project): QueryBuilder
+    {
+        $queryBuilder = $this->createQueryBuilder('sprint');
+
+        $queryBuilder
+            ->where('sprint.project = :project')
+            ->sqidParameter('project', $project->getId())
+            ->orderBy('sprint.number', 'DESC');
+
+        return $queryBuilder;
     }
 
 }

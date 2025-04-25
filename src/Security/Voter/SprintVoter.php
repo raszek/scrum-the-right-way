@@ -11,6 +11,8 @@ class SprintVoter extends Voter
 {
     public const SPRINT_HOME = 'SPRINT_HOME';
 
+    public const SPRINT_LIST = 'SPRINT_LIST';
+
     public const ADD_CURRENT_SPRINT_ISSUE = 'ADD_CURRENT_SPRINT_ISSUE';
 
     public const REMOVE_CURRENT_SPRINT_ISSUE = 'REMOVE_CURRENT_SPRINT_ISSUE';
@@ -42,6 +44,7 @@ class SprintVoter extends Voter
             self::SORT_SPRINT_GOAL,
             self::START_CURRENT_SPRINT,
             self::FINISH_CURRENT_SPRINT,
+            self::SPRINT_LIST,
         ];
 
         return in_array($attribute, $attributes) && $subject instanceof Project;
@@ -58,6 +61,10 @@ class SprintVoter extends Voter
         $user = $token->getUser();
 
         if (!$user instanceof User) {
+            return false;
+        }
+
+        if (!$subject->isScrum()) {
             return false;
         }
 

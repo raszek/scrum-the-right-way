@@ -94,6 +94,14 @@ readonly class ProjectMenuDataProvider
                 'label' => 'Issues',
                 'icon' => 'bi-ui-checks',
             ],
+            [
+                'url' => $this->urlGenerator->generate('app_project_sprint_list', [
+                    'id' => $project->getId()
+                ]),
+                'label' => 'Sprints',
+                'icon' => 'iconoir-bounce-right',
+                'canBeAccessed' => $project->isScrum(),
+            ],
         ];
     }
 

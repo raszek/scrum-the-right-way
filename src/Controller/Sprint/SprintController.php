@@ -16,6 +16,8 @@ use App\Security\Voter\SprintVoter;
 use App\Service\Sprint\BurndownChartService\BurndownChartService;
 use App\Service\Sprint\SprintEditorFactory;
 use App\Service\Sprint\SprintService;
+use App\Table\QueryParams;
+use App\Table\Sprint\SprintTable;
 use Carbon\CarbonImmutable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -114,7 +116,26 @@ class SprintController extends CommonIssueController
         ]);
     }
 
-    public function overview(Sprint $currentSprint, Project $project): Response
+    #[Route('/sprints', 'app_project_sprint_list')]
+    public function list(
+        Project $project,
+        Request $request,
+        SprintTable $sprintTable
+    ): Response
+    {
+        $this->denyAccessUnlessGranted(SprintVoter::SPRINT_LIST, $project);
+
+        $queryParams = QueryParams::fromRequest($request);
+
+        $table = $sprintTable->create($project, $queryParams);
+
+        return $this->render('sprint/index.html.twig', [
+            'project' => $project,
+            'table' => $table
+        ]);
+    }
+
+    private function overview(Sprint $currentSprint, Project $project): Response
     {
         $chartRecords = $this->burndownChartService->getChartData($currentSprint);
 
