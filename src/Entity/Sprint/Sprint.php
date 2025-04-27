@@ -81,6 +81,11 @@ class Sprint
         return $this;
     }
 
+    public function isFinished(): bool
+    {
+        return $this->getEndedAt() !== null;
+    }
+
     public function getEndedAt(): ?DateTimeImmutable
     {
         return $this->endedAt;

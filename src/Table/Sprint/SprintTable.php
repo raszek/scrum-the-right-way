@@ -10,6 +10,7 @@ use App\Table\Table;
 use App\Table\TableColumn;
 use App\Table\TableDefinition;
 use App\Table\TableFactory;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class SprintTable
 {
@@ -17,6 +18,7 @@ readonly class SprintTable
     public function __construct(
         private SprintRepository $sprintRepository,
         private TableFactory $tableFactory,
+        private UrlGeneratorInterface $urlGenerator
     ) {
     }
 
@@ -28,9 +30,16 @@ readonly class SprintTable
 
         $definition->addColumn(new TableColumn(
             field: 'number',
-            label: 'Number',
+            label: 'Sprint number',
             sortField: 'sprint.number',
-            formatCallback: fn(Sprint $sprint) => 'Sprint ' . $sprint->getNumber()
+            stripTags: '<a>',
+            formatCallback: fn(Sprint $sprint) => sprintf('<a href="%s">%s</a>',
+                $this->urlGenerator->generate('app_project_sprint_view', [
+                    'id' => $project->getId(),
+                    'sprintId' => $sprint->getId()
+                ]),
+                'Sprint ' . $sprint->getNumber()
+            )
         ));
 
         return $this->tableFactory->create($definition, $queryParams);

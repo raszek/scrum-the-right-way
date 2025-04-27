@@ -23,6 +23,7 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/projects/{id}')]
@@ -91,7 +92,7 @@ class SprintController extends CommonIssueController
             ]);
         }
 
-        return $this->render('sprint/view.html.twig', [
+        return $this->render('sprint/plan.html.twig', [
             'project' => $project,
             'sprint' => $currentSprint,
             'sprintGoals' => $sprintGoals,
@@ -135,6 +136,24 @@ class SprintController extends CommonIssueController
         ]);
     }
 
+    #[Route('/sprints/{sprintId}/view', 'app_project_sprint_view')]
+    public function view(Project $project, string $sprintId): Response
+    {
+        $this->denyAccessUnlessGranted(SprintVoter::VIEW_SPRINT, $project);
+
+        $sprint = $this->findSprint($sprintId, $project);
+
+        $chartRecords = $this->burndownChartService->getChartData($sprint);
+
+        $sprintWithIssues = $this->sprintRepository->getSprintIssues($sprint);
+
+        return $this->render('sprint/view.html.twig', [
+            'project' => $project,
+            'sprint' => $sprintWithIssues,
+            'chartRecords' => StimulusHelper::object($chartRecords),
+        ]);
+    }
+
     private function overview(Sprint $currentSprint, Project $project): Response
     {
         $chartRecords = $this->burndownChartService->getChartData($currentSprint);
@@ -168,6 +187,20 @@ class SprintController extends CommonIssueController
         return $this->redirectToRoute('app_project_kanban', [
             'id' => $project->getId()
         ]);
+    }
+
+    private function findSprint(string $sprintId, Project $project): Sprint
+    {
+        $sprint = $this->sprintRepository->findOneBy([
+            'id' => $sprintId,
+            'project' => $project,
+        ]);
+
+        if (!$sprint) {
+            throw new NotFoundHttpException('Sprint not found');
+        }
+
+        return $sprint;
     }
 
     private function getCurrentSprint(Project $project): Sprint

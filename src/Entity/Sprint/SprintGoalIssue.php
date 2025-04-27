@@ -83,6 +83,11 @@ class SprintGoalIssue implements Positionable
         return self::DEFAULT_ORDER_SPACE;
     }
 
+    public function isFinished(): bool
+    {
+        return $this->getFinishedAt() !== null;
+    }
+
     public function getFinishedAt(): ?DateTimeImmutable
     {
         return $this->finishedAt;

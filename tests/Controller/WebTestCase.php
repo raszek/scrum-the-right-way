@@ -84,7 +84,7 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         $crawler = $this->getCrawler();
 
         return $crawler->filter($selector)->filter('tr')->each(function ($tr) {
-            return $tr->filter('td')->each(function ($td) {
+            return $tr->filter('td,th')->each(function ($td) {
                 return trim($td->text());
             });
         });

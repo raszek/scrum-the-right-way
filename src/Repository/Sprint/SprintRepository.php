@@ -67,9 +67,29 @@ class SprintRepository extends ServiceEntityRepository
         $queryBuilder
             ->where('sprint.project = :project')
             ->sqidParameter('project', $project->getId())
+            ->andWhere('sprint.isCurrent = false')
             ->orderBy('sprint.number', 'DESC');
 
         return $queryBuilder;
+    }
+
+    public function getSprintIssues(Sprint $sprint): Sprint
+    {
+        $queryBuilder = $this->createQueryBuilder('sprint');
+
+        $queryBuilder
+            ->addSelect('sprintGoal')
+            ->addSelect('sprintGoalIssue')
+            ->addSelect('issue')
+            ->join('sprint.sprintGoals', 'sprintGoal')
+            ->join('sprintGoal.sprintGoalIssues', 'sprintGoalIssue')
+            ->join('sprintGoalIssue.issue', 'issue')
+            ->where('sprint.id = :sprint')
+            ->sqidParameter('sprint', $sprint->getId())
+            ->orderBy('sprintGoal.sprintOrder', 'ASC')
+            ->addOrderBy('sprintGoalIssue.goalOrder', 'ASC');
+
+        return $queryBuilder->getQuery()->getSingleResult();
     }
 
 }

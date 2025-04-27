@@ -589,7 +589,7 @@ class SprintControllerTest extends WebTestCase
     }
 
     /** @test */
-    public function project_member_can_view_sprint_list()
+    public function project_member_can_view_list_of_sprints()
     {
         $client = static::createClient();
         $client->followRedirects();
@@ -634,10 +634,122 @@ class SprintControllerTest extends WebTestCase
 
         $table = $this->readTable('table');
 
-        $this->assertCount(3, $table);
+        $this->assertCount(2, $table);
 
-        $this->assertEquals('Sprint 2', $table[1][0]);
-        $this->assertEquals('Sprint 1', $table[2][0]);
+        $this->assertEquals('Sprint 1', $table[1][0]);
+    }
+
+    /** @test */
+    public function project_member_can_view_sprint()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $user = UserFactory::createOne();
+
+        $project = ProjectFactory::new()
+            ->withScrumType()
+            ->create([
+                'code' => 'SCP'
+            ]);
+
+        ProjectMemberFactory::createOne([
+            'user' => $user,
+            'project' => $project
+        ]);
+
+        SprintFactory::createOne([
+            'project' => $project,
+            'number' => 2,
+            'isCurrent' => true,
+        ]);
+
+        $olderSprint = SprintFactory::createOne([
+            'project' => $project,
+            'number' => 1,
+            'startedAt' => CarbonImmutable::create(2012, 12, 12),
+            'endedAt' => CarbonImmutable::create(2012, 12, 19),
+        ]);
+
+        $sprintGoalOne = SprintGoalFactory::createOne([
+            'sprint' => $olderSprint,
+            'name' => 'Sprint goal 1',
+            'sprintOrder' => 128,
+        ]);
+
+        $issue = IssueFactory::createOne([
+            'title' => 'Issue task',
+            'project' => $project,
+            'number' => 1,
+            'type' => IssueTypeFactory::issueType(),
+            'issueColumn' => IssueColumnFactory::finishedColumn(),
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $issue,
+            'sprintGoal' => $sprintGoalOne,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 14),
+            'goalOrder' => 128,
+        ]);
+
+        $backlogColumn = IssueColumnFactory::backlogColumn();
+
+        $feature = IssueFactory::createOne([
+            'title' => 'Feature task',
+            'project' => $project,
+            'number' => 2,
+            'type' => IssueTypeFactory::featureType(),
+            'issueColumn' => $backlogColumn,
+        ]);
+
+        $subIssue = IssueFactory::createOne([
+            'title' => 'Sub issue task',
+            'project' => $project,
+            'number' => 3,
+            'type' => IssueTypeFactory::subIssueType(),
+            'issueColumn' => $backlogColumn,
+            'parent' => $feature,
+        ]);
+
+        $sprintGoalTwo = SprintGoalFactory::createOne([
+            'sprint' => $olderSprint,
+            'name' => 'Sprint goal 2',
+            'sprintOrder' => 256,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $feature,
+            'sprintGoal' => $sprintGoalTwo,
+            'goalOrder' => 128,
+        ]);
+
+        SprintGoalIssueFactory::createOne([
+            'issue' => $subIssue,
+            'sprintGoal' => $sprintGoalTwo,
+            'goalOrder' => 256,
+        ]);
+
+        $this->loginAsUser($user);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/%s/view',
+            $project->getId(),
+            $olderSprint->getId()
+        );
+
+        $this->goToPage($uri);
+
+        $this->assertResponseIsSuccessful();
+
+        $table = $this->readTable('table');
+
+        $this->assertCount(6, $table);
+
+        $this->assertEquals('Sprint goal 1', $table[1][0]);
+        $this->assertEquals('[#1] [Issue] Issue task', $table[2][0]);
+        $this->assertEquals('Sprint goal 2', $table[3][0]);
+        $this->assertEquals('[#2] [Feature] Feature task', $table[4][0]);
+        $this->assertEquals('[#3] [Sub issue] Sub issue task', $table[5][0]);
     }
 
     private function sprintGoalRepository(): SprintGoalRepository

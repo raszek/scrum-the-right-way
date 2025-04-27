@@ -131,9 +131,9 @@ class DescriptionHistoryControllerTest extends WebTestCase
         
         $table = $this->readTable('table');
 
-        $this->assertEquals('## Working on something', $table[1][0]);
-        $this->assertEquals('## Added new text', $table[3][0]);
-        $this->assertEquals('## Super new text', $table[5][0]);
+        $this->assertEquals('## Working on something', $table[1][3]);
+        $this->assertEquals('## Added new text', $table[3][3]);
+        $this->assertEquals('## Super new text', $table[5][3]);
     }
 
     private function exampleChanges(): array
