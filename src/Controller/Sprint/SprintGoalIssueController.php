@@ -9,7 +9,7 @@ use App\Entity\Sprint\Sprint;
 use App\Entity\Sprint\SprintGoal;
 use App\Entity\Sprint\SprintGoalIssue;
 use App\Exception\Sprint\CannotAddSprintIssueException;
-use App\Exception\Sprint\CannotStartSprintException;
+use App\Form\Sprint\AddSprintIssueForm;
 use App\Form\Sprint\SprintGoalIssueMoveForm;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintGoalIssueRepository;
@@ -29,17 +29,20 @@ class SprintGoalIssueController extends CommonIssueController
 {
 
     public function __construct(
-        IssueRepository $issueRepository,
+        private readonly IssueRepository $issueRepository,
         private readonly SprintEditorFactory $sprintEditorFactory,
         private readonly SprintRepository $sprintRepository,
         private readonly SprintGoalRepository $sprintGoalRepository,
         private readonly SprintGoalIssueRepository $sprintGoalIssueRepository,
     ) {
-        parent::__construct($issueRepository);
+        parent::__construct($this->issueRepository);
     }
 
-    #[Route('/issues/{issueCode}', 'app_project_sprint_add_issue', methods: ['POST'])]
-    public function addSprintIssue(Project $project, string $issueCode): Response
+    #[Route('/issues', 'app_project_sprint_add_issues', methods: ['POST'])]
+    public function addSprintIssues(
+        Project $project,
+        #[MapRequestPayload] AddSprintIssueForm $form
+    ): Response
     {
         $this->denyAccessUnlessGranted(SprintVoter::ADD_CURRENT_SPRINT_ISSUE, $project);
 
@@ -47,10 +50,10 @@ class SprintGoalIssueController extends CommonIssueController
 
         $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
 
-        $issue = $this->findIssue($issueCode, $project);
+        $issues = $this->issueRepository->findByIds($form->issueIds, $project);
 
         try {
-            $sprintEditor->addSprintIssue($issue);
+            $sprintEditor->addSprintIssues($issues);
         } catch (CannotAddSprintIssueException $e) {
             $this->errorFlash($e->getMessage());
         }
@@ -73,7 +76,7 @@ class SprintGoalIssueController extends CommonIssueController
 
         $sprintEditor->removeSprintIssue($issue);
 
-        return $this->redirectToRoute('app_project_sprint_current_view', [
+        return $this->redirectToRoute('app_project_sprint_current_plan', [
             'id' => $project->getId(),
         ]);
     }

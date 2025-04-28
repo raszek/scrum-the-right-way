@@ -151,7 +151,9 @@ class SprintEditorTest extends KernelTestCase
 
         $sprintEditor = $this->factory()->create($sprint);
 
-        $sprintEditor->addSprintIssue($feature->_real());
+        $sprintEditor->addSprintIssues([
+            $feature->_real()
+        ]);
 
         $updatedSprintGoal = $this->sprintGoalRepository()->findOneBy([
             'id' => $sprintGoal->getId()

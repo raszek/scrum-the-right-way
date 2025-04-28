@@ -3,12 +3,44 @@
 {% set page_title = 'Backlog' %}
 
 {% block content %}
-    <div data-controller="issue--modal">
+    <div data-controller="issue--modal backlog--batch">
         {% include 'common/project_page_header.html.twig' %}
 
         <div class="row mb-3">
-            <div class="col-10">
+            <div class="col-10 d-flex justify-content-between align-items-center">
                 <h2>Issues</h2>
+                {% if is_granted('ADD_CURRENT_SPRINT_ISSUE', project) %}
+                    <div>
+                        <div class="dropdown">
+                            <button class="btn btn-primary"
+                                    data-backlog--batch-target="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    type="button"
+                            >
+                                Batch
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="javascript:void(0);"
+                                       data-action="backlog--batch#submit"
+                                       data-backlog--batch-url-param="{{ path('app_project_sprint_add_issues', {
+                                           id: project.id
+                                       }) }}"
+                                       class="dropdown-item"
+                                    >
+                                        Add to sprint
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <form action=""
+                              method="post"
+                              data-backlog--batch-target="form"
+                        >
+                        </form>
+                    </div>
+                {% endif %}
             </div>
             {% if showMetric %}
                 <div class="col-2">
@@ -52,18 +84,28 @@
                             issueCode: item.code
                         }) }}" class="list-group-item">
                             <div class="d-flex justify-content-between align-items-center">
-                                <a style="width: 90%" href="/projects/{{ project.id }}/backlog/issues/{{ item.code }}">{{ item.fullText }}</a>
+                                {% if is_granted('ADD_CURRENT_SPRINT_ISSUE', project) %}
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               data-backlog--batch-target="checkbox"
+                                               data-action="backlog--batch#toggle"
+                                               value="{{ item.id }}"
+                                        >
+                                    </div>
+                                {% endif %}
+                                <a href="javascript:void(0);"
+                                   data-action="issue--modal#show"
+                                   data-issue--modal-url-param="{{ path('app_project_issue_view_ajax', {
+                                       id: project.id,
+                                       issueCode: item.code
+                                   }) }}"
+                                   data-issue--modal-code-param="{{ item.code }}"
+                                   style="width: 90%"
+                                >
+                                    {{ item.fullText }}
+                                </a>
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-primary"
-                                            data-action="issue--modal#show"
-                                            data-issue--modal-url-param="{{ path('app_project_issue_view_ajax', {
-                                                id: project.id,
-                                                issueCode: item.code
-                                            }) }}"
-                                            data-issue--modal-code-param="{{ item.code }}"
-                                    >
-                                        <i class="bi bi-eye"></i>
-                                    </button>
                                     {% if is_granted('ADD_CURRENT_SPRINT_ISSUE', project) %}
                                         <div class="dropdown">
                                             <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -71,10 +113,17 @@
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <form action="{{ path('app_project_sprint_add_issue', {
+                                                    <a href="/projects/{{ project.id }}/backlog/issues/{{ item.code }}"
+                                                       class="dropdown-item"
+                                                    >
+                                                        View
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <form action="{{ path('app_project_sprint_add_issues', {
                                                         id: project.id,
-                                                        issueCode: item.code
                                                     }) }}" method="post">
+                                                        <input type="hidden" name="issueIds[]" value="{{ item.id }}">
                                                         <input type="submit" class="dropdown-item" value="Add to sprint">
                                                     </form>
                                                 </li>

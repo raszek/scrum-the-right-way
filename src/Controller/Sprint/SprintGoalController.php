@@ -52,7 +52,7 @@ class SprintGoalController extends CommonIssueController
 
         $sprintGoalEditor->editName($form->name);
 
-        return $this->redirectToRoute('app_project_sprint_current_view', [
+        return $this->redirectToRoute('app_project_sprint_current_plan', [
             'id' => $project->getId(),
         ]);
     }
@@ -76,7 +76,7 @@ class SprintGoalController extends CommonIssueController
 
         $sprintEditor->removeSprintGoal($sprintGoal);
 
-        return $this->redirectToRoute('app_project_sprint_current_view', [
+        return $this->redirectToRoute('app_project_sprint_current_plan', [
             'id' => $project->getId(),
         ]);
     }

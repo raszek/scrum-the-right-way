@@ -57,10 +57,10 @@ class SprintController extends CommonIssueController
     }
 
 
-    #[Route('/sprints/current', 'app_project_sprint_current_view')]
-    public function viewCurrent(Project $project, Request $request): Response
+    #[Route('/sprints/current/plan', 'app_project_sprint_current_plan')]
+    public function plan(Project $project, Request $request): Response
     {
-        $this->denyAccessUnlessGranted(SprintVoter::VIEW_CURRENT_SPRINT, $project);
+        $this->denyAccessUnlessGranted(SprintVoter::PLAN_CURRENT_SPRINT, $project);
 
         $currentSprint = $this->getCurrentSprint($project);
         if ($currentSprint->isStarted()) {
@@ -80,14 +80,13 @@ class SprintController extends CommonIssueController
         $sprintGoalForm = $this->createForm(SprintGoalFormType::class);
         $sprintGoalForm->handleRequest($request);
         if ($sprintGoalForm->isSubmitted() && $sprintGoalForm->isValid()) {
-
             $sprintEditor = $this->sprintEditorFactory->create($currentSprint);
 
             $sprintEditor->addGoal($sprintGoalForm->getData());
 
             $this->successFlash('Successfully added new sprint goal');
 
-            return $this->redirectToRoute('app_project_sprint_current_view', [
+            return $this->redirectToRoute('app_project_sprint_current_plan', [
                 'id' => $project->getId(),
             ]);
         }
@@ -179,7 +178,7 @@ class SprintController extends CommonIssueController
         } catch (CannotStartSprintException $e) {
             $this->errorFlash($e->getMessage());
 
-            return $this->redirectToRoute('app_project_sprint_current_view', [
+            return $this->redirectToRoute('app_project_sprint_current_plan', [
                 'id' => $project->getId(),
             ]);
         }
@@ -216,5 +215,4 @@ class SprintController extends CommonIssueController
 
         return $sprint;
     }
-
 }

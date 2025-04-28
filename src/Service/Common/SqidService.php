@@ -38,7 +38,7 @@ class SqidService
      */
     public function decodeMany(array $values): array
     {
-        return ArrayHelper::map($values, $this->sqids->decode(...));
+        return ArrayHelper::map($values, fn(string $value) => $this->decode($value));
     }
 
     public static function create(): static

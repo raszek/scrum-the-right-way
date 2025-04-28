@@ -14,6 +14,7 @@ use App\Factory\Sprint\SprintGoalFactory;
 use App\Factory\Sprint\SprintGoalIssueFactory;
 use App\Factory\UserFactory;
 use App\Repository\Issue\IssueRepository;
+use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Repository\Sprint\SprintGoalRepository;
 use App\Tests\Controller\WebTestCase;
 
@@ -175,6 +176,170 @@ class SprintGoalIssueControllerTest extends WebTestCase
         $updatedIssue = $this->issueRepository()->findByCode('SCP-12', $project);
 
         $this->assertTrue($updatedIssue->getIssueColumn()->isBacklog());
+    }
+
+    /** @test */
+    public function developer_can_add_issue_to_sprint_in_first_sprint_goal_only()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $backlogColumn = IssueColumnFactory::backlogColumn();
+        IssueColumnFactory::todoColumn();
+
+        $issueType = IssueTypeFactory::issueType();
+
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $issueType,
+            'number' => 12,
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        $sprintGoal = SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+        ]);
+
+        $anotherSprintGoal = SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current/issues',
+            $project->getId(),
+        );
+
+        $client->request('POST', $uri, [
+            'issueIds' => [
+                $issue->getId()
+            ]
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $updatedIssue = $this->issueRepository()->findOneBy([
+            'id' => $issue->getId()
+        ]);
+
+        $this->assertTrue($updatedIssue->getIssueColumn()->isToDo());
+
+        $updatedSprintGoal = $this->sprintGoalRepository()->findOneBy([
+            'id' => $sprintGoal->getId()
+        ]);
+
+        $this->assertEquals(1, $updatedSprintGoal->getSprintGoalIssues()->count());
+
+        $notUpdatedAnotherSprintGoal = $this->sprintGoalRepository()->findOneBy([
+            'id' => $anotherSprintGoal->getId()
+        ]);
+
+        $this->assertEquals(0, $notUpdatedAnotherSprintGoal->getSprintGoalIssues()->count());
+    }
+
+    /** @test */
+    public function developer_can_batch_add_issues_to_sprint()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $backlogColumn = IssueColumnFactory::backlogColumn();
+        IssueColumnFactory::todoColumn();
+
+        $issueType = IssueTypeFactory::issueType();
+
+        $issue = IssueFactory::createOne([
+            'number' => 1,
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => $issueType,
+        ]);
+
+        $emptyFeature = IssueFactory::createOne([
+            'number' => 2,
+            'project' => $project,
+            'issueColumn' => $backlogColumn,
+            'type' => IssueTypeFactory::featureType(),
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true
+        ]);
+
+        SprintGoalFactory::createOne([
+            'sprint' => $sprint,
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current/issues',
+            $project->getId(),
+        );
+
+        $client->request('POST', $uri, [
+            'issueIds' => [
+                $issue->getId(),
+                $emptyFeature->getId()
+            ]
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $sprintGoalIssues = $this->sprintGoalIssueRepository()->findAll();
+
+        $this->assertCount(2, $sprintGoalIssues);
+
+        $this->assertTrue($issue->getIssueColumn()->isToDo());
+        $this->assertTrue($emptyFeature->getIssueColumn()->isToDo());
+    }
+
+    private function sprintGoalIssueRepository(): SprintGoalIssueRepository
+    {
+        return $this->getService(SprintGoalIssueRepository::class);
     }
 
     private function sprintGoalRepository(): SprintGoalRepository

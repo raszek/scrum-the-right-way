@@ -23,7 +23,7 @@ readonly class ProjectMenuDataProvider
             }
 
             $links[] = [
-                'isActive' => str_contains($currentPath, $menuLink['url']),
+                'isActive' => $currentPath === $menuLink['url'],
                 ...$menuLink
             ];
         }
@@ -51,7 +51,7 @@ readonly class ProjectMenuDataProvider
                 'icon' => 'bi-backpack',
             ],
             [
-                'url' => $this->urlGenerator->generate('app_project_sprint_current_view', [
+                'url' => $this->urlGenerator->generate('app_project_sprint_current_plan', [
                     'id' => $project->getId()
                 ]),
                 'label' => 'Sprint',

@@ -12,6 +12,7 @@ use App\Enum\Issue\IssueColumnEnum;
 use App\Form\Issue\IssueSearchForm;
 use App\Helper\ArrayHelper;
 use App\Repository\QueryBuilder\QueryBuilder;
+use App\Service\Common\SqidService;
 use App\Service\Position\ReorderService;
 use App\Table\QueryParams;
 use DateTimeImmutable;
@@ -27,6 +28,7 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
         ManagerRegistry $registry,
         private readonly IssueColumnRepository $issueColumnRepository,
         private readonly IssueTypeRepository $issueTypeRepository,
+        private readonly SqidService $sqidService
     ) {
         parent::__construct($registry, Issue::class);
     }
@@ -49,6 +51,19 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
         return $this->findOneBy([
             'project' => $project,
             'number' => $number,
+        ]);
+    }
+
+    /**
+     * @return Issue[]
+     */
+    public function findByIds(array $issueIds, Project $project): array
+    {
+        $ids = $this->sqidService->decodeMany($issueIds);
+
+        return $this->findBy([
+            'id' => $ids,
+            'project' => $project,
         ]);
     }
 

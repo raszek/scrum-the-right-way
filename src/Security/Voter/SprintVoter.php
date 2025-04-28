@@ -27,7 +27,7 @@ class SprintVoter extends Voter
 
     public const SORT_SPRINT_GOAL = 'SORT_SPRINT_GOAL';
 
-    public const VIEW_CURRENT_SPRINT = 'VIEW_CURRENT_SPRINT';
+    public const PLAN_CURRENT_SPRINT = 'VIEW_CURRENT_SPRINT';
 
     public const START_CURRENT_SPRINT = 'START_CURRENT_SPRINT';
 
@@ -38,7 +38,7 @@ class SprintVoter extends Voter
         $attributes = [
             self::SPRINT_HOME,
             self::ADD_CURRENT_SPRINT_ISSUE,
-            self::VIEW_CURRENT_SPRINT,
+            self::PLAN_CURRENT_SPRINT,
             self::REMOVE_CURRENT_SPRINT_ISSUE,
             self::REMOVE_CURRENT_SPRINT_GOAL,
             self::EDIT_SPRINT_GOAL,

@@ -106,7 +106,7 @@ class SprintControllerTest extends WebTestCase
 
         $this->loginAsUser($user);
 
-        $this->goToPage(sprintf('/projects/%s/sprints/current', $project->getId()));
+        $this->goToPage(sprintf('/projects/%s/sprints/current/plan', $project->getId()));
 
         $this->assertResponseIsSuccessful();
 
@@ -117,84 +117,6 @@ class SprintControllerTest extends WebTestCase
         $this->assertResponseHasNoText('Sub issue task');
     }
 
-    /** @test */
-    public function developer_can_add_issue_to_sprint_in_first_sprint_goal_only()
-    {
-        $client = static::createClient();
-        $client->followRedirects();
-
-        $developer = UserFactory::createOne();
-
-        $project = ProjectFactory::createOne([
-            'code' => 'SCP'
-        ]);
-
-        $memberDeveloper = ProjectMemberFactory::createOne([
-            'user' => $developer,
-            'project' => $project
-        ]);
-
-        $developerRole = ProjectRoleFactory::developerRole();
-
-        ProjectMemberRoleFactory::createOne([
-            'projectMember' => $memberDeveloper,
-            'role' => $developerRole
-        ]);
-
-        $backlogColumn = IssueColumnFactory::backlogColumn();
-        IssueColumnFactory::todoColumn();
-
-        $issueType = IssueTypeFactory::issueType();
-
-        $issue = IssueFactory::createOne([
-            'project' => $project,
-            'issueColumn' => $backlogColumn,
-            'type' => $issueType,
-            'number' => 12,
-        ]);
-
-        $sprint = SprintFactory::createOne([
-            'project' => $project,
-            'isCurrent' => true
-        ]);
-
-        $sprintGoal = SprintGoalFactory::createOne([
-            'sprint' => $sprint,
-        ]);
-
-        $anotherSprintGoal = SprintGoalFactory::createOne([
-            'sprint' => $sprint,
-        ]);
-
-        $this->loginAsUser($developer);
-
-        $uri = sprintf(
-            '/projects/%s/sprints/current/issues/SCP-12',
-            $project->getId(),
-        );
-
-        $client->request('POST', $uri);
-
-        $this->assertResponseIsSuccessful();
-
-        $updatedIssue = $this->issueRepository()->findOneBy([
-            'id' => $issue->getId()
-        ]);
-
-        $this->assertTrue($updatedIssue->getIssueColumn()->isToDo());
-
-        $updatedSprintGoal = $this->sprintGoalRepository()->findOneBy([
-            'id' => $sprintGoal->getId()
-        ]);
-
-        $this->assertEquals(1, $updatedSprintGoal->getSprintGoalIssues()->count());
-
-        $notUpdatedAnotherSprintGoal = $this->sprintGoalRepository()->findOneBy([
-            'id' => $anotherSprintGoal->getId()
-        ]);
-
-        $this->assertEquals(0, $notUpdatedAnotherSprintGoal->getSprintGoalIssues()->count());
-    }
 
     /** @test */
     public function developer_can_add_sprint_goal()
@@ -234,7 +156,7 @@ class SprintControllerTest extends WebTestCase
         $this->loginAsUser($developer);
 
         $uri = sprintf(
-            '/projects/%s/sprints/current',
+            '/projects/%s/sprints/current/plan',
             $project->getId(),
         );
 
@@ -314,7 +236,7 @@ class SprintControllerTest extends WebTestCase
         $this->loginAsUser($developer);
 
         $uri = sprintf(
-            '/projects/%s/sprints/current',
+            '/projects/%s/sprints/current/plan',
             $project->getId(),
         );
 
