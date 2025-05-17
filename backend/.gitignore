@@ -15,7 +15,6 @@
 
 .idea
 node_modules
-docker/getin-bank-root-ca.pem
 
 ###> phpunit/phpunit ###
 /phpunit.xml

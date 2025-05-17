@@ -1,0 +1,20 @@
+{
+  "name": "scrum-the-right-way-websocket",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/app.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "@types/ws": "^8.18.1",
+    "typescript": "~5.7.2"
+  },
+  "dependencies": {
+    "@fastify/websocket": "^11.0.2",
+    "express": "^5.1.0",
+    "fastify": "^5.3.3",
+    "socket.io": "^4.8.1"
+  }
+}

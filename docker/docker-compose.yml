@@ -11,14 +11,20 @@ services:
       POSTGRES_DB: scrumtherightway
     ports:
       - 5432:5432
-  web:
-    build: .
+  app:
+    build: php
     volumes:
-      - ../:/var/www/html/scrum-right-way
+      - ../backend/:/var/www/html/scrum-right-way
     ports:
-      - '8000:8000'
+      - '8000:80'
     depends_on:
       - db
+  websocket:
+    build: node
+    volumes:
+      - ../websocket/:/app
+    ports:
+      - '3000:3000'
   mailer:
     image: axllent/mailpit
     ports:

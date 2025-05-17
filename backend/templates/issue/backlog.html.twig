@@ -127,6 +127,16 @@
                                                         <input type="submit" class="dropdown-item" value="Add to sprint">
                                                     </form>
                                                 </li>
+                                                <li>
+                                                    <a href="{{ path('app_project_room_view', {
+                                                        id: project.id,
+                                                        roomId: 'qweasd'
+                                                    }) }}"
+                                                       class="dropdown-item"
+                                                    >
+                                                        Scrum poker
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </div>
                                     {% endif %}
