@@ -1,5 +1,6 @@
 {
   "name": "scrum-the-right-way-websocket",
+  "license": "GPL-3.0-or-later",
   "private": true,
   "version": "0.0.0",
   "type": "module",
