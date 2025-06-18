@@ -3,7 +3,7 @@
 namespace App\Tests\Controller;
 
 use App\Factory\UserFactory;
-use App\Service\Issue\Session\IssueSessionSettings;
+use App\Service\Session\Issue\IssueSessionSettings;
 
 class UserSettingsControllerTest extends WebTestCase
 {

@@ -5,17 +5,25 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/app.js"
+    "dev": "node --watch src/Server.js",
+    "test": "node --test"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^4.4.0",
+    "@stylistic/eslint-plugin-js": "^4.4.0",
     "@types/node": "^22.15.18",
     "@types/ws": "^8.18.1",
+    "eslint": "^9.27.0",
+    "globals": "^16.2.0",
     "typescript": "~5.7.2"
   },
   "dependencies": {
-    "@fastify/websocket": "^11.0.2",
+    "@fastify/env": "^5.0.2",
+    "@fastify/websocket": "^11.1.0",
     "express": "^5.1.0",
     "fastify": "^5.3.3",
+    "fastify-plugin": "^5.0.1",
+    "jsonwebtoken": "^9.0.2",
     "socket.io": "^4.8.1"
   }
 }

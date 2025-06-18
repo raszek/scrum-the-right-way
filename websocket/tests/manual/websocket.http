@@ -1,6 +1,0 @@
-WEBSOCKET ws://localhost:3000/rooms/qwerty
-Content-Type: application/json
-
-{
-  "message": "First message sent on connection"
-}

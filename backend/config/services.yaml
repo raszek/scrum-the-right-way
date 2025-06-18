@@ -35,3 +35,16 @@ services:
         arguments:
             $rootPath: '%kernel.project_dir%'
             $uploadDirectory: '%env(UPLOAD_DIRECTORY)%'
+
+    App\Service\Jwt\JwtServiceFactory:
+        arguments:
+            $secretKey: '%env(JWT_SECRET)%'
+            $baseUrl: '%env(BASE_URL)%'
+
+    App\Service\Jwt\Websocket\WebsocketJwtServiceFactory:
+        arguments:
+            $websocketBaseUrl: '%env(WEBSOCKET_BASE_URL)%'
+
+    App\Service\Websocket\WebsocketService:
+        arguments:
+            $baseUrl: '%env(HOST)%'

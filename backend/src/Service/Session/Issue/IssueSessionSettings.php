@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Service\Issue\Session;
+namespace App\Service\Session\Issue;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
 readonly class IssueSessionSettings
 {
 
-    CONST ACTIVITIES_VISIBLE_KEY = 'ACTIVITIES_VISIBLE_KEY';
+    CONST string ACTIVITIES_VISIBLE_KEY = 'ACTIVITIES_VISIBLE_KEY';
 
     public function __construct(
         private RequestStack $requestStack,
     ) {
     }
-
 
     public function isActivitiesVisible(): bool
     {

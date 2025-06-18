@@ -1,0 +1,2 @@
+WEBSOCKET ws://localhost:3000/rooms/qwerty?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODE3MjIyMjgsImlkIjoiMTIzNDU2Nzg5MCIsImZ1bGxOYW1lIjoiSm9obiBTbWl0aCJ9.o2OmM4ePXyKIb-YBoAuL2jmRg6wPXTETZemqlWF464g
+Content-Type: application/json

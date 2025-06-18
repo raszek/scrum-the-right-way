@@ -4,7 +4,7 @@ namespace App\Controller;
 
 
 
-use App\Service\Issue\Session\IssueSessionSettings;
+use App\Service\Session\Issue\IssueSessionSettings;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;

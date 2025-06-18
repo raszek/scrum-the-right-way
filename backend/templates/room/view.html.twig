@@ -10,8 +10,22 @@
             </div>
         </div>
 
-        <div data-controller="room--poker" class="row">
+        <div data-controller="room--poker"
+             data-room--poker-url-value="{{ websocketUrl }}"
+             class="row"
+        >
+            <div data-room--poker-target="userContainer" class="d-flex gap-2">
 
+            </div>
+
+            <template data-room--poker-target="userTemplate">
+                <div data-room--poker-target="user"
+                     class="col-sm-1 d-flex flex-column align-items-center"
+                >
+                    <img src="{{ asset('images/scrum-poker/blank-card.png') }}" class="w-100" alt="Blank card">
+                    <strong class="strw-poker-user-name"></strong>
+                </div>
+            </template>
         </div>
     </div>
 {% endblock %}
