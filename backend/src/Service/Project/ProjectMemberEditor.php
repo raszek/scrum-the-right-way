@@ -54,7 +54,7 @@ readonly class ProjectMemberEditor
         $this->entityManager->flush();
 
         $this->eventPersister->create(new AddRoleEvent(
-            userId: $this->projectMember->getUser()->getId(),
+            userId: $this->projectMember->getUser()->getId()->integerId(),
             projectRole: $role->value
         ));
     }
@@ -83,7 +83,7 @@ readonly class ProjectMemberEditor
         $this->entityManager->flush();
 
         $this->eventPersister->create(new RemoveRoleEvent(
-            $projectMember->getUser()->getId(),
+            $projectMember->getUser()->getId()->integerId(),
             $role->value
         ));
 
@@ -109,7 +109,7 @@ readonly class ProjectMemberEditor
             return;
         }
 
-        if ($this->projectMember->getUser()->getId() === $this->user->getId()) {
+        if ($this->projectMember->getUser()->getId()->integerId() === $this->user->getId()->integerId()) {
             throw new ProjectMemberCannotRemoveRoleException('You cannot remove admin privileges from yourself. Another project admin has to do this.');
         }
     }

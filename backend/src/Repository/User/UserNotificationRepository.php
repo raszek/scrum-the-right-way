@@ -34,7 +34,7 @@ class UserNotificationRepository extends ServiceEntityRepository
             ->join('userNotification.event', 'event')
             ->where('userNotification.forUser = :user')
             ->andWhere('userNotification.isRead = false')
-            ->setParameter('user', $user)
+            ->sqidParameter('user', $user->getId())
             ->orderBy('userNotification.id', 'DESC')
             ->setMaxResults(3);
 
@@ -49,7 +49,7 @@ class UserNotificationRepository extends ServiceEntityRepository
             ->addSelect('event')
             ->join('userNotification.event', 'event')
             ->where('userNotification.forUser = :user')
-            ->setParameter('user', $user)
+            ->sqidParameter('user', $user->getId())
             ->orderBy('userNotification.id', 'DESC');
 
         return $queryBuilder;
@@ -62,7 +62,7 @@ class UserNotificationRepository extends ServiceEntityRepository
         $query = $queryBuilder->update()
             ->set('userNotification.isRead', ':isRead')
             ->where('userNotification.forUser = :user')
-            ->setParameter('user', $user)
+            ->sqidParameter('user', $user->getId())
             ->setParameter('isRead', true)
             ->getQuery();
 
@@ -77,7 +77,7 @@ class UserNotificationRepository extends ServiceEntityRepository
             ->select('count(userNotification.id)')
             ->where('userNotification.forUser = :user')
             ->andWhere('userNotification.isRead = false')
-            ->setParameter('user', $user);
+            ->sqidParameter('user', $user->getId());
 
         return $queryBuilder->getQuery()->getSingleScalarResult();
     }

@@ -47,7 +47,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new RemoveMemberEvent(
-            $userWithAddedRole->getId(),
+            $userWithAddedRole->getId()->integerId(),
         );
 
         $event = $eventPersister->create($eventData);
@@ -108,7 +108,7 @@ class EventServiceTest extends KernelTestCase
         $eventPersister = $this->factory()->create($project->_real(), $user->_real());
 
         $eventData = new AddRoleEvent(
-            $userWithAddedRole->getId(),
+            $userWithAddedRole->getId()->integerId(),
             ProjectRoleEnum::Developer->value
         );
 
@@ -186,7 +186,7 @@ class EventServiceTest extends KernelTestCase
 
         $eventData = new SetIssueAssigneeEvent(
             issueId: $issue->getId()->integerId(),
-            userId: $assigneeUser->getId()
+            userId: $assigneeUser->getId()->integerId()
         );
 
         $event = $eventPersister->createIssueEvent($eventData, $issue->_real());

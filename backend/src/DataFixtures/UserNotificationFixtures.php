@@ -52,7 +52,7 @@ class UserNotificationFixtures extends Fixture implements DependentFixtureInterf
             ->andWhere('event.createdBy = :user')
             ->andWhere('event.issue is not null')
             ->sqidParameter('project', $project->getId())
-            ->setParameter('user', $user);
+            ->sqidParameter('user', $user->getId());
 
         $events = $queryBuilder->getQuery()->getResult();
 

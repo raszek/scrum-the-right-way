@@ -55,6 +55,6 @@ readonly class RoleEventRenderer
 
         $users = $this->userRepository->findInIds($userIds);
 
-        return ArrayHelper::indexByCallback($users, fn(User $user) => $user->getId());
+        return ArrayHelper::indexByCallback($users, fn(User $user) => $user->getId()->integerId());
     }
 }

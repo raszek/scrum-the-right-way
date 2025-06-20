@@ -83,7 +83,7 @@ class UserRepository extends ServiceEntityRepository
 
         $queryBuilder
             ->where('user.id NOT IN (:userIds)')
-            ->setParameter('userIds', $userIds);
+            ->sqidsParameter('userIds', $userIds);
 
         return $queryBuilder;
     }
@@ -127,7 +127,7 @@ class UserRepository extends ServiceEntityRepository
             'id' => $userIds
         ]);
 
-        return ArrayHelper::indexByCallback($users, fn(User $user) => $user->getId());
+        return ArrayHelper::indexByCallback($users, fn(User $user) => $user->getId()->integerId());
     }
 
     public function userNotificationsQuery(): QueryBuilder
@@ -148,7 +148,7 @@ class UserRepository extends ServiceEntityRepository
 
         $queryBuilder
             ->where('user.id IN (:ids)')
-            ->setParameter('ids', $ids);
+            ->sqidsParameter('ids', $ids);
 
         return $queryBuilder;
     }

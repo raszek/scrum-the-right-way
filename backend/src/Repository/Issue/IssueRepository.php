@@ -35,7 +35,7 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
 
     public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
     {
-        return (new QueryBuilder($this->getEntityManager()))
+        return new QueryBuilder($this->getEntityManager())
             ->select($alias)
             ->from($this->getEntityName(), $alias, $indexBy);
     }

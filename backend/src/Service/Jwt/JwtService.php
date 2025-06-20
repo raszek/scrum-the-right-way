@@ -30,10 +30,15 @@ readonly class JwtService
         return JWT::encode($payload, $this->secretKey, self::JWT_ALGORITHM);
     }
 
+    public function decode(string $token): array
+    {
+        return (array)JWT::decode($token, new Key($this->secretKey, self::JWT_ALGORITHM));
+    }
+
     public function isTokenExpired(string $token): bool
     {
         try {
-            JWT::decode($token, new Key($this->secretKey, self::JWT_ALGORITHM));
+            $this->decode($token);
         } catch (ExpiredException) {
             return true;
         }

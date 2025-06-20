@@ -20,4 +20,9 @@ readonly class WebsocketJwtService
     {
         return $this->jwtService->isTokenExpired($token);
     }
+
+    public function decode(string $jwtToken): array
+    {
+        return $this->jwtService->decode($jwtToken);
+    }
 }

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Project;
 
+use App\Controller\Controller;
 use App\Entity\Project\Project;
 use App\Form\Tag\NewTagForm;
 use App\Security\Voter\ProjectTagVoter;

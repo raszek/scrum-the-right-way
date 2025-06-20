@@ -5,6 +5,7 @@ namespace App\Repository\Project;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Repository\QueryBuilder\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -15,6 +16,13 @@ class ProjectRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Project::class);
+    }
+
+    public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
+    {
+        return new QueryBuilder($this->getEntityManager())
+            ->select($alias)
+            ->from($this->getEntityName(), $alias, $indexBy);
     }
 
     /**
@@ -28,7 +36,7 @@ class ProjectRepository extends ServiceEntityRepository
         return $queryBuilder
             ->innerJoin('project.members', 'projectMembers')
             ->where('projectMembers.user = :user')
-            ->setParameter('user', $user)
+            ->sqidParameter('user', $user->getId())
             ->getQuery()
             ->getResult();
     }

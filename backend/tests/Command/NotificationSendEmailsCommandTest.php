@@ -43,7 +43,7 @@ class NotificationSendEmailsCommandTest extends KernelTestCase
         $event = EventFactory::createOne([
             'name' => IssueEventList::SET_ISSUE_ASSIGNEE,
             'params' => [
-                'userId' => $user->getId(),
+                'userId' => $user->getId()->integerId(),
                 'issueId' => $issue->getId()->integerId()
             ],
             'project' => $project,

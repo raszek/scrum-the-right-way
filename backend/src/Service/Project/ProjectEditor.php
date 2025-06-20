@@ -39,7 +39,7 @@ readonly class ProjectEditor
         $this->entityManager->flush();
 
         $this->eventPersister->create(new AddMemberEvent(
-            userId: $newMemberAdmin->getUser()->getId()
+            userId: $newMemberAdmin->getUser()->getId()->integerId()
         ));
     }
 
@@ -50,7 +50,7 @@ readonly class ProjectEditor
         $this->entityManager->flush();
 
         $this->eventPersister->create(new AddMemberEvent(
-            userId: $newMember->getId()
+            userId: $newMember->getId()->integerId()
         ));
     }
 
@@ -69,7 +69,7 @@ readonly class ProjectEditor
         $this->entityManager->flush();
 
         $this->eventPersister->create(new RemoveMemberEvent(
-            userId: $userId
+            userId: $userId->integerId()
         ));
     }
 

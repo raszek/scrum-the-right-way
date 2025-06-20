@@ -2,6 +2,7 @@
 
 namespace App\Entity\User;
 
+use App\Doctrine\Sqid;
 use App\Entity\Issue\Issue;
 use App\Entity\Project\ProjectMember;
 use App\Repository\User\UserRepository;
@@ -20,8 +21,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue()]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'sqid')]
+    private ?Sqid $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
@@ -77,7 +78,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->notifications = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Sqid
     {
         return $this->id;
     }

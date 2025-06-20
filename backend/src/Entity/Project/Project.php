@@ -130,13 +130,11 @@ class Project
 
     public function findMember(User $searchedUser): ?ProjectMember
     {
-        foreach ($this->getMembers() as $member) {
-            if ($searchedUser->getId() === $member->getUser()->getId()) {
-                return $member;
-            }
-        }
+        return array_find(
+            $this->getMembers()->toArray(),
+            fn($member) => $searchedUser->getId()->integerId() === $member->getUser()->getId()->integerId()
+        );
 
-        return null;
     }
 
     public function member(User $user): ProjectMember
