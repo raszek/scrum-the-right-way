@@ -1,12 +1,12 @@
 import {test} from 'node:test';
 import Authentication from '../../src/Auth/Authentication.js';
 import {ImmutableDateTime} from '../../src/Date/ImmutableDateTime.js';
-import {configFastify} from '../../src/App.js';
+import {FastifyTest} from '../../src/App.js';
 
 test('JWT token can expire', async (t) => {
     t.plan(1);
 
-    const fastify = configFastify();
+    const fastify = FastifyTest();
 
     const currentTime = ImmutableDateTime.create(2012, 12, 12, 12, 12);
 

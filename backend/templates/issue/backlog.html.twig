@@ -128,14 +128,12 @@
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ path('app_project_room_view', {
+                                                    <form action="{{ path('app_project_room_create', {
                                                         id: project.id,
-                                                        roomId: 'qweasd'
-                                                    }) }}"
-                                                       class="dropdown-item"
-                                                    >
-                                                        Scrum poker
-                                                    </a>
+                                                    }) }}" method="post">
+                                                        <input type="hidden" name="issueIds[]" value="{{ item.id }}">
+                                                        <input type="submit" class="dropdown-item" value="Scrum poker">
+                                                    </form>
                                                 </li>
                                             </ul>
                                         </div>

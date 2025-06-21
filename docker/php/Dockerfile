@@ -23,6 +23,7 @@ RUN docker-php-ext-install gd zip bcmath intl
 
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
 RUN a2enmod proxy_http
+RUN a2enmod rewrite
 
 WORKDIR /var/www/html/scrum-right-way
 EXPOSE 8000

@@ -11,10 +11,13 @@ final class RoomVoter extends Voter
 {
     public const string VIEW_ROOM = 'VIEW_ROOM';
 
+    public const string CREATE_ROOM = 'CREATE_ROOM';
+
     protected function supports(string $attribute, mixed $subject): bool
     {
         $attributes = [
             self::VIEW_ROOM,
+            self::CREATE_ROOM
         ];
 
         return in_array($attribute, $attributes) && $subject instanceof Project;
@@ -36,6 +39,6 @@ final class RoomVoter extends Voter
 
         $foundMember = $subject->findMember($user);
 
-        return $foundMember !== null;
+        return $foundMember && $foundMember->isDeveloper();
     }
 }

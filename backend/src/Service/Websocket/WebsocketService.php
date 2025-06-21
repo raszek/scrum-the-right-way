@@ -37,7 +37,7 @@ readonly class WebsocketService
         $websocketSession = $this->websocketSessionFactory->create();
 
         $payload = new WebsocketJwtPayload(
-            id: $user->getEmail(),
+            id: $user->getId(),
             fullName: $user->getFullName(),
         );
 

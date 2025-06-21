@@ -27,9 +27,10 @@ const auth = FastifyPlugin( (fastify, _, done) => {
             throw new AuthError('Token must have encoded "fullName" field');
         }
 
+        this.token = token;
         this.user = {
             id: decoded.id,
-            fullName: decoded.fullName
+            fullName: decoded.fullName,
         };
     });
 

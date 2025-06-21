@@ -1,13 +1,42 @@
 'use strict';
 
 import { test } from 'node:test';
-import {TestFastify} from '../../src/App.js';
+import FastifyWebsocket from '@fastify/websocket';
+
+import {FastifyTest} from '../../src/App.js';
 import {timeout} from '../../src/Util/Promise.js';
+import Clock from '../../src/Date/Clock.js';
+import Authentication from '../../src/Auth/Authentication.js';
+import RoomRoutes from '../../src/Rooms/RoomRoute.js';
 
 test('User can connect to server', async (t) => {
     t.plan(1);
 
-    const fastify = TestFastify();
+    const fastify = FastifyTest();
+
+    class FakeBackend {
+        async checkRoomAccess(projectId, roomId, token) {
+            if (projectId !== 'projectid') {
+                return Promise.reject(new Error('Invalid project id'));
+            }
+
+            if (roomId !== 'some-room-id') {
+                return Promise.reject(new Error('Invalid room id'));
+            }
+
+            if (!token) {
+                return Promise.reject(new Error('No token provided'));
+            }
+
+            return Promise.resolve();
+        }
+    }
+
+    fastify.register(Clock);
+    fastify.register(Authentication);
+    fastify.decorate('backendApi', new FakeBackend());
+    fastify.register(FastifyWebsocket);
+    fastify.register(RoomRoutes);
 
     t.after(() => fastify.close());
 
@@ -23,7 +52,7 @@ test('User can connect to server', async (t) => {
 
     const port = fastify.server.address().port;
 
-    const ws = new WebSocket(`ws://localhost:${port}/rooms/some-room-id?token=${jwtToken}`);
+    const ws = new WebSocket(`ws://localhost:${port}/projects/projectid/rooms/some-room-id?token=${jwtToken}`);
 
     let resolve;
     const promise = new Promise((r) => {

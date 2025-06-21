@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Tests\Controller\Project;
+namespace App\Tests\Controller\Room;
 
+use App\Factory\Room\RoomFactory;
+use App\Service\Jwt\Websocket\WebsocketJwtService;
+use App\Service\Jwt\Websocket\WebsocketJwtServiceFactory;
+use App\Tests\Controller\WebTestCase;
 use App\Factory\Project\ProjectFactory;
 use App\Factory\Project\ProjectMemberFactory;
 use App\Factory\UserFactory;
 use App\Service\Jwt\Websocket\WebsocketJwtPayload;
-use App\Service\Jwt\Websocket\WebsocketJwtService;
-use App\Service\Jwt\Websocket\WebsocketJwtServiceFactory;
-use App\Tests\Controller\WebTestCase;
 
-class ApiProjectControllerTest extends WebTestCase
+class RoomControllerApiTest extends WebTestCase
 {
     /** @test */
     public function user_cannot_access_project_when_it_is_not_authenticated()
@@ -20,7 +21,9 @@ class ApiProjectControllerTest extends WebTestCase
 
         $project = ProjectFactory::createOne();
 
-        $client->request('GET', sprintf('/projects/%s/access', $project->getId()));
+        $room = RoomFactory::createOne();
+
+        $client->request('GET', sprintf('/projects/%s/rooms/%s/access', $project->getId(), $room->getId()));
 
         $this->assertResponseStatusCodeSame(401);
     }
@@ -35,6 +38,8 @@ class ApiProjectControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
 
+        $room = RoomFactory::createOne();
+
         $websocketJwtService = $this->websocketJwtService();
 
         $jwtToken = $websocketJwtService->encode(new WebsocketJwtPayload(
@@ -42,7 +47,7 @@ class ApiProjectControllerTest extends WebTestCase
             fullName: $user->getFullName(),
         ));
 
-        $client->request('GET', sprintf('/projects/%s/access', $project->getId()), server: [
+        $client->request('GET', sprintf('/projects/%s/rooms/%s/access', $project->getId(), $room->getId()), server: [
             'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $jwtToken),
         ]);
 
@@ -64,6 +69,10 @@ class ApiProjectControllerTest extends WebTestCase
             'project' => $project,
         ]);
 
+        $room = RoomFactory::createOne([
+            'project' => $project,
+        ]);
+
         $websocketJwtService = $this->websocketJwtService();
 
         $jwtToken = $websocketJwtService->encode(new WebsocketJwtPayload(
@@ -71,7 +80,7 @@ class ApiProjectControllerTest extends WebTestCase
             fullName: $user->getFullName(),
         ));
 
-        $client->request('GET', sprintf('/projects/%s/access', $project->getId()), server: [
+        $client->request('GET', sprintf('/projects/%s/rooms/%s/access', $project->getId(), $room->getId()), server: [
             'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $jwtToken),
         ]);
 

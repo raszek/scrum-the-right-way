@@ -5,8 +5,10 @@ namespace App\Controller\Room;
 use App\Controller\Controller;
 use App\Entity\Project\Project;
 use App\Entity\Room\Room;
+use App\Repository\Issue\IssueRepository;
 use App\Repository\Room\RoomRepository;
 use App\Security\Voter\RoomVoter;
+use App\Service\Room\ProjectRoomEditorFactory;
 use App\Service\Websocket\WebsocketService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +22,7 @@ class RoomController extends Controller
     public function __construct(
         private readonly WebsocketService $websocketService,
         private readonly RoomRepository $roomRepository,
+        private readonly IssueRepository $issueRepository,
     ) {
     }
 
@@ -33,10 +36,27 @@ class RoomController extends Controller
         return $this->render('room/view.html.twig', [
             'project' => $project,
             'websocketUrl' => $this->websocketService->getUrlConnection(
-                path: '/rooms/'.$roomId,
+                path: sprintf('projects/%s/rooms/%s', $project->getId(), $room->getId()),
                 user: $this->getLoggedInUser(),
             ),
             'roomIssues' => $room->getRoomIssues()
+        ]);
+    }
+
+    #[Route('/rooms', 'app_project_room_create', methods: ['POST'])]
+    public function create(Project $project, Request $request, ProjectRoomEditorFactory $factory): Response
+    {
+        $this->denyAccessUnlessGranted(RoomVoter::VIEW_ROOM, $project);
+
+        $projectRoomEditor = $factory->create($project);
+
+        $issues = $this->issueRepository->findByIds($request->get('issueIds'), $project);
+
+        $createdRoom = $projectRoomEditor->create($issues);
+
+        return $this->redirectToRoute('app_project_room_view', [
+            'id' => $project->getId(),
+            'roomId' => $createdRoom->getId()
         ]);
     }
 

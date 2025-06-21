@@ -5,6 +5,7 @@ import FastifyEnv from '@fastify/env';
 import {envOptions} from './Config/Env.js';
 import Authentication from './Auth/Authentication.js';
 import Clock from './Date/Clock.js';
+import Backend from './Api/Backend.js';
 
 const defaultAppConfig = {
     logger: true,
@@ -16,26 +17,27 @@ const testConfig = {
     showError: true
 };
 
-export const configFastify = (config) => {
+const fastifyCore = (config) => {
     const app = Fastify(config);
     app.register(FastifyEnv, envOptions);
 
     return app;
 };
 
+export const FastifyTest = () => {
+    return fastifyCore(testConfig);
+};
+
 const build = (config = defaultAppConfig) => {
-    const app = configFastify(config);
+    const app = fastifyCore(config);
 
     app.register(Clock);
     app.register(Authentication);
+    app.register(Backend);
     app.register(FastifyWebsocket);
     app.register(RoomRoutes);
 
     return app;
-};
-
-export const TestFastify = () => {
-    return build(testConfig);
 };
 
 export default build;

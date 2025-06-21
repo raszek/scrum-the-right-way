@@ -12,9 +12,17 @@ const routes = function (fastify, _, done) {
         } catch (e) {
             return reply.code(401).send(e.message);
         }
+
+        const {projectId, roomId} = request.params;
+
+        try {
+            await fastify.backendApi.checkRoomAccess(projectId, roomId, request.token);
+        } catch (e) {
+            return reply.code(403).send(e.message);
+        }
     });
 
-    fastify.get('/rooms/:roomId', { websocket: true }, async (socket, request) => {
+    fastify.get('/projects/:projectId/rooms/:roomId', { websocket: true }, async (socket, request) => {
         socket.on('error', (error) => {
             request.log.error(error);
         });
