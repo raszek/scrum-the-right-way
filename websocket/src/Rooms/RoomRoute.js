@@ -35,7 +35,13 @@ const routes = function (fastify, _, done) {
 
         rooms.join(roomUser, roomId);
 
+        socket.on('message', (message) => {
+            request.log.info(`Got message: ${message.toString()}`);
+            rooms.handleMessage(roomUser, roomId, JSON.parse(message.toString()));
+        });
+
         socket.on('close', () => {
+            request.log.info(`User left room ${roomId}`);
             rooms.leave(roomUser, roomId);
         });
     });

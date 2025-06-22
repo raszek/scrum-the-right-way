@@ -8,6 +8,7 @@ use App\Entity\Room\Room;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Room\RoomRepository;
 use App\Security\Voter\RoomVoter;
+use App\Service\Issue\StoryPointService;
 use App\Service\Room\ProjectRoomEditorFactory;
 use App\Service\Websocket\WebsocketService;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,7 @@ class RoomController extends Controller
         private readonly WebsocketService $websocketService,
         private readonly RoomRepository $roomRepository,
         private readonly IssueRepository $issueRepository,
+        private readonly StoryPointService $storyPointService,
     ) {
     }
 
@@ -39,7 +41,8 @@ class RoomController extends Controller
                 path: sprintf('projects/%s/rooms/%s', $project->getId(), $room->getId()),
                 user: $this->getLoggedInUser(),
             ),
-            'roomIssues' => $room->getRoomIssues()
+            'roomIssues' => $room->getRoomIssues(),
+            'availableStoryPoints' => $this->storyPointService->recommendedStoryPoints()
         ]);
     }
 

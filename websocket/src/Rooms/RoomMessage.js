@@ -3,28 +3,42 @@ export class RoomMessage {
     static chatMessage(message) {
         return RoomMessage.message({
             type: 'chat',
-            message,
+            data: message,
         });
     }
 
     static joinMessage(user) {
         return RoomMessage.message({
             type: 'join',
-            user,
+            data: user,
         });
     }
 
     static leaveMessage(user) {
         return RoomMessage.message({
             type: 'leave',
-            user,
+            data: user,
         });
     }
 
     static roomStateMessage(users) {
         return RoomMessage.message({
             type: 'roomState',
-            users,
+            data: users,
+        });
+    }
+
+    static betMessage(user) {
+        return RoomMessage.message({
+            type: 'bet',
+            data: user
+        });
+    }
+
+    static showBetsMessages(users) {
+        return RoomMessage.message({
+            type: 'showBets',
+            data: users
         });
     }
 
