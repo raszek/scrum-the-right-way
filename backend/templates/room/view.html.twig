@@ -15,44 +15,77 @@
              class="row"
         >
             <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header">[{{ roomIssues[0].code }}] {{ roomIssues[0].title }}</div>
+                    <div class="card-body">
+                        <div data-controller="markdown" class="card-body">
+                            {{ roomIssues[0].description | nl2br }}
+                        </div>
+                    </div>
+                </div>
 
             </div>
             <div class="col-md-3">
                 <div class="card">
-                    <div class="card-header">
+                    <div data-controller="tab" class="card-header">
                         <ul class="nav nav-tabs card-header-tabs">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="true" href="#">Users</a>
+                                <button class="nav-link active"
+                                        aria-current="true"
+                                        data-bs-target="#users"
+                                        data-tab-target="tab"
+                                >
+                                    Users
+                                </button>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Issues</a>
+                                <button class="nav-link"
+                                        data-bs-target="#issues"
+                                        data-tab-target="tab"
+                                >
+                                    Issues
+                                </button>
                             </li>
                         </ul>
                     </div>
                     <div class="card-body">
-                        <button class="btn btn-primary mb-2 w-100"
-                                data-action="room--poker#showBets"
-                        >
-                            Show bets
-                        </button>
-                        <ul data-room--poker-target="userContainer" class="list-group">
-
-                        </ul>
-
-                        <hr>
-                        <div class="row row-gap-2 mt-3">
-                            <h3 class="text-center">Bet</h3>
-                            {% for storyPoint in availableStoryPoints %}
-                            <div class="col d-flex justify-content-center ">
-                                <button class="btn btn-outline-primary"
-                                        data-action="room--poker#bet"
-                                        data-room--poker-target="betButton"
-                                        data-room--poker-value-param="{{ storyPoint }}"
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="users">
+                                <div class="row row-gap-2 mb-3">
+                                    <h3 class="text-center">Bet</h3>
+                                    {% for storyPoint in availableStoryPoints %}
+                                        <div class="col d-flex justify-content-center ">
+                                            <button class="btn btn-outline-primary"
+                                                    data-action="room--poker#bet"
+                                                    data-room--poker-target="betButton"
+                                                    data-room--poker-value-param="{{ storyPoint }}"
+                                            >
+                                                {{ storyPoint }}
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="btn btn-primary mb-2 w-100"
+                                        data-action="room--poker#showBets"
                                 >
-                                    {{ storyPoint }}
+                                    Show bets
                                 </button>
+                                <hr>
+                                <ul data-room--poker-target="userContainer" class="list-group">
+
+                                </ul>
                             </div>
-                            {% endfor %}
+                            <div class="tab-pane" id="issues">
+                                <ul class="list-group">
+                                    {% for issue in roomIssues %}
+                                        <li class="list-group-item strw-clickable {{ html_classes({
+                                            'active': loop.index == 1
+                                        }) }}">
+                                            {{ issue.prefixCodeTitle }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

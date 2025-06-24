@@ -23,6 +23,10 @@ export class Room {
         return users;
     }
 
+    getUsersBets() {
+        return this.getUsers().filter(user => user.bet !== undefined);
+    }
+
     emit(currentRoomUser, message) {
         for (const roomUser of this.users.values()) {
             if (roomUser !== currentRoomUser) {
@@ -52,6 +56,6 @@ export class Room {
         }
 
         this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has shown all bets.`));
-        this.broadcast(RoomMessage.showBetsMessages(this.getUsers()));
+        this.broadcast(RoomMessage.showBetsMessages(this.getUsersBets()));
     }
 }

@@ -37,6 +37,10 @@ readonly class ProjectRoomEditor
             $this->addIssue($issue, $createdRoom);
         }
 
+        if (count($this->entityManager->getUnitOfWork()->getScheduledEntityInsertions()) < 1) {
+            throw new DomainException('Cannot create room without issues.');
+        }
+
         $this->entityManager->flush();
 
         return $createdRoom;

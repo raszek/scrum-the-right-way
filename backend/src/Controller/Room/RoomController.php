@@ -41,7 +41,7 @@ class RoomController extends Controller
                 path: sprintf('projects/%s/rooms/%s', $project->getId(), $room->getId()),
                 user: $this->getLoggedInUser(),
             ),
-            'roomIssues' => $room->getRoomIssues(),
+            'roomIssues' => $room->getRoomIssues()->map(fn($issue) => $issue->getIssue()),
             'availableStoryPoints' => $this->storyPointService->recommendedStoryPoints()
         ]);
     }

@@ -36,7 +36,7 @@ export default class extends Controller {
                 this.userMadeBet(message.data);
                 break;
             case 'showBets':
-                this.setUsers(message.data);
+                this.displayBets(message.data);
                 break;
         }
     }
@@ -125,5 +125,21 @@ export default class extends Controller {
         }
 
         return undefined;
+    }
+
+    displayBets(users) {
+        for (const user of users) {
+            const userElement = this.findUserElement(user);
+            if (!userElement) {
+                throw new Error('User element not found');
+            }
+
+            const betElement = userElement.querySelector('.strw-poker-bet');
+            if (!betElement) {
+                throw new Error('Bet element not found');
+            }
+
+            betElement.innerHTML = user.bet.value;
+        }
     }
 }
