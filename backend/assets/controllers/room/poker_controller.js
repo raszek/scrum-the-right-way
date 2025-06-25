@@ -1,4 +1,5 @@
 import {Controller} from '@hotwired/stimulus';
+import {get} from 'util';
 
 export default class extends Controller {
 
@@ -7,7 +8,15 @@ export default class extends Controller {
         token: String
     }
 
-    static targets = ['userTemplate', 'userContainer', 'user', 'betButton'];
+    static targets = [
+        'userTemplate',
+        'userContainer',
+        'user',
+        'betButton',
+        'issue',
+        'issueContent',
+        'issueLoader'
+    ];
 
     connect() {
         this.socket = new WebSocket(this.urlValue);
@@ -38,7 +47,51 @@ export default class extends Controller {
             case 'showBets':
                 this.displayBets(message.data);
                 break;
+            case 'changeIssue':
+                this.userChangedIssue(message.data);
+                break;
         }
+    }
+
+    async userChangedIssue(issueId) {
+        const issueElement = this.findIssueElement(issueId);
+        if (!issueElement) {
+            throw new Error('Issue element not found');
+        }
+
+        this.activateIssue(issueElement);
+
+        const issueUrl = issueElement.getAttribute('data-room--poker-url-param');
+
+        this.issueLoaderTarget.classList.remove('d-none');
+        this.issueContentTarget.innerHTML = '';
+        this.issueContentTarget.innerHTML = await get(issueUrl);
+        this.issueLoaderTarget.classList.add('d-none');
+    }
+
+    changeIssue(event) {
+        this.activateIssue(event.currentTarget);
+
+        const issueId = event.params.id;
+
+        this.sendMessage('changeIssue', issueId);
+    }
+
+    activateIssue(issueElement) {
+        for (const issueTarget of this.issueTargets) {
+            issueTarget.classList.remove('active');
+        }
+
+        issueElement.classList.add('active');
+    }
+
+    findIssueElement(issueId) {
+        for (const issueTarget of this.issueTargets) {
+            if (issueTarget.getAttribute('data-room--poker-id-param') === issueId) {
+                return issueTarget;
+            }
+        }
+        return undefined;
     }
 
     userMadeBet(user) {

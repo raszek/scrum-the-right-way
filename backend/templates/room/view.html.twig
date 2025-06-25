@@ -15,15 +15,14 @@
              class="row"
         >
             <div class="col-md-9">
-                <div class="card">
-                    <div class="card-header">[{{ roomIssues[0].code }}] {{ roomIssues[0].title }}</div>
-                    <div class="card-body">
-                        <div data-controller="markdown" class="card-body">
-                            {{ roomIssues[0].description | nl2br }}
-                        </div>
+                <div data-room--poker-target="issueLoader" class="d-flex justify-content-center d-none">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-
+                <div data-room--poker-target="issueContent">
+                    {% include 'room/room_issue_view.html.twig' with {issue: roomIssues[0]} %}
+                </div>
             </div>
             <div class="col-md-3">
                 <div class="card">
@@ -72,15 +71,23 @@
                                 </button>
                                 <hr>
                                 <ul data-room--poker-target="userContainer" class="list-group">
-
                                 </ul>
                             </div>
                             <div class="tab-pane" id="issues">
                                 <ul class="list-group">
                                     {% for issue in roomIssues %}
-                                        <li class="list-group-item strw-clickable {{ html_classes({
-                                            'active': loop.index == 1
-                                        }) }}">
+                                        <li data-action="click->room--poker#changeIssue"
+                                            data-room--poker-id-param="{{ issue.id }}"
+                                            data-room--poker-url-param="{{ path('app_project_room_issue_view', {
+                                                id: project.id,
+                                                roomId: room.id,
+                                                issueId: issue.id
+                                            }) }}"
+                                            data-room--poker-target="issue"
+                                            class="list-group-item strw-clickable {{ html_classes({
+                                                'active': loop.index == 1
+                                            }) }}"
+                                        >
                                             {{ issue.prefixCodeTitle }}
                                         </li>
                                     {% endfor %}

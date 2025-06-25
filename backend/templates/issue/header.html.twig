@@ -8,6 +8,15 @@
         {% else %}
             <li class="breadcrumb-item"><a href="{{ path('app_project_issue_list', {id: project.id}) }}">Issues</a></li>
         {% endif %}
+        {% if issue.parent %}
+            <li class="breadcrumb-item">
+                <a href="{{ path('app_project_issue_view', {
+                    id: project.id,
+                    issueCode: issue.parent.code
+                }) }}"
+                >{{ issue.parent.code }}</a>
+            </li>
+        {% endif %}
         <li class="breadcrumb-item active" aria-current="page">{{ issue.code }}</li>
     </ol>
 </nav>

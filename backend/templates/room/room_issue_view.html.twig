@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">[{{ issue.code }}] {{ issue.title }}</div>
+    <div class="card-body">
+        <div data-controller="markdown" class="card-body">
+            {{ issue.description | nl2br }}
+        </div>
+    </div>
+</div>

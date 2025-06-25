@@ -53,6 +53,9 @@ export class Rooms {
         case 'showBets':
             room.showBets(roomUser);
             break;
+        case 'changeIssue':
+            room.changeIssue(roomUser, message.data);
+            break;
         }
     }
 }

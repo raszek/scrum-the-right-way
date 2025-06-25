@@ -6,6 +6,7 @@ use App\Controller\Controller;
 use App\Entity\Project\Project;
 use App\Entity\Room\Room;
 use App\Repository\Issue\IssueRepository;
+use App\Repository\Room\RoomIssueRepository;
 use App\Repository\Room\RoomRepository;
 use App\Security\Voter\RoomVoter;
 use App\Service\Issue\StoryPointService;
@@ -23,6 +24,7 @@ class RoomController extends Controller
     public function __construct(
         private readonly WebsocketService $websocketService,
         private readonly RoomRepository $roomRepository,
+        private readonly RoomIssueRepository $roomIssueRepository,
         private readonly IssueRepository $issueRepository,
         private readonly StoryPointService $storyPointService,
     ) {
@@ -37,12 +39,13 @@ class RoomController extends Controller
 
         return $this->render('room/view.html.twig', [
             'project' => $project,
+            'room' => $room,
+            'roomIssues' => $room->getRoomIssues()->map(fn($issue) => $issue->getIssue()),
+            'availableStoryPoints' => $this->storyPointService->recommendedStoryPoints(),
             'websocketUrl' => $this->websocketService->getUrlConnection(
                 path: sprintf('projects/%s/rooms/%s', $project->getId(), $room->getId()),
                 user: $this->getLoggedInUser(),
             ),
-            'roomIssues' => $room->getRoomIssues()->map(fn($issue) => $issue->getIssue()),
-            'availableStoryPoints' => $this->storyPointService->recommendedStoryPoints()
         ]);
     }
 
@@ -60,6 +63,22 @@ class RoomController extends Controller
         return $this->redirectToRoute('app_project_room_view', [
             'id' => $project->getId(),
             'roomId' => $createdRoom->getId()
+        ]);
+    }
+
+    #[Route('/rooms/{roomId}/issues/{issueId}', 'app_project_room_issue_view', methods: ['GET'])]
+    public function issueView(Project $project, string $roomId, string $issueId): Response
+    {
+        $this->denyAccessUnlessGranted(RoomVoter::VIEW_ROOM_ISSUE, $project);
+
+        $roomIssue = $this->roomIssueRepository->findRoomIssue($issueId, $roomId, $project);
+
+        if (!$roomIssue) {
+            throw new NotFoundHttpException('Room issue not found');
+        }
+
+        return $this->render('room/room_issue_view.html.twig', [
+            'issue' => $roomIssue->getIssue(),
         ]);
     }
 

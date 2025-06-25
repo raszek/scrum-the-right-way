@@ -27,6 +27,12 @@ export class Room {
         return this.getUsers().filter(user => user.bet !== undefined);
     }
 
+    resetBets() {
+        for (const roomUser of this.users.values()) {
+            roomUser.bet = undefined;
+        }
+    }
+
     emit(currentRoomUser, message) {
         for (const roomUser of this.users.values()) {
             if (roomUser !== currentRoomUser) {
@@ -56,6 +62,13 @@ export class Room {
         }
 
         this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has shown all bets.`));
-        this.broadcast(RoomMessage.showBetsMessages(this.getUsersBets()));
+        this.broadcast(RoomMessage.showBetsMessage(this.getUsersBets()));
+    }
+
+    changeIssue(roomUser, issueId) {
+        this.resetBets();
+
+        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has changed issue to ${issueId}.`));
+        this.broadcast(RoomMessage.changeIssueMessage(issueId));
     }
 }

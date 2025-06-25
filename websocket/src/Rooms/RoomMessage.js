@@ -35,10 +35,17 @@ export class RoomMessage {
         });
     }
 
-    static showBetsMessages(users) {
+    static showBetsMessage(users) {
         return RoomMessage.message({
             type: 'showBets',
             data: users
+        });
+    }
+
+    static changeIssueMessage(issueId) {
+        return RoomMessage.message({
+            type: 'changeIssue',
+            data: issueId
         });
     }
 
