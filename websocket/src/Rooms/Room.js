@@ -2,8 +2,10 @@ import {RoomMessage} from './RoomMessage.js';
 
 export class Room {
 
-    constructor() {
+    constructor(issue) {
         this.users = new Set();
+
+        this.issue = issue;
     }
 
     broadcast(message) {
@@ -11,7 +13,6 @@ export class Room {
             roomUser.socket.send(message);
         }
     }
-
 
     getUsers() {
         const users = [];
@@ -30,14 +31,6 @@ export class Room {
     resetBets() {
         for (const roomUser of this.users.values()) {
             roomUser.bet = undefined;
-        }
-    }
-
-    emit(currentRoomUser, message) {
-        for (const roomUser of this.users.values()) {
-            if (roomUser !== currentRoomUser) {
-                roomUser.socket.send(message);
-            }
         }
     }
 
@@ -65,10 +58,15 @@ export class Room {
         this.broadcast(RoomMessage.showBetsMessage(this.getUsersBets()));
     }
 
-    changeIssue(roomUser, issueId) {
+    changeIssue(roomUser, issue) {
+        this.issue = issue;
         this.resetBets();
 
-        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has changed issue to ${issueId}.`));
-        this.broadcast(RoomMessage.changeIssueMessage(issueId));
+        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has changed issue to ${issue.id}.`));
+        this.broadcast(RoomMessage.changeIssueMessage(issue));
+    }
+
+    setStoryPoints(roomUser, storyPoints) {
+        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has set story points to ${storyPoints}.`));
     }
 }

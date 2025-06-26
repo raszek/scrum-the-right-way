@@ -41,7 +41,7 @@ class RoomController extends Controller
             'project' => $project,
             'room' => $room,
             'roomIssues' => $room->getRoomIssues()->map(fn($issue) => $issue->getIssue()),
-            'availableStoryPoints' => $this->storyPointService->recommendedStoryPoints(),
+            'recommendedStoryPoints' => $this->storyPointService->recommendedStoryPoints(),
             'websocketUrl' => $this->websocketService->getUrlConnection(
                 path: sprintf('projects/%s/rooms/%s', $project->getId(), $room->getId()),
                 user: $this->getLoggedInUser(),
@@ -79,6 +79,7 @@ class RoomController extends Controller
 
         return $this->render('room/room_issue_view.html.twig', [
             'issue' => $roomIssue->getIssue(),
+            'recommendedStoryPoints' => $this->storyPointService->recommendedStoryPoints(),
         ]);
     }
 

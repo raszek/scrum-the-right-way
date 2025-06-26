@@ -39,7 +39,7 @@ export default class extends Controller {
                 this.removeUser(message.data);
                 break;
             case 'roomState':
-                this.setUsers(message.data);
+                this.setRoomState(message.data);
                 break;
             case 'bet':
                 this.userMadeBet(message.data);
@@ -48,16 +48,24 @@ export default class extends Controller {
                 this.displayBets(message.data);
                 break;
             case 'changeIssue':
-                this.userChangedIssue(message.data);
+                this.setCurrentIssue(message.data);
                 break;
         }
     }
 
-    async userChangedIssue(issueId) {
-        const issueElement = this.findIssueElement(issueId);
+    setRoomState(data) {
+        this.setCurrentIssue(data.issue);
+
+        this.setUsers(data.users);
+    }
+
+    async setCurrentIssue(issue) {
+        const issueElement = this.findIssueElement(issue.id);
         if (!issueElement) {
             throw new Error('Issue element not found');
         }
+
+        this.resetBets();
 
         this.activateIssue(issueElement);
 
@@ -72,9 +80,12 @@ export default class extends Controller {
     changeIssue(event) {
         this.activateIssue(event.currentTarget);
 
-        const issueId = event.params.id;
+        const issue = {
+            id: event.params.id,
+            storyPoints: event.params.storyPoints || undefined,
+        };
 
-        this.sendMessage('changeIssue', issueId);
+        this.sendMessage('changeIssue', issue);
     }
 
     activateIssue(issueElement) {
@@ -108,19 +119,22 @@ export default class extends Controller {
     bet(event) {
         const bet = event.params.value;
 
-        for (const betButton of this.betButtonTargets) {
-            betButton.classList.remove('active');
-        }
+        this.removeSelectedBet();
 
         event.currentTarget.classList.add('active');
 
         this.sendMessage('bet', bet);
     }
 
+    removeSelectedBet() {
+        for (const betButton of this.betButtonTargets) {
+            betButton.classList.remove('active');
+        }
+    }
+
     showBets() {
         this.sendMessage('showBets');
     }
-
 
     sendMessage(type, data) {
         this.socket.send(JSON.stringify({
@@ -152,7 +166,7 @@ export default class extends Controller {
         if (user.bet) {
             const pokerBetElement = clone.firstElementChild.querySelector('.strw-poker-bet');
             if (user.bet.type === 'hidden') {
-                pokerBetElement.innerHTML = '<i class="bi bi-exclamation-circle"></i>';
+                this.makeBetSelected(pokerBetElement);
             } else if (user.bet.type === 'visible') {
                 pokerBetElement.innerHTML = user.bet.value;
             }
@@ -194,5 +208,23 @@ export default class extends Controller {
 
             betElement.innerHTML = user.bet.value;
         }
+    }
+
+    makeBetSelected(betElement) {
+        betElement.innerHTML = '<i class="bi bi-exclamation-circle"></i>';
+    }
+
+    makeBetEmpty(betElement) {
+        betElement.innerHTML = '<i class="bi bi-question-circle"></i>';
+    }
+
+    resetBets() {
+        const betElements = document.querySelectorAll('.strw-poker-bet');
+
+        for (const betElement of betElements) {
+            this.makeBetEmpty(betElement);
+        }
+
+        this.removeSelectedBet();
     }
 }

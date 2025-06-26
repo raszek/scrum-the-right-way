@@ -10,9 +10,9 @@ export class Rooms {
         this.rooms = new Map();
     }
 
-    join(roomUser, roomId) {
+    join(roomUser, roomId, initIssue) {
         if (!this.rooms.has(roomId)) {
-            this.rooms.set(roomId, new Room());
+            this.rooms.set(roomId, new Room(initIssue));
         }
 
         const room = this.rooms.get(roomId);
@@ -24,7 +24,7 @@ export class Rooms {
 
         room.addUser(roomUser);
 
-        roomUser.socket.send(RoomMessage.roomStateMessage(room.getUsers()));
+        roomUser.socket.send(RoomMessage.roomStateMessage(room.getUsers(), room.issue));
         room.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has joined room ${roomId}`));
     }
 
@@ -55,6 +55,9 @@ export class Rooms {
             break;
         case 'changeIssue':
             room.changeIssue(roomUser, message.data);
+            break;
+        case 'setStoryPoints':
+            room.setStoryPoints(roomUser, message.data);
             break;
         }
     }

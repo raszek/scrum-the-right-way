@@ -1,5 +1,24 @@
 <div class="card">
-    <div class="card-header">[{{ issue.code }}] {{ issue.title }}</div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center gap-3">
+            <label for="">Story points</label>
+            <select class="form-select w-75" aria-label="Issue story points">
+                <option>None</option>
+                {% for storyPoint in recommendedStoryPoints %}
+                    <option value="{{ storyPoint }}"
+                            {% if issue.storyPoints == storyPoint %} selected {% endif %}
+                    >
+                        {{ storyPoint }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-header d-flex flex-column ">
+        [{{ issue.code }}] {{ issue.title }}
+    </div>
     <div class="card-body">
         <div data-controller="markdown" class="card-body">
             {{ issue.description | nl2br }}

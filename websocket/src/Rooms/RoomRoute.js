@@ -10,14 +10,16 @@ const routes = function (fastify, _, done) {
         try {
             await request.isAuthenticated();
         } catch (e) {
+            request.log.info(e.message);
             return reply.code(401).send(e.message);
         }
 
         const {projectId, roomId} = request.params;
 
         try {
-            await fastify.backendApi.checkRoomAccess(projectId, roomId, request.token);
+            fastify.initIssue = await fastify.backendApi.checkRoomAccess(projectId, roomId, request.token);
         } catch (e) {
+            request.log.info(e.message);
             return reply.code(403).send(e.message);
         }
     });
@@ -33,7 +35,7 @@ const routes = function (fastify, _, done) {
 
         const roomUser = new RoomUser(socket, request.user);
 
-        rooms.join(roomUser, roomId);
+        rooms.join(roomUser, roomId, fastify.initIssue);
 
         socket.on('message', (message) => {
             request.log.info(`Got message: ${message.toString()}`);

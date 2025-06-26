@@ -16,8 +16,10 @@ class BackendApi {
             })
         });
 
-        if (response.status === 204) {
-            return Promise.resolve();
+        const json = await response.text();
+
+        if (response.status === 200) {
+            return Promise.resolve(JSON.parse(json));
         }
 
         return Promise.reject(new Error('Cannot access room'));

@@ -21,10 +21,13 @@ export class RoomMessage {
         });
     }
 
-    static roomStateMessage(users) {
+    static roomStateMessage(users, issue) {
         return RoomMessage.message({
             type: 'roomState',
-            data: users,
+            data: {
+                users,
+                issue,
+            },
         });
     }
 

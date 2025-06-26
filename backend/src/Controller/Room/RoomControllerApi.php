@@ -7,6 +7,7 @@ use App\Entity\Project\Project;
 use App\Repository\Room\RoomRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Jwt\Websocket\WebsocketJwtServiceFactory;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -56,7 +57,15 @@ class RoomControllerApi extends Controller
             throw new AccessDeniedHttpException('Room not found');
         }
 
-        return new Response(status: 204);
+        $firstIssue = $room->getRoomIssues()->first();
+        if (!$firstIssue) {
+            throw new AccessDeniedHttpException('First issue not found');
+        }
+
+        return new JsonResponse([
+            'id' => $firstIssue->getIssue()->getId()->get(),
+            'storyPoints' => $firstIssue->getIssue()->getStoryPoints(),
+        ]);
     }
 
     private function readJwtToken(Request $request): string
