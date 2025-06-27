@@ -78,6 +78,7 @@ class RoomController extends Controller
         }
 
         return $this->render('room/room_issue_view.html.twig', [
+            'project' => $project,
             'issue' => $roomIssue->getIssue(),
             'recommendedStoryPoints' => $this->storyPointService->recommendedStoryPoints(),
         ]);

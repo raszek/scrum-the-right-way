@@ -5,7 +5,7 @@ export default class extends Controller {
 
     static values = {
         url: String,
-        token: String
+        token: String,
     }
 
     static targets = [
@@ -15,7 +15,8 @@ export default class extends Controller {
         'betButton',
         'issue',
         'issueContent',
-        'issueLoader'
+        'issueLoader',
+        'select'
     ];
 
     connect() {
@@ -50,7 +51,39 @@ export default class extends Controller {
             case 'changeIssue':
                 this.setCurrentIssue(message.data);
                 break;
+            case 'setStoryPoints':
+                this.userChangedStoryPoints(message.data);
+                break;
+            case 'resetBets':
+                this.userResetBets();
+                break;
         }
+    }
+
+    userChangedStoryPoints(storyPoints) {
+        this.selectTarget.value = storyPoints;
+    }
+
+    async updateStoryPoints(event) {
+        const value = event.currentTarget.value;
+
+        const url = event.params.url;
+
+        await this.storyPointRequest(value, url);
+
+        this.sendMessage('setStoryPoints', value);
+    }
+
+    async storyPointRequest(storyPoints, url) {
+        const formData = new FormData();
+        if (storyPoints) {
+            formData.append('points', storyPoints);
+        }
+
+        return fetch(url, {
+            method: 'POST',
+            body: formData
+        })
     }
 
     setRoomState(data) {
@@ -65,7 +98,7 @@ export default class extends Controller {
             throw new Error('Issue element not found');
         }
 
-        this.resetBets();
+        this.removeBets();
 
         this.activateIssue(issueElement);
 
@@ -218,7 +251,7 @@ export default class extends Controller {
         betElement.innerHTML = '<i class="bi bi-question-circle"></i>';
     }
 
-    resetBets() {
+    removeBets() {
         const betElements = document.querySelectorAll('.strw-poker-bet');
 
         for (const betElement of betElements) {
@@ -226,5 +259,14 @@ export default class extends Controller {
         }
 
         this.removeSelectedBet();
+    }
+
+    userResetBets() {
+        this.removeBets()
+    }
+
+
+    resetBets() {
+        this.sendMessage('resetBets');
     }
 }

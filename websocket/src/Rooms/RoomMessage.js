@@ -52,6 +52,19 @@ export class RoomMessage {
         });
     }
 
+    static setStoryPointsMessage(storyPoints) {
+        return RoomMessage.message({
+            type: 'setStoryPoints',
+            data: storyPoints
+        });
+    }
+
+    static resetBets() {
+        return RoomMessage.message({
+            type: 'resetBets',
+        });
+    }
+
     static message(data) {
         return JSON.stringify(data);
     }

@@ -59,6 +59,10 @@ export class Rooms {
         case 'setStoryPoints':
             room.setStoryPoints(roomUser, message.data);
             break;
+        case 'resetBets':
+            room.resetBets(roomUser);
+            break;
+
         }
     }
 }

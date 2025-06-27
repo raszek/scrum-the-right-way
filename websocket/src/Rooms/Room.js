@@ -28,7 +28,7 @@ export class Room {
         return this.getUsers().filter(user => user.bet !== undefined);
     }
 
-    resetBets() {
+    removeBets() {
         for (const roomUser of this.users.values()) {
             roomUser.bet = undefined;
         }
@@ -60,7 +60,7 @@ export class Room {
 
     changeIssue(roomUser, issue) {
         this.issue = issue;
-        this.resetBets();
+        this.removeBets();
 
         this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has changed issue to ${issue.id}.`));
         this.broadcast(RoomMessage.changeIssueMessage(issue));
@@ -68,5 +68,13 @@ export class Room {
 
     setStoryPoints(roomUser, storyPoints) {
         this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has set story points to ${storyPoints}.`));
+        this.broadcast(RoomMessage.setStoryPointsMessage(storyPoints));
+    }
+
+    resetBets(roomUser) {
+        this.removeBets();
+
+        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has reset bets.`));
+        this.broadcast(RoomMessage.resetBets());
     }
 }

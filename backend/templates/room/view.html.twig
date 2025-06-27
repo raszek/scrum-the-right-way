@@ -63,11 +63,18 @@
                                         </div>
                                     {% endfor %}
                                 </div>
-                                <button class="btn btn-primary mb-2 w-100"
-                                        data-action="room--poker#showBets"
-                                >
-                                    Show bets
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary mb-2 w-100"
+                                            data-action="room--poker#showBets"
+                                    >
+                                        Show
+                                    </button>
+                                    <button class="btn btn-primary mb-2 w-100"
+                                            data-action="room--poker#resetBets"
+                                    >
+                                        Reset
+                                    </button>
+                                </div>
                                 <hr>
                                 <ul data-room--poker-target="userContainer" class="list-group">
                                 </ul>
