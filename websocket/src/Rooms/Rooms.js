@@ -53,16 +53,21 @@ export class Rooms {
         case 'showBets':
             room.showBets(roomUser);
             break;
-        case 'changeIssue':
-            room.changeIssue(roomUser, message.data);
-            break;
         case 'setStoryPoints':
             room.setStoryPoints(roomUser, message.data);
             break;
         case 'resetBets':
             room.resetBets(roomUser);
             break;
-
+        case 'changeIssue':
+            room.changeIssue(roomUser, message.data);
+            break;
+        case 'addIssue':
+            room.addIssue(roomUser, message.data);
+            break;
+        case 'removeIssue':
+            room.removeIssue(roomUser, message.data);
+            break;
         }
     }
 }

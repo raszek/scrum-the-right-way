@@ -52,6 +52,20 @@ export class RoomMessage {
         });
     }
 
+    static addIssueMessage(issue) {
+        return RoomMessage.message({
+            type: 'addIssue',
+            data: issue
+        });
+    }
+
+    static removeIssueMessage(issueId) {
+        return RoomMessage.message({
+            type: 'removeIssue',
+            data: issueId
+        });
+    }
+
     static setStoryPointsMessage(storyPoints) {
         return RoomMessage.message({
             type: 'setStoryPoints',

@@ -66,6 +66,16 @@ export class Room {
         this.broadcast(RoomMessage.changeIssueMessage(issue));
     }
 
+    addIssue(roomUser, issue) {
+        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has added new issue ${issue.id}.`));
+        this.broadcast(RoomMessage.addIssueMessage(issue));
+    }
+
+    removeIssue(roomUser, issueId) {
+        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has removed issue ${issueId}.`));
+        this.broadcast(RoomMessage.removeIssueMessage(issueId));
+    }
+
     setStoryPoints(roomUser, storyPoints) {
         this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has set story points to ${storyPoints}.`));
         this.broadcast(RoomMessage.setStoryPointsMessage(storyPoints));

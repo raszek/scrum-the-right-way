@@ -2,7 +2,10 @@
 
 namespace App\Tests\Controller\Room;
 
+use App\Factory\Issue\IssueFactory;
 use App\Factory\Room\RoomFactory;
+use App\Factory\Room\RoomIssueFactory;
+use App\Helper\JsonHelper;
 use App\Service\Jwt\Websocket\WebsocketJwtService;
 use App\Service\Jwt\Websocket\WebsocketJwtServiceFactory;
 use App\Tests\Controller\WebTestCase;
@@ -69,8 +72,19 @@ class RoomControllerApiTest extends WebTestCase
             'project' => $project,
         ]);
 
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+            'number' => 1,
+            'storyPoints' => 13
+        ]);
+
         $room = RoomFactory::createOne([
             'project' => $project,
+        ]);
+
+        RoomIssueFactory::createOne([
+            'room' => $room,
+            'issue' => $issue,
         ]);
 
         $websocketJwtService = $this->websocketJwtService();
@@ -84,7 +98,12 @@ class RoomControllerApiTest extends WebTestCase
             'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $jwtToken),
         ]);
 
-        $this->assertResponseStatusCodeSame(204);
+        $this->assertResponseIsSuccessful();
+
+        $response = JsonHelper::decode($client->getResponse()->getContent());
+
+        $this->assertArrayHasKey('id', $response);
+        $this->assertEquals(13, $response['storyPoints']);;
     }
 
     private function websocketJwtService(): WebsocketJwtService

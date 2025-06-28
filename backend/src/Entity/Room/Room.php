@@ -62,4 +62,16 @@ class Room
     {
         return $this->createdAt;
     }
+
+    public function addRoomIssue(RoomIssue $roomIssue): void
+    {
+        if (!$this->roomIssues->contains($roomIssue)) {
+            $this->roomIssues->add($roomIssue);
+        }
+    }
+
+    public function removeIssue(RoomIssue $roomIssue): void
+    {
+        $this->roomIssues->removeElement($roomIssue);
+    }
 }

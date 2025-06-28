@@ -2,8 +2,10 @@
 
 namespace App\Repository\Room;
 
+use App\Doctrine\Sqid;
 use App\Entity\Project\Project;
 use App\Entity\Room\RoomIssue;
+use App\Helper\ArrayHelper;
 use App\Repository\QueryBuilder\QueryBuilder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -38,5 +40,24 @@ class RoomIssueRepository extends ServiceEntityRepository
             ->sqidParameter('project', $project->getId());
 
         return $query->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * @param string $roomId
+     * @return int[]
+     */
+    public function findRoomIssueIds(string $roomId): array
+    {
+        $query = $this->createQueryBuilder('roomIssue');
+
+        $query
+            ->select(['issue.id as id'])
+            ->join('roomIssue.issue', 'issue')
+            ->where('roomIssue.room = :room')
+            ->sqidParameter('room', $roomId);
+
+        $ids = array_column($query->getQuery()->getArrayResult(), 'id');
+
+        return ArrayHelper::map($ids, fn(Sqid $id) => $id->integerId());
     }
 }
