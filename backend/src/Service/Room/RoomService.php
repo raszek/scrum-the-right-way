@@ -7,6 +7,7 @@ use App\Enum\Issue\IssueTypeEnum;
 use App\Helper\ArrayHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Room\RoomIssueRepository;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class RoomService
 {
@@ -14,6 +15,7 @@ readonly class RoomService
     public function __construct(
         private IssueRepository $issueRepository,
         private RoomIssueRepository $roomIssueRepository,
+        private UrlGeneratorInterface $urlGenerator
     ) {
     }
 
@@ -30,7 +32,7 @@ readonly class RoomService
 
         $query
             ->notIn('issue.id', $roomIds)
-            ->fuzzyLike("CONCAT(issue.title, ' #', issue.number)", $search)
+            ->fuzzyLike("CONCAT('[#', issue.number, '] ', issue.title)", $search)
             ->andWhere('issue.type <> :type')
             ->setParameter('type', IssueTypeEnum::Feature)
             ->setMaxResults(10);
@@ -38,9 +40,14 @@ readonly class RoomService
         $issues = $query->getQuery()->getResult();
 
         return ArrayHelper::map($issues, fn(Issue $issue) => [
-            'id' => $issue->getId()->get(),
-            'title' => $issue->getTitleWithCode(),
+            'value' => $issue->getId()->get(),
+            'text' => $issue->prefixCodeTitle(),
             'storyPoints' => $issue->getStoryPoints(),
+            'url' => $this->urlGenerator->generate('app_project_room_issue_view', [
+                'id' => $issue->getProject()->getId()->get(),
+                'roomId' => $roomId,
+                'issueId' => $issue->getId()->get(),
+            ]),
         ]);
     }
 

@@ -12,9 +12,17 @@
 
         <div data-controller="room--poker"
              data-room--poker-url-value="{{ websocketUrl }}"
+             data-room--poker-search-issue-url-value="{{ path('app_project_room_search_issues', {
+                 id: project.id,
+                 roomId: room.id
+             }) }}"
+             data-room--poker-add-issue-url-value="{{ path('app_project_room_add_issue', {
+                 id: project.id,
+                 roomId: room.id
+             }) }}"
              class="row"
         >
-            <div class="col-md-9">
+            <div class="col-md-8">
                 <div data-room--poker-target="issueLoader" class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -23,7 +31,7 @@
                 <div data-room--poker-target="issueContent">
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card">
                     <div data-controller="tab" class="card-header">
                         <ul class="nav nav-tabs card-header-tabs">
@@ -79,8 +87,17 @@
                                 <ul data-room--poker-target="userContainer" class="list-group">
                                 </ul>
                             </div>
-                            <div class="tab-pane" id="issues">
-                                <ul class="list-group">
+                            <div id="issues"
+                                 class="tab-pane"
+                            >
+                                <select data-room--poker-target="issueSelect"
+                                        class="flex-fill"
+                                >
+                                </select>
+                                <ul data-room--poker-target="issueContainer"
+                                    class="list-group mt-3 overflow-auto"
+                                    style="max-height: 65vh"
+                                >
                                     {% for issue in roomIssues %}
                                         <li data-action="click->room--poker#changeIssue"
                                             data-room--poker-id-param="{{ issue.id }}"
@@ -112,6 +129,20 @@
                     <button class="btn btn-primary strw-poker-bet"><i class="bi bi-question-circle"></i></button>
                     <strong class="strw-poker-user-name"></strong>
                 </div>
+            </template>
+            <template data-room--poker-target="issueTemplate">
+                <li data-room--poker-id-param=""
+                    data-room--poker-story-points-param=""
+                    data-room--poker-url-param=""
+                    data-room--poker-target="issue"
+                    class="list-group-item strw-clickable"
+                >
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </li>
             </template>
         </div>
     </div>

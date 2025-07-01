@@ -1,11 +1,14 @@
 import {Controller} from '@hotwired/stimulus';
-import {get} from 'util';
+import {get, post} from 'util';
+import TomSelect from 'tom-select';
 
 export default class extends Controller {
 
     static values = {
         url: String,
         token: String,
+        searchIssueUrl: String,
+        addIssueUrl: String
     }
 
     static targets = [
@@ -16,13 +19,73 @@ export default class extends Controller {
         'issue',
         'issueContent',
         'issueLoader',
-        'select'
+        'issueSelect',
+        'issueTemplate',
+        'issueContainer',
+        'storyPointSelect',
     ];
 
     connect() {
         this.socket = new WebSocket(this.urlValue);
 
         this.socket.addEventListener('message', this.messageHandler.bind(this));
+
+        this.addIssueSelect = new TomSelect(this.issueSelectTarget, {
+            load: this.fetchRoomIssues.bind(this),
+            onChange: this.addIssue.bind(this),
+            render: {
+                option: function (data, escape) {
+                    return `
+                    <div data-room--poker-story-point-param="${data.storyPoints}"
+                         data-room--poker-url-param="${data.url}"
+                    >
+                      ${escape(data.text)}
+                    </div>
+                    `;
+                }
+            }
+        });
+    }
+
+    async addIssue(value) {
+        const option = this.addIssueSelect.getOption(value);
+        if (!option) {
+            return;
+        }
+
+        const clone = this.issueTemplateTarget.content.cloneNode(true);
+
+        const li = clone.firstElementChild;
+        li.setAttribute('data-room--poker-id-param', value);
+        li.setAttribute('data-room--poker-story-points-param', option.getAttribute('data-room--poker-story-point-param'));
+        li.setAttribute('data-room--poker-url-param', option.getAttribute('data-room--poker-url-param'));
+
+        const formData = new FormData();
+        formData.append('issueId', value);
+
+        this.issueContainerTarget.appendChild(li);
+
+        this.addIssueSelect.clear();
+
+        await post(this.addIssueUrlValue, formData);
+        li.innerText = option.innerText.trim();
+        li.setAttribute('data-action', 'click->room--poker#changeIssue');
+    }
+
+    async fetchRoomIssues(query, callback) {
+
+        const encodedQuery = encodeURIComponent(query);
+
+        const url = `${this.searchIssueUrlValue}?query=${encodedQuery}`;
+
+        try {
+            const data = JSON.parse(await get(url));
+
+            callback(data);
+        } catch (e) {
+            callback();
+        }
+
     }
 
     messageHandler(event) {
