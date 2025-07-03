@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <div data-controller="room--poker"
+        <div data-controller="room--poker confirm-modal"
              data-room--poker-url-value="{{ websocketUrl }}"
              data-room--poker-search-issue-url-value="{{ path('app_project_room_search_issues', {
                  id: project.id,
@@ -22,7 +22,7 @@
              }) }}"
              class="row"
         >
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <div data-room--poker-target="issueLoader" class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -31,7 +31,7 @@
                 <div data-room--poker-target="issueContent">
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <div class="card">
                     <div data-controller="tab" class="card-header">
                         <ul class="nav nav-tabs card-header-tabs">
@@ -107,12 +107,26 @@
                                                 roomId: room.id,
                                                 issueId: issue.id
                                             }) }}"
+                                            data-room--poker-remove-url-param="{{ path('app_project_room_remove_issue', {
+                                                id: project.id,
+                                                roomId: room.id,
+                                                issueId: issue.id
+                                            }) }}"
                                             data-room--poker-target="issue"
-                                            class="list-group-item strw-clickable {{ html_classes({
+                                            class="list-group-item strw-clickable d-flex justify-content-between align-items-center {{ html_classes({
                                                 'active': loop.index == 1
                                             }) }}"
                                         >
                                             {{ issue.prefixCodeTitle }}
+
+                                            <button class="btn btn-danger"
+                                                    data-action="confirm-modal#open"
+                                                    data-confirm-modal-callback-param="room--poker#removeIssue"
+                                                    data-confirm-modal-callback-attribute-param="data-room--poker-issue-id-param"
+                                                    data-confirm-modal-callback-value-param="{{ issue.id }}"
+                                            >
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </li>
                                     {% endfor %}
                                 </ul>
@@ -134,16 +148,26 @@
                 <li data-room--poker-id-param=""
                     data-room--poker-story-points-param=""
                     data-room--poker-url-param=""
+                    data-room--poker-remove-url-param=""
                     data-room--poker-target="issue"
-                    class="list-group-item strw-clickable"
+                    class="list-group-item strw-clickable d-flex justify-content-between align-items-center"
                 >
-                    <div class="d-flex justify-content-center">
+                    <div class="strw-loader d-flex justify-content-center">
                         <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
+                    <button class="btn btn-danger d-none"
+                            data-action="confirm-modal#open"
+                            data-confirm-modal-callback-param="room--poker#removeIssue"
+                            data-confirm-modal-callback-attribute-param="data-room--poker-issue-id-param"
+                            data-confirm-modal-callback-value-param=""
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </li>
             </template>
+            {% include 'common/confirm_modal.html.twig' %}
         </div>
     </div>
 {% endblock %}

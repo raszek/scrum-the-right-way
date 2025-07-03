@@ -38,6 +38,7 @@ export default class extends Controller {
                     return `
                     <div data-room--poker-story-point-param="${data.storyPoints}"
                          data-room--poker-url-param="${data.url}"
+                         data-room--poker-remove-url-param="${data.removeUrl}"
                     >
                       ${escape(data.text)}
                     </div>
@@ -45,6 +46,23 @@ export default class extends Controller {
                 }
             }
         });
+    }
+
+    async removeIssue(event) {
+        event.preventDefault();
+
+        const issueId = event.params.issueId;
+
+        const issueElement = this.findIssueElement(issueId);
+        if (!issueElement) {
+            throw new Error('Issue element not found');
+        }
+
+        const removeUrl = issueElement.getAttribute('data-room--poker-remove-url-param');
+
+        await post(removeUrl);
+
+        this.sendMessage('removeIssue', issueId);
     }
 
     async addIssue(value) {
@@ -55,10 +73,16 @@ export default class extends Controller {
 
         const clone = this.issueTemplateTarget.content.cloneNode(true);
 
+        const storyPoints = option.getAttribute('data-room--poker-story-point-param');
+        const url = option.getAttribute('data-room--poker-url-param');
+        const removeUrl = option.getAttribute('data-room--poker-remove-url-param');
+        const text = option.innerText.trim();
+
         const li = clone.firstElementChild;
         li.setAttribute('data-room--poker-id-param', value);
-        li.setAttribute('data-room--poker-story-points-param', option.getAttribute('data-room--poker-story-point-param'));
-        li.setAttribute('data-room--poker-url-param', option.getAttribute('data-room--poker-url-param'));
+        li.setAttribute('data-room--poker-story-points-param', storyPoints);
+        li.setAttribute('data-room--poker-url-param', url);
+        li.setAttribute('data-room--poker-remove-url-param', removeUrl);
 
         const formData = new FormData();
         formData.append('issueId', value);
@@ -68,8 +92,56 @@ export default class extends Controller {
         this.addIssueSelect.clear();
 
         await post(this.addIssueUrlValue, formData);
-        li.innerText = option.innerText.trim();
+
         li.setAttribute('data-action', 'click->room--poker#changeIssue');
+
+        const loader = li.querySelector('.strw-loader');
+        loader.remove();
+        const button = li.querySelector('button');
+        button.setAttribute('data-confirm-modal-callback-value-param', value);
+        button.classList.remove('d-none');
+
+        li.prepend(text);
+
+        const newIssue = {
+            value,
+            text,
+            storyPoints,
+            url,
+            removeUrl
+        };
+
+        this.sendMessage('addIssue', newIssue);
+    }
+
+    userRemovedIssue(issueId) {
+        const issueElement = this.findIssueElement(issueId);
+        if (!issueElement) {
+            throw new Error('Issue element not found');
+        }
+
+        issueElement.remove();
+    }
+
+    userAddedIssue(newIssue) {
+        const clone = this.issueTemplateTarget.content.cloneNode(true);
+
+        const li = clone.firstElementChild;
+        li.setAttribute('data-room--poker-id-param', newIssue.value);
+        li.setAttribute('data-room--poker-story-points-param', newIssue.storyPoints);
+        li.setAttribute('data-room--poker-url-param', newIssue.url);
+        li.setAttribute('data-room--poker-remove-url-param', newIssue.removeUrl);
+        li.setAttribute('data-action', 'click->room--poker#changeIssue');
+
+        const loader = li.querySelector('.strw-loader');
+        loader.remove();
+        const button = li.querySelector('button');
+        button.setAttribute('data-confirm-modal-callback-value-param', newIssue.value);
+        button.classList.remove('d-none');
+
+        li.prepend(newIssue.text);
+
+        this.issueContainerTarget.appendChild(li);
     }
 
     async fetchRoomIssues(query, callback) {
@@ -85,7 +157,6 @@ export default class extends Controller {
         } catch (e) {
             callback();
         }
-
     }
 
     messageHandler(event) {
@@ -113,6 +184,12 @@ export default class extends Controller {
                 break;
             case 'changeIssue':
                 this.setCurrentIssue(message.data);
+                break;
+            case 'addIssue':
+                this.userAddedIssue(message.data);
+                break;
+            case 'removeIssue':
+                this.userRemovedIssue(message.data);
                 break;
             case 'setStoryPoints':
                 this.userChangedStoryPoints(message.data);

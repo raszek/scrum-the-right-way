@@ -14,6 +14,14 @@ export class Room {
         }
     }
 
+    emit(loggedRoomUser, message) {
+        for (const roomUser of this.users.values()) {
+            if (loggedRoomUser.user.id !== roomUser.user.id) {
+                roomUser.socket.send(message);
+            }
+        }
+    }
+
     getUsers() {
         const users = [];
 
@@ -67,8 +75,8 @@ export class Room {
     }
 
     addIssue(roomUser, issue) {
-        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has added new issue ${issue.id}.`));
-        this.broadcast(RoomMessage.addIssueMessage(issue));
+        this.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has added new issue ${issue.value}.`));
+        this.emit(roomUser, RoomMessage.addIssueMessage(issue));
     }
 
     removeIssue(roomUser, issueId) {

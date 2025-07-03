@@ -48,6 +48,11 @@ readonly class RoomService
                 'roomId' => $roomId,
                 'issueId' => $issue->getId()->get(),
             ]),
+            'removeUrl' => $this->urlGenerator->generate('app_project_room_remove_issue', [
+                'id' => $issue->getProject()->getId()->get(),
+                'roomId' => $roomId,
+                'issueId' => $issue->getId()->get(),
+            ]),
         ]);
     }
 

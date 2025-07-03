@@ -25,7 +25,7 @@ readonly class RoomEditor
             throw new CannotAddRoomIssueException('Cannot add feature to room.');
         }
 
-        if ($this->room->getProject()->getId() !== $issue->getProject()->getId()) {
+        if (!$this->room->getProject()->getId()->equals($issue->getProject()->getId())) {
             throw new CannotAddRoomIssueException('Issue and room must belong to the same project.');
         }
 

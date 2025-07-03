@@ -20,6 +20,11 @@ readonly class Sqid
         return $this->integerId;
     }
 
+    public function equals(Sqid $id): bool
+    {
+        return $this->integerId === $id->integerId;
+    }
+
     public function __toString(): string
     {
         return $this->sqid;

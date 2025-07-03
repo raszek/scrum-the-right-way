@@ -95,9 +95,7 @@ class RoomIssueController extends Controller
 
         $room = $this->findRoom($roomId);
 
-        $roomIssue = $this->roomIssueRepository->findOneBy([
-            'id' => $issueId,
-        ]);
+        $roomIssue = $this->roomIssueRepository->findByIssueId($issueId, $roomId);
         if (!$roomIssue) {
             throw new NotFoundHttpException('Room issue not found');
         }

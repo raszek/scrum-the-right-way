@@ -3,6 +3,7 @@
 namespace App\Repository\Room;
 
 use App\Doctrine\Sqid;
+use App\Entity\Issue\Issue;
 use App\Entity\Project\Project;
 use App\Entity\Room\RoomIssue;
 use App\Helper\ArrayHelper;
@@ -59,5 +60,17 @@ class RoomIssueRepository extends ServiceEntityRepository
         $ids = array_column($query->getQuery()->getArrayResult(), 'id');
 
         return ArrayHelper::map($ids, fn(Sqid $id) => $id->integerId());
+    }
+
+    public function findByIssueId(string $issueId, string $roomId): ?RoomIssue
+    {
+        $query = $this->createQueryBuilder('roomIssue');
+
+        $query->where('roomIssue.issue = :issue');
+        $query->sqidParameter('issue', $issueId);
+        $query->andWhere('roomIssue.room = :room');
+        $query->sqidParameter('room', $roomId);
+
+        return $query->getQuery()->getOneOrNullResult();
     }
 }

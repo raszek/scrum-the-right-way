@@ -15,7 +15,11 @@ export default class extends Controller {
     }
 
     open(event) {
-        const modalIdentifier = event.params.id || this.DEFAULT_MODAL_ID;
+        event.stopPropagation();
+
+        const params = event.params;
+
+        const modalIdentifier = params.id || this.DEFAULT_MODAL_ID;
 
         const modal = this.modals[modalIdentifier];
         if (!modal) {
@@ -32,13 +36,29 @@ export default class extends Controller {
             throw new Error('Form in modal not found');
         }
 
-        if (!event.params.url) {
-            throw new Error('Url for form not found');
+        if (params.url) {
+            form.setAttribute('action', event.params.url);
+            form.setAttribute('method', 'post');
+        } else if (params.callback) {
+            form.setAttribute('data-action', 'confirm-modal#close ' + params.callback);
+            form.setAttribute(params.callbackAttribute, params.callbackValue);
+            form.setAttribute('data-confirm-modal-id-param', modalIdentifier);
+        } else {
+            throw new Error('No url or callback set');
         }
 
-        form.setAttribute('action', event.params.url);
-
         modal.show();
+    }
+
+    close(event) {
+        const modalIdentifier = event.params.id || this.DEFAULT_MODAL_ID;
+
+        const modal = this.modals[modalIdentifier];
+        if (!modal) {
+            throw new Error(`No modal found with identifier "${modalIdentifier}".`)
+        }
+
+        modal.hide();
     }
 
     findModalTarget(modalId) {
