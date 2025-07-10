@@ -73,7 +73,10 @@ export default class extends Controller {
 
         const clone = this.issueTemplateTarget.content.cloneNode(true);
 
-        const storyPoints = option.getAttribute('data-room--poker-story-point-param');
+        const storyPoints = option.getAttribute('data-room--poker-story-point-param') === 'null'
+            ? null
+            : option.getAttribute('data-room--poker-story-point-param');
+
         const url = option.getAttribute('data-room--poker-url-param');
         const removeUrl = option.getAttribute('data-room--poker-remove-url-param');
         const text = option.innerText.trim();
@@ -101,7 +104,8 @@ export default class extends Controller {
         button.setAttribute('data-confirm-modal-callback-value-param', value);
         button.classList.remove('d-none');
 
-        li.prepend(text);
+        this.changeIssueText(li, text);
+        this.changeStoryPointText(li, storyPoints);
 
         const newIssue = {
             value,
@@ -139,7 +143,8 @@ export default class extends Controller {
         button.setAttribute('data-confirm-modal-callback-value-param', newIssue.value);
         button.classList.remove('d-none');
 
-        li.prepend(newIssue.text);
+        this.changeIssueText(li, newIssue.text);
+        this.changeStoryPointText(li, newIssue.storyPoints);
 
         this.issueContainerTarget.appendChild(li);
     }
@@ -201,7 +206,40 @@ export default class extends Controller {
     }
 
     userChangedStoryPoints(storyPoints) {
-        this.selectTarget.value = storyPoints;
+        this.storyPointSelectTarget.value = storyPoints;
+
+        const activeIssue = this.findActiveIssue();
+        if (!activeIssue) {
+            throw new Error('Active issue not found');
+        }
+
+        this.changeStoryPointText(activeIssue, storyPoints);
+    }
+
+    changeIssueText(li, text) {
+        const p = li.querySelector('p');
+        if (!p) {
+            throw new Error('Issue text not found');
+        }
+
+        p.firstChild.nodeValue = text;
+    }
+
+    changeStoryPointText(li, storyPoints) {
+        const span = li.querySelector('span.strw-issue-story-points');
+        if (!span) {
+            throw new Error('Story points span not found');
+        }
+
+        span.innerText = this.issueStoryPointText(storyPoints);
+    }
+
+    issueStoryPointText(storyPoints) {
+        if (!storyPoints) {
+            return '(none)';
+        }
+
+        return `(${storyPoints} story points)`;
     }
 
     async updateStoryPoints(event) {
@@ -275,6 +313,16 @@ export default class extends Controller {
                 return issueTarget;
             }
         }
+        return undefined;
+    }
+
+    findActiveIssue() {
+        for (const issueTarget of this.issueTargets) {
+            if (issueTarget.classList.contains('active')) {
+                return issueTarget;
+            }
+        }
+
         return undefined;
     }
 

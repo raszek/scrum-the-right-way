@@ -114,11 +114,15 @@
                                             }) }}"
                                             data-room--poker-target="issue"
                                             class="list-group-item strw-clickable d-flex justify-content-between align-items-center {{ html_classes({
-                                                'active': loop.index == 1
+                                                'active': loop.index == 1,
                                             }) }}"
                                         >
-                                            {{ issue.prefixCodeTitle }}
-
+                                            <p>
+                                                {{ issue.prefixCodeTitle }}
+                                                <span class="strw-issue-story-points">
+                                                    ({{ issue.storyPoints ? issue.storyPoints ~ ' story points' : 'none' }})
+                                                </span>
+                                            </p>
                                             <button class="btn btn-danger"
                                                     data-action="confirm-modal#open"
                                                     data-confirm-modal-callback-param="room--poker#removeIssue"
@@ -157,6 +161,10 @@
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
+                    <p>
+                        <span class="strw-issue-story-points">
+                        </span>
+                    </p>
                     <button class="btn btn-danger d-none"
                             data-action="confirm-modal#open"
                             data-confirm-modal-callback-param="room--poker#removeIssue"
