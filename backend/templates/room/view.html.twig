@@ -20,6 +20,7 @@
                  id: project.id,
                  roomId: room.id
              }) }}"
+             data-room--poker-set-tab-url-value="{{ path('app_user_settings_set_room_tab') }}"
              class="row"
         >
             <div class="col-md-7">
@@ -36,18 +37,21 @@
                     <div data-controller="tab" class="card-header">
                         <ul class="nav nav-tabs card-header-tabs">
                             <li class="nav-item">
-                                <button class="nav-link active"
-                                        aria-current="true"
+                                <button class="nav-link {{ html_classes({'active': tab == 'users'}) }}"
                                         data-bs-target="#users"
                                         data-tab-target="tab"
+                                        data-action="room--poker#changeTab"
+                                        data-room--poker-tab-param="users"
                                 >
                                     Users
                                 </button>
                             </li>
                             <li class="nav-item">
-                                <button class="nav-link"
+                                <button class="nav-link {{ html_classes({'active': tab == 'issues'}) }}"
                                         data-bs-target="#issues"
                                         data-tab-target="tab"
+                                        data-action="room--poker#changeTab"
+                                        data-room--poker-tab-param="issues"
                                 >
                                     Issues
                                 </button>
@@ -56,7 +60,7 @@
                     </div>
                     <div class="card-body">
                         <div class="tab-content">
-                            <div class="tab-pane active" id="users">
+                            <div class="tab-pane" id="users">
                                 <div class="row row-gap-2 mb-3">
                                     <h3 class="text-center">Bet</h3>
                                     {% for storyPoint in recommendedStoryPoints %}
@@ -123,7 +127,7 @@
                                                     ({{ issue.storyPoints ? issue.storyPoints ~ ' story points' : 'none' }})
                                                 </span>
                                             </p>
-                                            <button class="btn btn-danger"
+                                            <button class="strw-room-issue-remove-button btn btn-danger"
                                                     data-action="confirm-modal#open"
                                                     data-confirm-modal-callback-param="room--poker#removeIssue"
                                                     data-confirm-modal-callback-attribute-param="data-room--poker-issue-id-param"
@@ -165,7 +169,7 @@
                         <span class="strw-issue-story-points">
                         </span>
                     </p>
-                    <button class="btn btn-danger d-none"
+                    <button class="strw-room-issue-remove-button btn btn-danger d-none"
                             data-action="confirm-modal#open"
                             data-confirm-modal-callback-param="room--poker#removeIssue"
                             data-confirm-modal-callback-attribute-param="data-room--poker-issue-id-param"

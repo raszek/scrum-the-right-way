@@ -4,6 +4,7 @@ namespace App\Service\Room;
 
 use App\Entity\Issue\Issue;
 use App\Enum\Issue\IssueTypeEnum;
+use App\Enum\Room\RoomTabEnum;
 use App\Helper\ArrayHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Room\RoomIssueRepository;
@@ -55,5 +56,4 @@ readonly class RoomService
             ]),
         ]);
     }
-
 }

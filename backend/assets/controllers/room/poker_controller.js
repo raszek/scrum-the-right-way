@@ -8,7 +8,8 @@ export default class extends Controller {
         url: String,
         token: String,
         searchIssueUrl: String,
-        addIssueUrl: String
+        addIssueUrl: String,
+        setTabUrl: String,
     }
 
     static targets = [
@@ -58,11 +59,27 @@ export default class extends Controller {
             throw new Error('Issue element not found');
         }
 
+        if (this.isActiveIssue(issueElement)) {
+            const firstNonActiveIssue = this.findFirstNonActiveIssue();
+            if (!firstNonActiveIssue) {
+                throw new Error('Cannot remove every issue from room');
+            }
+
+            this.changeIssueAction(firstNonActiveIssue, {
+                id: firstNonActiveIssue.getAttribute('data-room--poker-id-param'),
+                storyPoints: firstNonActiveIssue.getAttribute('data-room--poker-story-points-param') || undefined,
+            });
+        }
+
         const removeUrl = issueElement.getAttribute('data-room--poker-remove-url-param');
 
         await post(removeUrl);
 
         this.sendMessage('removeIssue', issueId);
+    }
+
+    isActiveIssue(issueElement) {
+        return issueElement.classList.contains('active');
     }
 
     async addIssue(value) {
@@ -93,6 +110,7 @@ export default class extends Controller {
         this.issueContainerTarget.appendChild(li);
 
         this.addIssueSelect.clear();
+        this.addIssueSelect.clearOptions();
 
         await post(this.addIssueUrlValue, formData);
 
@@ -106,6 +124,8 @@ export default class extends Controller {
 
         this.changeIssueText(li, text);
         this.changeStoryPointText(li, storyPoints);
+
+        this.updateRemoveIssueButtonState();
 
         const newIssue = {
             value,
@@ -125,6 +145,8 @@ export default class extends Controller {
         }
 
         issueElement.remove();
+
+        this.updateRemoveIssueButtonState();
     }
 
     userAddedIssue(newIssue) {
@@ -147,6 +169,8 @@ export default class extends Controller {
         this.changeStoryPointText(li, newIssue.storyPoints);
 
         this.issueContainerTarget.appendChild(li);
+
+        this.updateRemoveIssueButtonState();
     }
 
     async fetchRoomIssues(query, callback) {
@@ -289,12 +313,20 @@ export default class extends Controller {
     }
 
     changeIssue(event) {
-        this.activateIssue(event.currentTarget);
+        if (this.isActiveIssue(event.currentTarget)) {
+            return;
+        }
 
         const issue = {
             id: event.params.id,
             storyPoints: event.params.storyPoints || undefined,
         };
+
+        this.changeIssueAction(event.currentTarget, issue);
+    }
+
+    changeIssueAction(element, issue) {
+        this.activateIssue(element);
 
         this.sendMessage('changeIssue', issue);
     }
@@ -319,6 +351,16 @@ export default class extends Controller {
     findActiveIssue() {
         for (const issueTarget of this.issueTargets) {
             if (issueTarget.classList.contains('active')) {
+                return issueTarget;
+            }
+        }
+
+        return undefined;
+    }
+
+    findFirstNonActiveIssue() {
+        for (const issueTarget of this.issueTargets) {
+            if (!issueTarget.classList.contains('active')) {
                 return issueTarget;
             }
         }
@@ -456,5 +498,46 @@ export default class extends Controller {
 
     resetBets() {
         this.sendMessage('resetBets');
+    }
+
+    hideRemoveButtons(issueElements) {
+        for (const issueElement of issueElements) {
+            const removeButton = issueElement.querySelector('.strw-room-issue-remove-button');
+
+            if (!removeButton) {
+                throw new Error('Remove button not found');
+            }
+
+            removeButton.classList.add('d-none');
+        }
+    }
+
+    showRemoveButtons(issueElements) {
+        for (const issueElement of issueElements) {
+            const removeButton = issueElement.querySelector('.strw-room-issue-remove-button');
+
+            if (!removeButton) {
+                throw new Error('Remove button not found');
+            }
+
+            removeButton.classList.remove('d-none');
+        }
+    }
+
+    updateRemoveIssueButtonState() {
+        if (this.issueTargets.length <= 1) {
+            this.hideRemoveButtons(this.issueTargets);
+        } else {
+            this.showRemoveButtons(this.issueTargets);
+        }
+    }
+
+    changeTab(event) {
+        const tab = event.params.tab;
+
+        const formData = new FormData();
+        formData.append('tab', tab);
+
+        return post(this.setTabUrlValue, formData);
     }
 }

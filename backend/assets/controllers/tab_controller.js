@@ -10,9 +10,15 @@ export default class extends Controller {
             const tabTrigger = new Tab(tabElement);
 
             tabElement.addEventListener('click', (event) => {
-                event.preventDefault()
-                tabTrigger.show()
+                event.preventDefault();
+                tabTrigger.show();
             });
+
+            if (tabElement.classList.contains('active')) {
+                tabTrigger.show();
+                const tabContent = document.querySelector(tabElement.getAttribute('data-bs-target'));
+                tabContent.classList.add('active');
+            }
         }
     }
 
