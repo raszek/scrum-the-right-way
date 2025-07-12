@@ -24,6 +24,7 @@ export default class extends Controller {
         'issueTemplate',
         'issueContainer',
         'storyPointSelect',
+        'storyPointAverage',
     ];
 
     connect() {
@@ -47,6 +48,50 @@ export default class extends Controller {
                 }
             }
         });
+    }
+
+    messageHandler(event) {
+        const message = JSON.parse(event.data);
+        console.log('Got message: ', message);
+
+        switch (message.type) {
+            case 'chat':
+                this.chatMessage(message.data);
+                break;
+            case 'join':
+                this.addUser(message.data);
+                break;
+            case 'leave':
+                this.removeUser(message.data);
+                break;
+            case 'remove':
+                this.userHasBeenKicked(message.data);
+                break;
+            case 'roomState':
+                this.setRoomState(message.data);
+                break;
+            case 'bet':
+                this.userMadeBet(message.data);
+                break;
+            case 'showBets':
+                this.displayBets(message.data);
+                break;
+            case 'changeIssue':
+                this.setCurrentIssue(message.data);
+                break;
+            case 'addIssue':
+                this.userAddedIssue(message.data);
+                break;
+            case 'removeIssue':
+                this.userRemovedIssue(message.data);
+                break;
+            case 'setStoryPoints':
+                this.userChangedStoryPoints(message.data);
+                break;
+            case 'resetBets':
+                this.userResetBets();
+                break;
+        }
     }
 
     async removeIssue(event) {
@@ -188,46 +233,6 @@ export default class extends Controller {
         }
     }
 
-    messageHandler(event) {
-        const message = JSON.parse(event.data);
-        console.log('Got message: ', message);
-
-        switch (message.type) {
-            case 'chat':
-                this.chatMessage(message.data);
-                break;
-            case 'join':
-                this.addUser(message.data);
-                break;
-            case 'leave':
-                this.removeUser(message.data);
-                break;
-            case 'roomState':
-                this.setRoomState(message.data);
-                break;
-            case 'bet':
-                this.userMadeBet(message.data);
-                break;
-            case 'showBets':
-                this.displayBets(message.data);
-                break;
-            case 'changeIssue':
-                this.setCurrentIssue(message.data);
-                break;
-            case 'addIssue':
-                this.userAddedIssue(message.data);
-                break;
-            case 'removeIssue':
-                this.userRemovedIssue(message.data);
-                break;
-            case 'setStoryPoints':
-                this.userChangedStoryPoints(message.data);
-                break;
-            case 'resetBets':
-                this.userResetBets();
-                break;
-        }
-    }
 
     userChangedStoryPoints(storyPoints) {
         this.storyPointSelectTarget.value = storyPoints;
@@ -458,6 +463,7 @@ export default class extends Controller {
     }
 
     displayBets(users) {
+        let storyPointSum = 0;
         for (const user of users) {
             const userElement = this.findUserElement(user);
             if (!userElement) {
@@ -470,7 +476,16 @@ export default class extends Controller {
             }
 
             betElement.innerHTML = user.bet.value;
+            storyPointSum += user.bet.value;
         }
+
+        if (users.length === 0) {
+            throw new Error('No users found');
+        }
+
+        const average = storyPointSum / users.length;
+
+        this.storyPointAverageTarget.innerText = `Average ${average} story points`;
     }
 
     makeBetSelected(betElement) {
@@ -493,6 +508,8 @@ export default class extends Controller {
 
     userResetBets() {
         this.removeBets()
+
+        this.storyPointAverageTarget.innerText = '';
     }
 
 
@@ -539,5 +556,9 @@ export default class extends Controller {
         formData.append('tab', tab);
 
         return post(this.setTabUrlValue, formData);
+    }
+
+    userHasBeenKicked() {
+        this.element.innerHTML = `<div class="col-12">You are removed from the room. Reason: Someone connected the room using your account</div>`;
     }
 }

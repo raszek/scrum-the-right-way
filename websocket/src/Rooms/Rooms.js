@@ -40,6 +40,29 @@ export class Rooms {
         room.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has left room ${roomId}`));
     }
 
+    remove(roomUser, roomId) {
+        const room = this.rooms.get(roomId);
+        if (!room) {
+            return;
+        }
+
+        roomUser.socket.send(RoomMessage.removeMessage(roomUser.user));
+
+        room.removeUser(roomUser);
+
+        room.broadcast(RoomMessage.leaveMessage(roomUser.user));
+        room.broadcast(RoomMessage.chatMessage(`${roomUser.user.fullName} has been removed from room ${roomId}`));
+    }
+
+    findRoomUser(userId, roomId) {
+        const room = this.rooms.get(roomId);
+        if (!room) {
+            return;
+        }
+
+        return room.findUser(userId);
+    }
+
     handleMessage(roomUser, roomId, message) {
         const room = this.rooms.get(roomId);
         if (!room) {

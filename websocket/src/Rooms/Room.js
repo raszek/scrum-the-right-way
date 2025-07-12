@@ -50,6 +50,16 @@ export class Room {
         this.users.add(roomUser);
     }
 
+    findUser(userId) {
+        for (const roomUser of this.users.values()) {
+            if (roomUser.user.id === userId) {
+                return roomUser;
+            }
+        }
+
+        return undefined;
+    }
+
     makeBet(roomUser, bet) {
         roomUser.makeBet(bet);
 

@@ -33,6 +33,11 @@ const routes = function (fastify, _, done) {
 
         request.log.info(`User connected to room ${roomId}`);
 
+        const roomUserAlreadyExist = rooms.findRoomUser(request.user.id, roomId);
+        if (roomUserAlreadyExist) {
+            rooms.remove(roomUserAlreadyExist, roomId);
+        }
+
         const roomUser = new RoomUser(socket, request.user);
 
         rooms.join(roomUser, roomId, fastify.initIssue);

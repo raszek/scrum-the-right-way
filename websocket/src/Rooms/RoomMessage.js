@@ -21,6 +21,13 @@ export class RoomMessage {
         });
     }
 
+    static removeMessage(user) {
+        return RoomMessage.message({
+            type: 'remove',
+            data: user,
+        });
+    }
+
     static roomStateMessage(users, issue) {
         return RoomMessage.message({
             type: 'roomState',
