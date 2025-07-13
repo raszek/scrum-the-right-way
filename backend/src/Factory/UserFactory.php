@@ -3,6 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\User\User;
+use App\Enum\User\UserRoleEnum;
 use DateTimeImmutable;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -21,6 +22,11 @@ final class UserFactory extends PersistentProxyObjectFactory
     public static function class(): string
     {
         return User::class;
+    }
+
+    public function withAdminRole(): static
+    {
+        return $this->with(['roles' => [UserRoleEnum::Admin->value]]);
     }
 
     protected function defaults(): array|callable

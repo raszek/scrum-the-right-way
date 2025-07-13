@@ -2,6 +2,7 @@
 
 namespace App\Service\Menu;
 
+use App\Entity\User\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class MenuDataProvider
@@ -12,12 +13,16 @@ readonly class MenuDataProvider
     ) {
     }
 
-    public function getLinks(string $currentPath): array
+    public function getLinks(string $currentPath, User $user): array
     {
         $links = [];
-        foreach ($this->getMenuLinks() as $menuLink) {
+        foreach ($this->getMenuLinks($user) as $menuLink) {
+            if (isset($menuLink['canBeAccessed']) && $menuLink['canBeAccessed'] === false) {
+                continue;
+            }
+
             $links[] = [
-                'isActive' => $menuLink['url'] === $currentPath,
+                'isActive' => isset($menuLink['url']) && $menuLink['url'] === $currentPath,
                 ...$menuLink
             ];
         }
@@ -25,13 +30,23 @@ readonly class MenuDataProvider
         return $links;
     }
 
-    private function getMenuLinks(): array
+    private function getMenuLinks(User $user): array
     {
         return [
             [
                 'url' => $this->urlGenerator->generate('app_project_list'),
-                'label' => 'Projects'
-            ]
+                'label' => 'Projects',
+            ],
+            [
+                'label' => 'Admin',
+                'submenu' => [
+                    [
+                        'url' => $this->urlGenerator->generate('app_admin_user_list'),
+                        'label' => 'Users'
+                    ]
+                ],
+                'canBeAccessed' => $user->isAdmin(),
+            ],
         ];
     }
 }

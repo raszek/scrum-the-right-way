@@ -5,6 +5,11 @@ namespace App\Helper;
 class ArrayHelper
 {
 
+    public static function inArray(mixed $needle, array $haystack): bool
+    {
+        return in_array($needle, $haystack, strict: true);
+    }
+
     public static function map(array $items, callable $callback): array
     {
         return array_map($callback, $items);

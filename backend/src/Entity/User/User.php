@@ -5,6 +5,8 @@ namespace App\Entity\User;
 use App\Doctrine\Sqid;
 use App\Entity\Issue\Issue;
 use App\Entity\Project\ProjectMember;
+use App\Enum\User\UserRoleEnum;
+use App\Helper\ArrayHelper;
 use App\Repository\User\UserRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -252,5 +254,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setInProgressIssue(?Issue $inProgressIssue): void
     {
         $this->inProgressIssue = $inProgressIssue;
+    }
+
+    public function isAdmin(): bool
+    {
+        return ArrayHelper::inArray(UserRoleEnum::Admin->value, $this->roles);
     }
 }

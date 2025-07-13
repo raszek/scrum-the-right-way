@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-
 use App\Entity\Project\Project;
 use App\Repository\User\UserNotificationRepository;
 use App\Service\Menu\MenuDataProvider;
@@ -36,7 +35,7 @@ class MenuController extends Controller
         $unreadNotificationCount = $this->userNotificationRepository->unreadNotificationCountForUser($this->getLoggedInUser());
 
         return $this->render('menu/top_menu.html.twig', [
-            'links' => $this->menuDataProvider->getLinks($currentPath),
+            'links' => $this->menuDataProvider->getLinks($currentPath, $this->getLoggedInUser()),
             'unreadNotificationCount' => $unreadNotificationCount
         ]);
     }

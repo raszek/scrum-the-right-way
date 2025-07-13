@@ -6,6 +6,7 @@ use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Helper\ArrayHelper;
 use App\Repository\QueryBuilder\QueryBuilder;
+use App\Table\User\UserRecord;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -149,6 +150,18 @@ class UserRepository extends ServiceEntityRepository
         $queryBuilder
             ->where('user.id IN (:ids)')
             ->sqidsParameter('ids', $ids);
+
+        return $queryBuilder;
+    }
+
+    public function listUserQuery(): QueryBuilder
+    {
+        $queryBuilder = $this->createQueryBuilder('user');
+
+        $queryBuilder
+            ->select(sprintf("NEW %s(user.id, user.email, concat(user.firstName, ' ', user.lastName))", UserRecord::class))
+            ->addSelect("concat(user.firstName, ' ', user.lastName) as HIDDEN fullName")
+            ->orderBy('user.id', 'DESC');
 
         return $queryBuilder;
     }

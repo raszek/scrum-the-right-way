@@ -272,7 +272,7 @@ class RoomIssueControllerTest extends WebTestCase
             'room' => $room,
         ]);
 
-        $secondRoomIssue = RoomIssueFactory::createOne([
+        RoomIssueFactory::createOne([
             'issue' => $secondIssue,
             'room' => $room,
         ]);
@@ -283,7 +283,7 @@ class RoomIssueControllerTest extends WebTestCase
             '/projects/%s/rooms/%s/issues/%s/remove',
             $project->getId(),
             $room->getId(),
-            $secondRoomIssue->getId()->get()
+            $secondIssue->getId()->get()
         );
 
         $client->request('POST', $url);
@@ -292,6 +292,4 @@ class RoomIssueControllerTest extends WebTestCase
 
         $this->assertCount(1, $room->getRoomIssues());
     }
-
-
 }

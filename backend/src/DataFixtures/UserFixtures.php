@@ -4,20 +4,19 @@ namespace App\DataFixtures;
 
 use App\Factory\UserFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 
 class UserFixtures extends Fixture
 {
-    const PROJECT_ADMIN_EMAIL = 'projectadmin@example.com';
+    const string PROJECT_ADMIN_EMAIL = 'projectadmin@example.com';
 
-    const CLIENT_EMAIL = 'client@example.com';
+    const string CLIENT_EMAIL = 'client@example.com';
 
-    const ANALYTIC_EMAIL = 'analytic@example.com';
+    const string ANALYTIC_EMAIL = 'analytic@example.com';
 
-    const DEVELOPER_EMAIL = 'developer@example.com';
+    const string DEVELOPER_EMAIL = 'developer@example.com';
 
-    const TESTER_EMAIL = 'tester@example.com';
+    const string TESTER_EMAIL = 'tester@example.com';
 
     /**
      * @return string[]
@@ -41,6 +40,13 @@ class UserFixtures extends Fixture
                 'plainPassword' => 'Password123!',
             ]);
         }
+
+        UserFactory::new()
+            ->withAdminRole()
+            ->create([
+                'email' => 'admin@example.com',
+                'plainPassword' => 'Password123!'
+            ]);
 
         UserFactory::createMany(15, [
             'plainPassword' => 'Password123!',

@@ -1,0 +1,21 @@
+{% extends 'layout/layout.html.twig' %}
+
+{% set page_title = 'User list' %}
+
+{% block content %}
+    <div class="container-fluid">
+        {% include 'common/page_header.html.twig' %}
+
+        <div class="row">
+            <div class="col-12">
+                <a href="#" class="btn btn-primary">Create user</a>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                {% include 'common/table.html.twig' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

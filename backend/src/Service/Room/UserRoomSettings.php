@@ -19,10 +19,13 @@ readonly class UserRoomSettings
     {
         $session = $this->requestStack->getSession();
 
-        $session->get(self::ROOM_SELECTED_TAB_KEY);
+        $tab = $session->get(self::ROOM_SELECTED_TAB_KEY);
 
-        return RoomTabEnum::tryFrom($session->get(self::ROOM_SELECTED_TAB_KEY))
-            ?? RoomTabEnum::Users;
+        if (!$tab) {
+            return RoomTabEnum::Users;
+        }
+
+        return RoomTabEnum::tryFrom($tab);
     }
 
     public function setTab(RoomTabEnum $tabEnum): void

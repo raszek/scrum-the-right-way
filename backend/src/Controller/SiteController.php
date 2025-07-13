@@ -46,30 +46,6 @@ class SiteController extends Controller
         ]);
     }
 
-    #[Route('/register', name: 'app_register')]
-    public function register(Request $request): Response
-    {
-        $registerForm = $this->createForm(RegisterType::class);
-
-        $registerForm->handleRequest($request);
-        
-        if ($registerForm->isSubmitted() && $registerForm->isValid()) {
-            /**
-             * @var RegisterForm $data
-             */
-            $data = $registerForm->getData();
-            $this->siteService->register($data);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'You successfully created account. Confirmation mail was sent to your email address.');
-            return $this->redirectToRoute('app_register');
-        }
-
-        return $this->render('site/register.html.twig', [
-            'registerForm' => $registerForm
-        ]);
-    }
-
     #[Route('/activate-account/{email}/{activationCode}', name: 'app_activate_account')]
     public function activateAccount(string $email, string $activationCode): Response
     {

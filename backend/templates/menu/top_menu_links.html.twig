@@ -1,7 +1,22 @@
 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
     {% for link in links %}
-        <li class="nav-item">
-            <a class="nav-link {{ link.isActive ? 'active' : '' }}" aria-current="page" href="{{ link.url }}">{{ link.label }}</a>
-        </li>
+        {% if link.submenu is defined %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ link.label }}
+                </a>
+                <ul class="dropdown-menu">
+                    {% for sublink in link.submenu %}
+                        <li>
+                            <a class="dropdown-item" href="{{ sublink.url }}">{{ sublink.label }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a class="nav-link {{ link.isActive ? 'active' : '' }}" aria-current="page" href="{{ link.url }}">{{ link.label }}</a>
+            </li>
+        {% endif %}
     {% endfor %}
 </ul>
