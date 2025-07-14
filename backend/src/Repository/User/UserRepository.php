@@ -32,11 +32,9 @@ class UserRepository extends ServiceEntityRepository
 
     public function create(User $user): void
     {
-        $passwordHash = $this->userPasswordHasher->hashPassword($user, $user->getPlainPassword());
-
-        $user->setPasswordHash($passwordHash);
-
         $this->getEntityManager()->persist($user);
+
+        $this->getEntityManager()->flush();
     }
 
     /**

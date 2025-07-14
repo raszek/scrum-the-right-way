@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Form\Site;
+namespace App\Form\User;
 
 use App\Entity\User\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[UniqueEntity('email', entityClass: User::class)]
-class RegisterForm
+class CreateUserForm
 {
 
     public function __construct(
@@ -20,10 +20,6 @@ class RegisterForm
 
         #[Assert\NotBlank]
         public ?string $lastName = null,
-
-        #[Assert\NotBlank]
-        #[Assert\Length(min: 8)]
-        public $password = null,
     ) {
     }
 

@@ -2,9 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Action\User\CreateUser;
 use App\Action\User\ListUsers;
 use App\Controller\Controller;
-use App\Form\Site\RegisterType;
+use App\Form\User\CreateUserForm;
+use App\Form\User\CreateUserType;
 use App\Table\QueryParams;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,26 +30,23 @@ class UserController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    #[Route('/users/create', name: 'app_admin_user_create')]
+    public function create(CreateUser $createUser, Request $request): Response
     {
-        $registerForm = $this->createForm(RegisterType::class);
+        $form = $this->createForm(CreateUserType::class);
 
-        $registerForm->handleRequest($request);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
 
-        if ($registerForm->isSubmitted() && $registerForm->isValid()) {
-            /**
-             * @var RegisterForm $data
-             */
-            $data = $registerForm->getData();
-            $this->siteService->register($data);
-            $this->entityManager->flush();
+            $createUser->execute($form->getData());
 
-            $this->addFlash('success', 'You successfully created account. Confirmation mail was sent to your email address.');
-            return $this->redirectToRoute('app_register');
+            $this->addFlash('success', 'User successfully created. Welcome email was sent to user.');
+            return $this->redirectToRoute('app_admin_user_list');
         }
 
-        return $this->render('site/register.html.twig', [
-            'registerForm' => $registerForm
+        return $this->render('user/create.html.twig', [
+            'form' => $form
         ]);
     }
 

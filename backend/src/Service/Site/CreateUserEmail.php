@@ -7,7 +7,7 @@ use App\Service\Common\DefaultMailer;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 #[Autoconfigure(public: true)]
-class RegisterMail
+class CreateUserEmail
 {
 
     public function __construct(
@@ -22,7 +22,7 @@ class RegisterMail
 
         $email
             ->to($user->getEmail())
-            ->subject('Thanks for signing up!')
+            ->subject('Your account has been created')
             ->htmlTemplate('emails/site/register.html.twig')
             ->context([
                 'user' => $user,

@@ -4,8 +4,8 @@ namespace App\Service\Site;
 
 use App\Entity\User\User;
 use App\Exception\Site\UserNotFoundException;
-use App\Form\Site\RegisterForm;
 use App\Form\Site\ResetPasswordForm;
+use App\Form\User\CreateUserForm;
 use App\Repository\User\UserRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\ByteString;
@@ -15,26 +15,9 @@ readonly class SiteService
 
     public function __construct(
         private UserRepository $userRepository,
-        private RegisterMail $registerMail,
         private ForgotPasswordMail $forgotPasswordMail,
         private UserPasswordHasherInterface $userPasswordHasher
     ) {
-    }
-
-    public function register(RegisterForm $registerForm): void
-    {
-        $user = new User(
-            email: $registerForm->email,
-            plainPassword: $registerForm->password,
-            firstName: $registerForm->firstName,
-            lastName: $registerForm->lastName,
-            createdAt: new \DateTimeImmutable(),
-            activationCode: ByteString::fromRandom(64)->toString()
-        );
-
-        $this->userRepository->create($user);
-
-        $this->registerMail->send($user);
     }
 
     public function activateUser(User $user): void
@@ -65,5 +48,4 @@ readonly class SiteService
         $user->setPasswordHash($passwordHash);
         $user->setResetPasswordCode(null);
     }
-
 }

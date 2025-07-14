@@ -5,8 +5,6 @@ namespace App\Controller;
 use App\Exception\Site\UserNotFoundException;
 use App\Form\Site\ForgotPasswordForm;
 use App\Form\Site\ForgotPasswordType;
-use App\Form\Site\RegisterForm;
-use App\Form\Site\RegisterType;
 use App\Form\Site\ResetPasswordForm;
 use App\Form\Site\ResetPasswordType;
 use App\Repository\User\UserRepository;

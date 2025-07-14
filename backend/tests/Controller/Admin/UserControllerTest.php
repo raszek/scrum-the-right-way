@@ -5,7 +5,7 @@ namespace App\Tests\Controller\Admin;
 use App\Entity\User\User;
 use App\Factory\UserFactory;
 use App\Repository\User\UserRepository;
-use App\Service\Site\RegisterMail;
+use App\Service\Site\CreateUserEmail;
 use App\Tests\Controller\WebTestCase;
 
 class UserControllerTest extends WebTestCase
@@ -42,13 +42,15 @@ class UserControllerTest extends WebTestCase
     /** @test */
     public function admin_can_create_user()
     {
-        $this->markTestSkipped();
-
         $client = static::createClient();
         $client->followRedirects();
         $client->disableReboot();
 
-        $registerMailMock = new class extends RegisterMail
+        $admin = UserFactory::new()
+            ->withAdminRole()
+            ->create();
+
+        $registerMailMock = new class extends CreateUserEmail
         {
             public function __construct()
             {
@@ -62,23 +64,23 @@ class UserControllerTest extends WebTestCase
             }
         };
 
-        $this->mockService(RegisterMail::class, $registerMailMock);
+        $this->mockService(CreateUserEmail::class, $registerMailMock);
 
-        $crawler = $this->goToPageSafe('/register');
+        $this->loginAsUser($admin);
 
-        $form = $crawler->selectButton('Register')->form();
+        $crawler = $this->goToPageSafe('/admin/users/create');
+
+        $form = $crawler->selectButton('Create')->form();
 
         $client->submit($form, [
-            'register[email]' => 'raszek@wp.pl',
-            'register[firstName]' => 'Donald',
-            'register[lastName]' => 'Smith',
-            'register[password][first]' => 'Password123!',
-            'register[password][second]' => 'Password123!',
+            'create_user[email]' => 'raszek@wp.pl',
+            'create_user[firstName]' => 'Donald',
+            'create_user[lastName]' => 'Smith',
         ]);
 
         $this->assertResponseIsSuccessful();
 
-        $this->assertResponseHasText('You successfully created account. Confirmation mail was sent to your email address.');
+        $this->assertResponseHasText('User successfully created. Welcome email was sent to user.');
 
         $createdUser = $this->userRepository()->findOneBy([
             'email' => 'raszek@wp.pl'

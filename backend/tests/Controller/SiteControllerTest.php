@@ -5,7 +5,7 @@ namespace App\Tests\Controller;
 use App\Entity\User\User;
 use App\Factory\UserFactory;
 use App\Repository\User\UserRepository;
-use App\Service\Site\RegisterMail;
+use App\Service\Site\CreateUserEmail;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class SiteControllerTest extends WebTestCase

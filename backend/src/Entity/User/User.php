@@ -38,7 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $activationCode = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $passwordHash = null;
 
     #[ORM\Column(type: 'json')]
@@ -57,21 +57,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ProjectMember::class, mappedBy: 'user')]
     private Collection $projectMembers;
 
-    #[ORM\OneToMany(targetEntity: UserNotification::class, mappedBy: 'forUser')]
-    private Collection $notifications;
+    #[ORM\OneToMany(targetEntity: UserNotification::class, mappedBy: 'forUser')] private Collection $notifications;
 
     private ?string $plainPassword = null;
 
     public function __construct(
         string $email,
-        string $plainPassword,
         string $firstName,
         string $lastName,
         DateTimeImmutable $createdAt,
         ?string $activationCode = null,
     ) {
         $this->email = $email;
-        $this->plainPassword = $plainPassword;
         $this->createdAt = $createdAt;
         $this->activationCode = $activationCode;
         $this->firstName = $firstName;
@@ -191,7 +188,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isActive(): bool
     {
-        return $this->activationCode === null;
+        return $this->activationCode === null && $this->passwordHash !== null;
     }
 
     public function getFullName(): string
