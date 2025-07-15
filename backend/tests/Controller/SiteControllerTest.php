@@ -2,10 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\User\User;
 use App\Factory\UserFactory;
 use App\Repository\User\UserRepository;
-use App\Service\Site\CreateUserEmail;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class SiteControllerTest extends WebTestCase
@@ -164,16 +162,37 @@ class SiteControllerTest extends WebTestCase
 
         UserFactory::createOne([
             'email' => 'test@test.com',
-            'activationCode' => 'some-activation-code'
+            'activationCode' => 'some-activation-code',
+            'plainPassword' => null
         ]);
 
-        $this->goToPage('/activate-account/test@test.com/some-activation-code');
+        $crawler = $this->goToPageSafe( '/activate-account/test@test.com/some-activation-code');
+
+        $form = $crawler->selectButton('Reset')->form();
+
+        $client->submit($form, [
+            'reset_password[password][first]' => 'NewPass123!',
+            'reset_password[password][second]' => 'NewPass123!',
+            'reset_password[email]' => 'test@test.com',
+            'reset_password[resetPasswordCode]' => 'some-activation-code'
+        ]);
 
         $this->assertResponseIsSuccessful();
 
         $this->assertPath('/login');
 
-        $this->assertResponseHasText('Account successfully activated');
+        $this->assertResponseHasText('Account successfully activated. You can now log in.');
+
+        $updatedUser = $this->userRepository()->findOneBy([
+            'email' => 'test@test.com'
+        ]);
+
+        $this->assertNotNull($updatedUser);
+        $this->assertNull($updatedUser->getResetPasswordCode());
+
+        $isPasswordValid = $this->getUserPasswordHasher()->isPasswordValid($updatedUser, 'NewPass123!');
+
+        $this->assertTrue($isPasswordValid);
     }
 
     private function userRepository(): UserRepository

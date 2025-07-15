@@ -163,4 +163,9 @@ class UserRepository extends ServiceEntityRepository
 
         return $queryBuilder;
     }
+
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
 }

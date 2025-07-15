@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Action\Site\ActivateUser;
 use App\Exception\Site\UserNotFoundException;
 use App\Form\Site\ForgotPasswordForm;
 use App\Form\Site\ForgotPasswordType;
@@ -45,23 +46,25 @@ class SiteController extends Controller
     }
 
     #[Route('/activate-account/{email}/{activationCode}', name: 'app_activate_account')]
-    public function activateAccount(string $email, string $activationCode): Response
+    public function activateAccount(ActivateUser $activateUser, Request $request): Response
     {
-        $user = $this->userRepository->findOneBy([
-            'email' => $email,
-            'activationCode' => $activationCode
-        ]);
+        $form = $this->createForm(ResetPasswordType::class, new ResetPasswordForm(
+            resetPasswordCode: $request->get('activationCode'),
+            email: $request->get('email')
+        ));
 
-        if (!$user) {
-            throw new NotFoundHttpException('Page not found');
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $activateUser->execute($form->getData());
+
+            $this->addFlash('success', 'Account successfully activated. You can now log in.');
+            return $this->redirect('/login');
         }
 
-        $this->siteService->activateUser($user);
-        $this->entityManager->flush();
-
-        $this->addFlash('success', 'Account successfully activated');
-
-        return $this->redirect('/login');
+        return $this->render('site/reset_password.html.twig', [
+            'form' => $form
+        ]);
     }
 
     #[Route('/forgot-password', name: 'app_forgot_password')]
