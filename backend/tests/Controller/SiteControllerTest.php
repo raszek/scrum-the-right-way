@@ -188,7 +188,7 @@ class SiteControllerTest extends WebTestCase
         ]);
 
         $this->assertNotNull($updatedUser);
-        $this->assertNull($updatedUser->getResetPasswordCode());
+        $this->assertNull($updatedUser->getActivationCode());
 
         $isPasswordValid = $this->getUserPasswordHasher()->isPasswordValid($updatedUser, 'NewPass123!');
 

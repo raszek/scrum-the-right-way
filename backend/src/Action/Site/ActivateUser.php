@@ -29,7 +29,7 @@ readonly class ActivateUser
         }
 
         $user->setPasswordHash($this->userPasswordHasher->hashPassword($user, $form->password));
-        $user->setResetPasswordCode(null);
+        $user->setActivationCode(null);
 
         $this->userRepository->flush();
     }
