@@ -3,7 +3,7 @@
 namespace App\Action\User;
 
 use App\Entity\User\User;
-use App\Form\User\CreateUserForm;
+use App\Form\User\CommonUserForm;
 use App\Repository\User\UserRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Site\CreateUserEmail;
@@ -19,7 +19,7 @@ readonly class CreateUser
     ) {
     }
 
-    public function execute(CreateUserForm $form): User
+    public function execute(CommonUserForm $form): User
     {
         $user = new User(
             email: $form->email,

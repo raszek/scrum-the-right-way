@@ -1,0 +1,10 @@
+<div class="dropdown">
+    <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-three-dots"></i>
+    </button>
+    <ul class="dropdown-menu">
+        {% for action in actions %}
+            <li><a class="dropdown-item" href="{{ path(action.route, action.routeParameters) }}">{{ action.label }}</a></li>
+        {% endfor %}
+    </ul>
+</div>

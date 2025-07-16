@@ -73,9 +73,9 @@ class UserControllerTest extends WebTestCase
         $form = $crawler->selectButton('Create')->form();
 
         $client->submit($form, [
-            'create_user[email]' => 'raszek@wp.pl',
-            'create_user[firstName]' => 'Donald',
-            'create_user[lastName]' => 'Smith',
+            'common_user[email]' => 'raszek@wp.pl',
+            'common_user[firstName]' => 'Donald',
+            'common_user[lastName]' => 'Smith',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -96,23 +96,25 @@ class UserControllerTest extends WebTestCase
     /** @test */
     public function admin_cannot_create_account_with_existing_email()
     {
-        $this->markTestSkipped();
-
         $client = static::createClient();
         $client->followRedirects();
 
-        UserFactory::createOne([
-            'email' => 'raszek@wp.pl',
-        ]);
+        $admin = UserFactory::new()
+            ->withAdminRole()
+            ->create([
+                'email' => 'raszek@wp.pl'
+            ]);
 
-        $crawler = $this->goToPageSafe('/register');
+        $this->loginAsUser($admin);
 
-        $form = $crawler->selectButton('Register')->form();
+        $crawler = $this->goToPageSafe('/admin/users/create');
+
+        $form = $crawler->selectButton('Create')->form();
 
         $client->submit($form, [
-            'register[email]' => 'raszek@wp.pl',
-            'register[password][first]' => 'Password123!',
-            'register[password][second]' => 'Password123!',
+            'common_user[email]' => 'raszek@wp.pl',
+            'common_user[firstName]' => 'Donald',
+            'common_user[lastName]' => 'Smith',
         ]);
 
         $this->assertResponseStatusCodeSame(422);
@@ -122,6 +124,78 @@ class UserControllerTest extends WebTestCase
         $this->assertEquals(1, $userCount);
 
         $this->assertResponseHasText('This value is already used.');
+    }
+
+    /** @test */
+    public function admin_can_update_user()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $admin = UserFactory::new()
+            ->withAdminRole()
+            ->create([
+                'email' => 'admin@wp.pl',
+                'firstName' => 'Admin',
+                'lastName' => 'Admin'
+            ]);
+
+        $this->loginAsUser($admin);
+
+        $url = sprintf('/admin/users/%s/edit', $admin->getId());
+
+        $crawler = $this->goToPageSafe($url);
+
+        $form = $crawler->selectButton('Update')->form();
+
+        $client->submit($form, [
+            'common_user[email]' => 'raszek@wp.pl',
+            'common_user[firstName]' => 'Donald',
+            'common_user[lastName]' => 'Smith',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertPath($url);
+
+        $this->assertResponseHasText('User successfully updated.');
+
+        $this->assertEquals('raszek@wp.pl', $admin->getEmail());
+        $this->assertEquals('Donald', $admin->getFirstName());
+        $this->assertEquals('Smith', $admin->getLastName());
+    }
+
+    /** @test */
+    public function admin_can_deactivate_user()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $admin = UserFactory::new()
+            ->withAdminRole()
+            ->create([
+                'email' => 'admin@wp.pl',
+                'firstName' => 'Admin',
+                'lastName' => 'Admin'
+            ]);
+
+        $user = UserFactory::createOne([
+            'plainPassword' => 'Password123!',
+            'activationCode' => 'some-activation-code'
+        ]);
+
+        $this->loginAsUser($admin);
+
+        $url = sprintf('/admin/users/%s/deactivate', $user->getId());
+
+        $client->request('POST', $url);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseHasText('User has been deactivated.');
+
+        $this->assertNull($user->getActivationCode());
+        $this->assertNull($user->getPasswordHash());
     }
 
     private function userRepository(): UserRepository

@@ -5,7 +5,7 @@ namespace App\Service\Site;
 use App\Entity\User\User;
 use App\Exception\Site\UserNotFoundException;
 use App\Form\Site\ResetPasswordForm;
-use App\Form\User\CreateUserForm;
+use App\Form\User\CommonUserForm;
 use App\Repository\User\UserRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\ByteString;
