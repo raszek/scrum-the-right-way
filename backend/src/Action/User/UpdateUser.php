@@ -3,7 +3,7 @@
 namespace App\Action\User;
 
 use App\Entity\User\User;
-use App\Form\User\CommonUserForm;
+use App\Form\User\UserFormData;
 use App\Repository\User\UserRepository;
 
 readonly class UpdateUser
@@ -14,7 +14,7 @@ readonly class UpdateUser
     ) {
     }
 
-    public function execute(CommonUserForm $form, User $user): void
+    public function execute(UserFormData $form, User $user): void
     {
         $user->setFirstName($form->firstName);
         $user->setLastName($form->lastName);

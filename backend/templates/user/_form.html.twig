@@ -1,11 +1,15 @@
 <div class="row">
     <div class="col">
-        {{ form_start(form) }}
-        {{ form_row(form.email) }}
-        {{ form_row(form.firstName) }}
-        {{ form_row(form.lastName) }}
+        {{ form.begin() }}
 
-        <button class="btn btn-primary">{{ buttonSubmit }}</button>
-        {{ form_end(form) }}
+        {{ form.field('email') }}
+
+        {{ form.field('firstName') }}
+
+        {{ form.field('lastName') }}
+
+        <input type="submit" value="{{ buttonSubmit }}" class="btn btn-primary">
+
+        {{ form.end() }}
     </div>
 </div>

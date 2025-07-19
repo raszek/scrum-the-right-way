@@ -73,9 +73,9 @@ class UserControllerTest extends WebTestCase
         $form = $crawler->selectButton('Create')->form();
 
         $client->submit($form, [
-            'common_user[email]' => 'raszek@wp.pl',
-            'common_user[firstName]' => 'Donald',
-            'common_user[lastName]' => 'Smith',
+            'user_form[email]' => 'raszek@wp.pl',
+            'user_form[firstName]' => 'Donald',
+            'user_form[lastName]' => 'Smith',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -112,9 +112,9 @@ class UserControllerTest extends WebTestCase
         $form = $crawler->selectButton('Create')->form();
 
         $client->submit($form, [
-            'common_user[email]' => 'raszek@wp.pl',
-            'common_user[firstName]' => 'Donald',
-            'common_user[lastName]' => 'Smith',
+            'user_form[email]' => 'raszek@wp.pl',
+            'user_form[firstName]' => 'Donald',
+            'user_form[lastName]' => 'Smith',
         ]);
 
         $this->assertResponseStatusCodeSame(422);
@@ -123,7 +123,7 @@ class UserControllerTest extends WebTestCase
 
         $this->assertEquals(1, $userCount);
 
-        $this->assertResponseHasText('This value is already used.');
+        $this->assertResponseHasText('Email is already in use');
     }
 
     /** @test */
@@ -149,9 +149,9 @@ class UserControllerTest extends WebTestCase
         $form = $crawler->selectButton('Update')->form();
 
         $client->submit($form, [
-            'common_user[email]' => 'raszek@wp.pl',
-            'common_user[firstName]' => 'Donald',
-            'common_user[lastName]' => 'Smith',
+            'user_form[email]' => 'newemail@wp.pl',
+            'user_form[firstName]' => 'Donald',
+            'user_form[lastName]' => 'Smith',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -160,7 +160,46 @@ class UserControllerTest extends WebTestCase
 
         $this->assertResponseHasText('User successfully updated.');
 
-        $this->assertEquals('raszek@wp.pl', $admin->getEmail());
+        $this->assertEquals('newemail@wp.pl', $admin->getEmail());
+        $this->assertEquals('Donald', $admin->getFirstName());
+        $this->assertEquals('Smith', $admin->getLastName());
+    }
+
+    /** @test */
+    public function admin_can_update_first_name_only()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $admin = UserFactory::new()
+            ->withAdminRole()
+            ->create([
+                'email' => 'admin@wp.pl',
+                'firstName' => 'Admin',
+                'lastName' => 'Smith'
+            ]);
+
+        $this->loginAsUser($admin);
+
+        $url = sprintf('/admin/users/%s/edit', $admin->getId());
+
+        $crawler = $this->goToPageSafe($url);
+
+        $form = $crawler->selectButton('Update')->form();
+
+        $client->submit($form, [
+            'user_form[email]' => 'admin@wp.pl',
+            'user_form[firstName]' => 'Donald',
+            'user_form[lastName]' => 'Smith',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertPath($url);
+
+        $this->assertResponseHasText('User successfully updated.');
+
+        $this->assertEquals('admin@wp.pl', $admin->getEmail());
         $this->assertEquals('Donald', $admin->getFirstName());
         $this->assertEquals('Smith', $admin->getLastName());
     }

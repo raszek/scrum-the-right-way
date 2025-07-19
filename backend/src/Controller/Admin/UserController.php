@@ -8,8 +8,9 @@ use App\Action\User\ListUsers;
 use App\Action\User\UpdateUser;
 use App\Controller\Controller;
 use App\Entity\User\User;
-use App\Form\User\CommonUserForm;
+use App\Form\User\UserFormData;
 use App\Form\User\CommonUserType;
+use App\Form\User\UserForm;
 use App\Table\QueryParams;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,14 +35,11 @@ class UserController extends Controller
     }
 
     #[Route('/users/create', name: 'app_admin_user_create')]
-    public function create(CreateUser $createUser, Request $request): Response
+    public function create(CreateUser $createUser, UserForm $userForm, Request $request): Response
     {
-        $form = $this->createForm(CommonUserType::class);
+        $form = $userForm->create();
 
-        $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
-
+        if ($form->loadRequest($request) && $form->validate()) {
             $user = $createUser->execute($form->getData());
 
             $this->addFlash('success', 'User successfully created. Welcome email was sent to user.');
@@ -56,16 +54,11 @@ class UserController extends Controller
     }
 
     #[Route('/users/{id}/edit', name: 'app_admin_user_edit')]
-    public function edit(UpdateUser $updateUser, User $user, Request $request): Response
+    public function edit(UpdateUser $updateUser, UserForm $userForm, User $user, Request $request): Response
     {
-        $form = $this->createForm(CommonUserType::class, new CommonUserForm(
-            email: $user->getEmail(),
-            firstName: $user->getFirstName(),
-            lastName: $user->getLastName(),
-        ));
+        $form = $userForm->create($user);
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->loadRequest($request) && $form->validate()) {
 
             $updateUser->execute($form->getData(), $user);
 
