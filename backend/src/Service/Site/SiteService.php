@@ -3,10 +3,12 @@
 namespace App\Service\Site;
 
 use App\Entity\User\User;
+use App\Exception\Site\CannotResetPasswordException;
 use App\Exception\Site\UserNotFoundException;
 use App\Form\Site\ResetPasswordForm;
-use App\Form\User\UserFormData;
 use App\Repository\User\UserRepository;
+use App\Service\Common\ClockInterface;
+use Carbon\CarbonImmutable;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\ByteString;
 
@@ -16,7 +18,8 @@ readonly class SiteService
     public function __construct(
         private UserRepository $userRepository,
         private ForgotPasswordMail $forgotPasswordMail,
-        private UserPasswordHasherInterface $userPasswordHasher
+        private UserPasswordHasherInterface $userPasswordHasher,
+        private ClockInterface $clock
     ) {
     }
 
@@ -40,12 +43,30 @@ readonly class SiteService
         ]);
 
         if (!$user) {
-            throw new UserNotFoundException('User not found');
+            throw new CannotResetPasswordException('User not found');
         }
+
+        $this->guardAgainstResetPasswordCodeExpire($user);
 
         $passwordHash = $this->userPasswordHasher->hashPassword($user, $resetPasswordForm->password);
 
         $user->setPasswordHash($passwordHash);
         $user->setResetPasswordCode(null);
+
+        $this->userRepository->flush();
+    }
+
+    private function guardAgainstResetPasswordCodeExpire(User $user): void
+    {
+        $exception = new CannotResetPasswordException('Reset password link is only valid for 1 hour. Reset password again.');
+
+        if ($user->getResetPasswordCodeSendDate() === null) {
+            throw $exception;
+        }
+
+        $resetPasswordActivationDate = CarbonImmutable::instance($user->getResetPasswordCodeSendDate());
+        if ($this->clock->now()->greaterThan($resetPasswordActivationDate->addHour())) {
+            throw $exception;
+        }
     }
 }

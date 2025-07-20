@@ -36,16 +36,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $activationCode = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
     private ?string $passwordHash = null;
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
     #[ORM\Column(length: 255, nullable: true)]
+    private ?string $activationCode = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private ?DateTimeImmutable $activationCodeSendDate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $resetPasswordCode = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $resetPasswordCodeSendDate = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?DateTimeImmutable $createdAt = null;
@@ -70,6 +76,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     ) {
         $this->email = $email;
         $this->createdAt = $createdAt;
+        $this->activationCodeSendDate = $createdAt;
         $this->activationCode = $activationCode;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
@@ -256,5 +263,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdmin(): bool
     {
         return ArrayHelper::inArray(UserRoleEnum::Admin->value, $this->roles);
+    }
+
+    public function getActivationCodeSendDate(): ?DateTimeImmutable
+    {
+        return $this->activationCodeSendDate;
+    }
+
+    public function setActivationCodeSendDate(?DateTimeImmutable $activationCodeSendDate): void
+    {
+        $this->activationCodeSendDate = $activationCodeSendDate;
+    }
+
+    public function getResetPasswordCodeSendDate(): ?DateTimeImmutable
+    {
+        return $this->resetPasswordCodeSendDate;
+    }
+
+    public function setResetPasswordCodeSendDate(?DateTimeImmutable $resetPasswordCodeSendDate): void
+    {
+        $this->resetPasswordCodeSendDate = $resetPasswordCodeSendDate;
     }
 }

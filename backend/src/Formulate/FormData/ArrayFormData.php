@@ -3,6 +3,7 @@
 namespace App\Formulate\FormData;
 
 use App\Formulate\Form;
+use App\Formulate\FormField;
 
 readonly class ArrayFormData implements FormDataInterface
 {
@@ -24,16 +25,14 @@ readonly class ArrayFormData implements FormDataInterface
         return $data;
     }
 
-    public function load(): void
+    public function loadField(FormField $field): void
     {
         $loadedFields = $this->data ?? [];
 
-        foreach ($this->form->fields() as $field) {
-            if (!isset($loadedFields[$field->name])) {
-                continue;
-            }
-
-            $field->load($loadedFields[$field->name]);
+        if (!isset($loadedFields[$field->name])) {
+            return;
         }
+
+        $field->load($loadedFields[$field->name]);
     }
 }

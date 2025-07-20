@@ -5,11 +5,10 @@ namespace App\Controller\Admin;
 use App\Action\User\CreateUser;
 use App\Action\User\DeactivateUser;
 use App\Action\User\ListUsers;
+use App\Action\User\SendActivationLink;
 use App\Action\User\UpdateUser;
 use App\Controller\Controller;
 use App\Entity\User\User;
-use App\Form\User\UserFormData;
-use App\Form\User\CommonUserType;
 use App\Form\User\UserForm;
 use App\Table\QueryParams;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,6 +79,18 @@ class UserController extends Controller
         $deactivateUser->execute($user);
 
         $this->successFlash('User has been deactivated.');
+
+        return $this->redirectToRoute('app_admin_user_edit', [
+            'id' => $user->getId()
+        ]);
+    }
+
+    #[Route('/users/{id}/send-activation-link', name: 'app_admin_user_send_activation_link', methods: ['POST'])]
+    public function sendActivationLink(SendActivationLink $sendActivationLink, User $user): Response
+    {
+        $sendActivationLink->execute($user);
+
+        $this->successFlash('User activation link has been sent.');
 
         return $this->redirectToRoute('app_admin_user_edit', [
             'id' => $user->getId()

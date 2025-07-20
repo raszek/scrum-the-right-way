@@ -4,10 +4,8 @@ namespace App\Service\Site;
 
 use App\Entity\User\User;
 use App\Service\Common\DefaultMailer;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-#[Autoconfigure(public: true)]
-class CreateUserEmail
+class ActivationUserEmail
 {
 
     public function __construct(
@@ -22,8 +20,8 @@ class CreateUserEmail
 
         $email
             ->to($user->getEmail())
-            ->subject('Your account has been created')
-            ->htmlTemplate('emails/site/register.html.twig')
+            ->subject(sprintf('Account activation %s', $user->getFullName()))
+            ->htmlTemplate('emails/site/activation_user.html.twig')
             ->context([
                 'user' => $user,
             ]);

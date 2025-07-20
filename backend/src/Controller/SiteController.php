@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Action\Site\ActivateUser;
+use App\Action\Site\ResetPassword;
+use App\Exception\Site\CannotActivateUserException;
+use App\Exception\Site\CannotResetPasswordException;
 use App\Exception\Site\UserNotFoundException;
 use App\Form\Site\ForgotPasswordForm;
 use App\Form\Site\ForgotPasswordType;
@@ -47,6 +50,10 @@ class SiteController extends Controller
     #[Route('/activate-account/{email}/{activationCode}', name: 'app_activate_account')]
     public function activateAccount(ActivateUser $activateUser, Request $request): Response
     {
+        if ($this->getUser()) {
+            throw new BadRequestException('User is already logged in. Log out to activate account.');
+        }
+
         $form = $this->createForm(ResetPasswordType::class, new ResetPasswordForm(
             resetPasswordCode: $request->get('activationCode'),
             email: $request->get('email')
@@ -55,7 +62,11 @@ class SiteController extends Controller
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $activateUser->execute($form->getData());
+            try {
+                $activateUser->execute($form->getData());
+            } catch (CannotActivateUserException $e) {
+                throw new BadRequestException($e->getMessage());
+            }
 
             $this->addFlash('success', 'Account successfully activated. You can now log in.');
             return $this->redirect('/login');
@@ -85,6 +96,7 @@ class SiteController extends Controller
 
     #[Route('/reset-password/{email}/{resetPasswordCode}', name: 'app_reset_password')]
     public function resetPassword(
+        ResetPassword $resetPassword,
         Request $request,
         string $resetPasswordCode,
         string $email
@@ -97,14 +109,11 @@ class SiteController extends Controller
 
         $resetPasswordForm->handleRequest($request);
         if ($resetPasswordForm->isSubmitted() && $resetPasswordForm->isValid()) {
-
             try {
-                $this->siteService->resetPassword($resetPasswordForm->getData());
-            } catch (UserNotFoundException) {
-                throw new BadRequestException('Could not reset password');
+                $resetPassword->execute($resetPasswordForm->getData());
+            } catch (CannotResetPasswordException $e) {
+                throw new BadRequestException($e->getMessage());
             }
-
-            $this->entityManager->flush();
 
             $this->addFlash('success', 'Successfully reset password!');
             return $this->redirect('/login');

@@ -6,7 +6,7 @@ use App\Entity\User\User;
 use App\Form\User\UserFormData;
 use App\Repository\User\UserRepository;
 use App\Service\Common\ClockInterface;
-use App\Service\Site\CreateUserEmail;
+use App\Service\Site\ActivationUserEmail;
 use Symfony\Component\String\ByteString;
 
 readonly class CreateUser
@@ -15,7 +15,7 @@ readonly class CreateUser
     public function __construct(
         private ClockInterface $clock,
         private UserRepository $userRepository,
-        private CreateUserEmail $registerMail,
+        private ActivationUserEmail $registerMail,
     ) {
     }
 

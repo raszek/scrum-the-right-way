@@ -4,10 +4,51 @@
 
 {% block content %}
     <div class="container-fluid">
-        {% include 'common/page_header.html.twig' %}
+        {% include 'common/page_header.html.twig' with {
+            links: [
+                {
+                    label: 'Users',
+                    url: path('app_admin_user_list')
+                }
+            ]
+        } %}
 
         {% include 'user/_form.html.twig' with {
             'buttonSubmit': 'Update'
         } %}
+
+        <hr>
+
+        {% if user.isActive %}
+            <div data-controller="confirm-modal">
+                <h4>User deactivate</h4>
+                <button class="btn btn-danger"
+                        data-action="confirm-modal#open"
+                        data-confirm-modal-url-param="{{ path('app_admin_user_deactivate', {
+                            id: user.id
+                        }) }}"
+                >
+                    Deactivate
+                </button>
+                {% include 'common/confirm_modal.html.twig' with {
+                    dialogText: 'Are you sure to deactivate user?'
+                } %}
+            </div>
+        {% else %}
+            <div data-controller="confirm-modal">
+                <h4>Send an activation link</h4>
+                <button class="btn btn-info"
+                        data-action="confirm-modal#open"
+                        data-confirm-modal-url-param="{{ path('app_admin_user_send_activation_link', {
+                            id: user.id
+                        }) }}"
+                >
+                    Send
+                </button>
+                {% include 'common/confirm_modal.html.twig' with {
+                    dialogText: 'Are you sure to send activation link?'
+                } %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

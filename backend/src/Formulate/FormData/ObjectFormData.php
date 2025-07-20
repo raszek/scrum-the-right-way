@@ -3,6 +3,7 @@
 namespace App\Formulate\FormData;
 
 use App\Formulate\Form;
+use App\Formulate\FormField;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -29,12 +30,8 @@ readonly class ObjectFormData implements FormDataInterface
         return $data;
     }
 
-    public function load(): void
+    public function loadField(FormField $field): void
     {
-        $data = $this->data;
-
-        foreach ($this->form->fields() as $field) {
-            $field->load($this->propertyAccessor->getValue($data, $field->name));
-        }
+        $field->load($this->propertyAccessor->getValue($this->data, $field->name));
     }
 }

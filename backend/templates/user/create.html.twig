@@ -4,7 +4,14 @@
 
 {% block content %}
     <div class="container-fluid">
-        {% include 'common/page_header.html.twig' %}
+        {% include 'common/page_header.html.twig' with {
+            links: [
+                {
+                    label: 'Users',
+                    url: path('app_admin_user_list')
+                }
+            ]
+        } %}
 
         {% include 'user/_form.html.twig' with {
             'buttonSubmit': 'Create'

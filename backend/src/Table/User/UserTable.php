@@ -4,8 +4,6 @@ namespace App\Table\User;
 
 use App\Repository\User\UserRepository;
 use App\Table\Column\ActionColumn;
-use App\Table\Column\ColumnAction;
-use App\Table\Column\ColumnRendererFactory;
 use App\Table\QueryParams;
 use App\Table\Table;
 use App\Table\TableColumn;

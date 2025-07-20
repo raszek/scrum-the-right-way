@@ -58,6 +58,8 @@ class Form
             throw new FieldDoesNotHaveWidgetException('Field cannot be rendered. Field does not have a widget.');
         }
 
+        $this->data->loadField($field);
+
         return $this->markup($field->widget->render($field, $this));
     }
 
@@ -148,8 +150,6 @@ class Form
         } else {
             throw new InvalidDataTypeException('Data must be an object or an array or null.');
         }
-
-        $this->data->load();
     }
 
 }

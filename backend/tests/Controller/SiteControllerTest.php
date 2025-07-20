@@ -4,6 +4,8 @@ namespace App\Tests\Controller;
 
 use App\Factory\UserFactory;
 use App\Repository\User\UserRepository;
+use App\Service\Common\ClockInterface;
+use Carbon\CarbonImmutable;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class SiteControllerTest extends WebTestCase
@@ -33,11 +35,23 @@ class SiteControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->followRedirects();
+        $client->disableReboot();
+
+        $clockMock = new class implements ClockInterface {
+
+            public function now(): CarbonImmutable
+            {
+                return CarbonImmutable::create(2010, 10, 10, 9, 10);
+            }
+        };
+
+        $this->mockService(ClockInterface::class, $clockMock);
 
         $user = UserFactory::createOne([
             'email' => 'test@test.com',
             'plainPassword' => 'Password123!',
-            'resetPasswordCode' => 'some-reset-password-code'
+            'resetPasswordCode' => 'some-reset-password-code',
+            'resetPasswordCodeSendDate' => CarbonImmutable::create(2010, 10, 10, 9)
         ]);
 
         $crawler = $this->goToPageSafe('/reset-password/test@test.com/some-reset-password-code');
@@ -48,7 +62,7 @@ class SiteControllerTest extends WebTestCase
             'reset_password[password][first]' => 'NewPass123!',
             'reset_password[password][second]' => 'NewPass123!',
             'reset_password[email]' => 'test@test.com',
-            'reset_password[resetPasswordCode]' => 'some-reset-password-code'
+            'reset_password[resetPasswordCode]' => 'some-reset-password-code',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -66,6 +80,46 @@ class SiteControllerTest extends WebTestCase
         $isPasswordValid = $this->getUserPasswordHasher()->isPasswordValid($updatedUser, 'NewPass123!');
 
         $this->assertTrue($isPasswordValid);
+    }
+
+    /** @test */
+    public function user_reset_link_is_only_valid_for_1_hour()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+        $client->disableReboot();
+
+        $clockMock = new class implements ClockInterface {
+
+            public function now(): CarbonImmutable
+            {
+                return CarbonImmutable::create(2010, 10, 10, 10, 10);
+            }
+        };
+
+        $this->mockService(ClockInterface::class, $clockMock);
+
+        UserFactory::createOne([
+            'email' => 'test@test.com',
+            'plainPassword' => 'Password123!',
+            'resetPasswordCode' => 'some-reset-password-code',
+            'resetPasswordCodeSendDate' => CarbonImmutable::create(2010, 10, 10, 9)
+        ]);
+
+        $crawler = $this->goToPageSafe('/reset-password/test@test.com/some-reset-password-code');
+
+        $form = $crawler->selectButton('Reset')->form();
+
+        $client->submit($form, [
+            'reset_password[password][first]' => 'NewPass123!',
+            'reset_password[password][second]' => 'NewPass123!',
+            'reset_password[email]' => 'test@test.com',
+            'reset_password[resetPasswordCode]' => 'some-reset-password-code'
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+
+        $this->assertResponseHasText('Reset password link is only valid for 1 hour. Reset password again.');
     }
 
     /** @test */
@@ -159,11 +213,22 @@ class SiteControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->followRedirects();
+        $client->disableReboot();
+
+        $clockMock = new class implements ClockInterface {
+
+            public function now(): CarbonImmutable
+            {
+                return CarbonImmutable::create(2010, 10, 10, 10, 10);
+            }
+        };
+        $this->mockService(ClockInterface::class, $clockMock);
 
         UserFactory::createOne([
             'email' => 'test@test.com',
             'activationCode' => 'some-activation-code',
-            'plainPassword' => null
+            'plainPassword' => null,
+            'activationCodeSendDate' => CarbonImmutable::create(2010, 10, 10, 10)
         ]);
 
         $crawler = $this->goToPageSafe( '/activate-account/test@test.com/some-activation-code');
@@ -193,6 +258,45 @@ class SiteControllerTest extends WebTestCase
         $isPasswordValid = $this->getUserPasswordHasher()->isPasswordValid($updatedUser, 'NewPass123!');
 
         $this->assertTrue($isPasswordValid);
+    }
+
+    /** @test */
+    public function user_activation_link_is_only_valid_for_1_hour()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+        $client->disableReboot();
+
+        $clockMock = new class implements ClockInterface {
+
+            public function now(): CarbonImmutable
+            {
+                return CarbonImmutable::create(2010, 10, 10, 10, 10);
+            }
+        };
+        $this->mockService(ClockInterface::class, $clockMock);
+
+        UserFactory::createOne([
+            'email' => 'test@test.com',
+            'activationCode' => 'some-activation-code',
+            'plainPassword' => null,
+            'activationCodeSendDate' => CarbonImmutable::create(2010, 10, 10, 9)
+        ]);
+
+        $crawler = $this->goToPageSafe( '/activate-account/test@test.com/some-activation-code');
+
+        $form = $crawler->selectButton('Reset')->form();
+
+        $client->submit($form, [
+            'reset_password[password][first]' => 'NewPass123!',
+            'reset_password[password][second]' => 'NewPass123!',
+            'reset_password[email]' => 'test@test.com',
+            'reset_password[resetPasswordCode]' => 'some-activation-code'
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+
+        $this->assertResponseHasText('Activation link is only valid for 1 hour. Ask admin for another activation link.');
     }
 
     private function userRepository(): UserRepository

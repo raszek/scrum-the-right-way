@@ -5,8 +5,13 @@ namespace App\Tests\Controller\Admin;
 use App\Entity\User\User;
 use App\Factory\UserFactory;
 use App\Repository\User\UserRepository;
-use App\Service\Site\CreateUserEmail;
+use App\Service\Common\ClockInterface;
+use App\Service\Site\ActivationUserEmail;
 use App\Tests\Controller\WebTestCase;
+use Carbon\CarbonImmutable;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\RawMessage;
 
 class UserControllerTest extends WebTestCase
 {
@@ -50,7 +55,7 @@ class UserControllerTest extends WebTestCase
             ->withAdminRole()
             ->create();
 
-        $registerMailMock = new class extends CreateUserEmail
+        $activationMailMock = new class extends ActivationUserEmail
         {
             public function __construct()
             {
@@ -64,7 +69,7 @@ class UserControllerTest extends WebTestCase
             }
         };
 
-        $this->mockService(CreateUserEmail::class, $registerMailMock);
+        $this->mockService(ActivationUserEmail::class, $activationMailMock);
 
         $this->loginAsUser($admin);
 
@@ -88,7 +93,7 @@ class UserControllerTest extends WebTestCase
 
         $this->assertNotNull($createdUser);
         $this->assertNotNull($createdUser->getActivationCode());
-        $this->assertTrue($registerMailMock->isMailSent);
+        $this->assertTrue($activationMailMock->isMailSent);
 
         $client->enableReboot();
     }
@@ -147,6 +152,10 @@ class UserControllerTest extends WebTestCase
         $crawler = $this->goToPageSafe($url);
 
         $form = $crawler->selectButton('Update')->form();
+
+        $this->assertEquals('admin@wp.pl', $form->get('user_form[email]')->getValue());
+        $this->assertEquals('Admin', $form->get('user_form[firstName]')->getValue());
+        $this->assertEquals('Admin', $form->get('user_form[lastName]')->getValue());
 
         $client->submit($form, [
             'user_form[email]' => 'newemail@wp.pl',
@@ -220,7 +229,7 @@ class UserControllerTest extends WebTestCase
 
         $user = UserFactory::createOne([
             'plainPassword' => 'Password123!',
-            'activationCode' => 'some-activation-code'
+            'activationCode' => null
         ]);
 
         $this->loginAsUser($admin);
@@ -235,6 +244,58 @@ class UserControllerTest extends WebTestCase
 
         $this->assertNull($user->getActivationCode());
         $this->assertNull($user->getPasswordHash());
+    }
+
+    /** @test */
+    public function admin_can_send_activation_link()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $clockMock = new class implements ClockInterface {
+            public function now(): CarbonImmutable
+            {
+                return CarbonImmutable::create(2010, 10, 10);
+            }
+        };
+
+        $this->mockService(ClockInterface::class, $clockMock);
+
+        $mailerMock = new class implements MailerInterface {
+
+            public bool $isMailSent = false;
+
+            public function send(RawMessage $message, ?Envelope $envelope = null): void
+            {
+                $this->isMailSent = true;
+            }
+        };
+        $this->mockService(MailerInterface::class, $mailerMock);
+
+        $admin = UserFactory::new()
+            ->withAdminRole()
+            ->create([
+                'email' => 'admin@wp.pl',
+                'firstName' => 'Admin',
+                'lastName' => 'Admin'
+            ]);
+
+        $user = UserFactory::createOne([
+            'plainPassword' => 'Password123!',
+            'activationCode' => 'some-activation-code'
+        ]);
+
+        $this->loginAsUser($admin);
+
+        $url = sprintf('/admin/users/%s/send-activation-link', $user->getId());
+
+        $client->request('POST', $url);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertNotEquals('some-activation-code', $user->getActivationCode());
+        $this->assertEquals('2010-10-10', $user->getActivationCodeSendDate()->format('Y-m-d'));;
+        $this->assertTrue($mailerMock->isMailSent);
     }
 
     private function userRepository(): UserRepository

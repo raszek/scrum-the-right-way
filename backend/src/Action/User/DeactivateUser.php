@@ -15,6 +15,10 @@ readonly class DeactivateUser
 
     public function execute(User $user): void
     {
+        if (!$user->isActive()) {
+            throw new \DomainException('User is already inactive');
+        }
+
         $user->setActivationCode(null);
         $user->setResetPasswordCode(null);
         $user->setPasswordHash(null);
