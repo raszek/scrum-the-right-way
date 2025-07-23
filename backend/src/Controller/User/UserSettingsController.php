@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\User;
 
 
 
+use App\Controller\Controller;
 use App\Service\Session\Issue\IssueSessionSettings;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

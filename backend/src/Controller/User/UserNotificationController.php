@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\User;
 
+use App\Controller\Controller;
 use App\Entity\User\UserNotification;
 use App\Event\EventRecord;
 use App\Helper\ArrayHelper;
