@@ -32,7 +32,9 @@ class ProfileControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $this->assertEquals('John', $user->getFirstName());;
-        $this->assertEquals('Terry', $user->getLastName());;
+        $this->assertResponseHasText('Profile successfully updated.');
+
+        $this->assertEquals('John', $user->getFirstName());
+        $this->assertEquals('Terry', $user->getLastName());
     }
 }
