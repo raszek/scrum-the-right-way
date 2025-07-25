@@ -19,4 +19,12 @@ readonly class FormWidgetFactory
         );
     }
 
+    public function passwordField(): TextField
+    {
+        return new TextField(
+            twig: $this->twig,
+            type: 'password'
+        );
+    }
+
 }

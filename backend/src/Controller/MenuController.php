@@ -4,13 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Project\Project;
 use App\Repository\User\UserNotificationRepository;
-use App\Service\Menu\MenuDataProvider;
-use App\Service\Menu\ProjectMenuDataProvider;
+use App\Service\Menu\Provider\ProjectMenuDataProvider;
+use App\Service\Menu\Provider\TopMenuDataProvider;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Exception;
 
 #[IsGranted('ROLE_USER')]
 class MenuController extends Controller
@@ -18,7 +18,7 @@ class MenuController extends Controller
 
     public function __construct(
         private readonly ProjectMenuDataProvider $projectMenuDataProvider,
-        private readonly MenuDataProvider $menuDataProvider,
+        private readonly TopMenuDataProvider $menuDataProvider,
         private readonly UserNotificationRepository $userNotificationRepository
     ) {
     }

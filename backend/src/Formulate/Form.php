@@ -20,6 +20,8 @@ class Form
 
     private FormDataInterface $data;
 
+    private bool $isSubmitted = false;
+
     public function __construct(
         private readonly string $name,
         mixed $data = null,
@@ -52,13 +54,15 @@ class Form
 
     public function field(string $field): Markup
     {
-        $field = $this->getField($field);
+        $field = $this->findField($field);
 
         if (!$field->widget) {
             throw new FieldDoesNotHaveWidgetException('Field cannot be rendered. Field does not have a widget.');
         }
 
-        $this->data->loadField($field);
+        if ($this->isSubmitted === false) {
+            $this->data->loadField($field);
+        }
 
         return $this->markup($field->widget->render($field, $this));
     }
@@ -87,6 +91,7 @@ class Form
             $this->fields[$fieldKey]->load($value);
         }
 
+        $this->isSubmitted = true;
         return true;
     }
 
@@ -127,7 +132,7 @@ class Form
         return $this->data->get();
     }
 
-    private function getField(string $field): FormField
+    public function findField(string $field): FormField
     {
         if (!isset($this->fields[$field])) {
             throw new FieldDoesNotExistException(sprintf('Field "%s" does not exist.', $field));

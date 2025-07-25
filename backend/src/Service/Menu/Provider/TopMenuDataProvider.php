@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service\Menu;
+namespace App\Service\Menu\Provider;
 
 use App\Entity\User\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-readonly class MenuDataProvider
+readonly class TopMenuDataProvider
 {
 
     public function __construct(

@@ -11,7 +11,8 @@ readonly class TextField implements FormWidget
 {
 
     public function __construct(
-        private Environment $twig
+        private Environment $twig,
+        private string $type = 'text'
     ) {
     }
 
@@ -20,7 +21,7 @@ readonly class TextField implements FormWidget
         return $this->twig->render('formulate/widget/text_input.html.twig', [
             'id' => $form->generateFieldId($formField),
             'name' => $form->generateFieldName($formField),
-            'type' => 'text',
+            'type' => $this->type,
             'label' => $formField->label ?? $formField->name,
             'error' => $formField->error,
             'value' => $formField->value()

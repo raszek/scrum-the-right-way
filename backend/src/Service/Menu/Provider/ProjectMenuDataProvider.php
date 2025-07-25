@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Menu;
+namespace App\Service\Menu\Provider;
 
 use App\Entity\Project\Project;
 use App\Service\Kanban\KanbanAccess;

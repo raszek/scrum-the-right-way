@@ -2,13 +2,19 @@
 
 namespace App\Controller\User;
 
+use App\Action\Profile\ChangePassword;
 use App\Action\Profile\UpdateProfile;
 use App\Controller\Controller;
+use App\Form\Profile\ChangePasswordForm;
 use App\Form\Profile\ProfileForm;
+use App\Service\Menu\Profile\ProfileMenu;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 class ProfileController extends Controller
 {
 
@@ -27,6 +33,41 @@ class ProfileController extends Controller
 
         return $this->render('profile/profile.html.twig', [
             'form' => $profileForm
+        ]);
+    }
+
+
+    #[Route('/profile/change-password', 'app_user_profile_change_password')]
+    public function changePassword(
+        ChangePasswordForm $changePasswordForm,
+        Request $request,
+        ChangePassword $changePassword
+    ): Response {
+        $form = $changePasswordForm->create();
+
+        if ($form->loadRequest($request) && $form->validate()) {
+            $changePassword->execute($form->getData(), $this->getLoggedInUser());
+
+            $this->successFlash('Password successfully changed.');
+            return $this->redirectToRoute('app_user_profile_change_password');
+        }
+
+        return $this->render('profile/change_password.html.twig', [
+            'form' => $form
+        ]);
+    }
+
+    #[Route('/profile/menu', 'app_user_profile_menu')]
+    public function profileMenu(ProfileMenu $profileMenu, Request $request): Response
+    {
+        $currentPath = $request->get('currentPath');
+
+        if (!$currentPath) {
+            throw new Exception('Current path must be set');
+        }
+
+        return $this->render('profile/_menu.html.twig', [
+            'menu' => $profileMenu->create($currentPath)
         ]);
     }
 }
