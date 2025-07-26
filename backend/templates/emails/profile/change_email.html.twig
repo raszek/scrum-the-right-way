@@ -1,0 +1,9 @@
+{# templates/emails/user/change_email.html.twig #}
+
+<h1>Welcome {{ user.fullName }}!</h1>
+
+<p>
+    <a href="{{ url('app_user_profile_confirm_change_email', {
+        'activationCode': changeEmailCode,
+    }) }}">Confirm change of your email</a>
+</p>

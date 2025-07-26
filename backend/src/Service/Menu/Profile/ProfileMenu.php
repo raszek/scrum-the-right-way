@@ -23,6 +23,10 @@ readonly class ProfileMenu
                 url: new MenuUrl('app_user_profile')
             ),
             new MenuLink(
+                label: 'Change email',
+                url: new MenuUrl('app_user_profile_change_email')
+            ),
+            new MenuLink(
                 label: 'Change password',
                 url: new MenuUrl('app_user_profile_change_password')
             ),

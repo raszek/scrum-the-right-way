@@ -2,8 +2,15 @@
 
 namespace App\Tests\Controller\User;
 
+use App\Enum\User\UserCodeTypeEnum;
+use App\Factory\User\UserCodeFactory;
 use App\Factory\UserFactory;
+use App\Repository\User\UserCodeRepository;
 use App\Tests\Controller\WebTestCase;
+use Carbon\CarbonImmutable;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ProfileControllerTest extends WebTestCase
@@ -101,8 +108,94 @@ class ProfileControllerTest extends WebTestCase
         $this->assertTrue($this->userPasswordHasher()->isPasswordValid($user, 'Password123!'));
     }
 
+    /** @test */
+    public function user_can_change_his_email()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+        $client->disableReboot();
+
+        $mailerMock = new class implements MailerInterface {
+
+            public bool $isMailSent = false;
+
+            public function send(RawMessage $message, ?Envelope $envelope = null): void
+            {
+                $this->isMailSent = true;
+            }
+        };
+        $this->mockService(MailerInterface::class, $mailerMock);
+
+        $user = UserFactory::createOne([
+            'email' => 'donek@example.com',
+        ]);
+
+        $this->loginAsUser($user);
+
+        $crawler = $this->goToPageSafe('/profile/change-email');
+
+        $form = $crawler->selectButton('Change email')->form();
+
+        $client->submit($form, [
+            'change_email_form[email]' => 'zenek@example.com',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseHasText('Email sent was to your inbox. Confirm changing your email address.');
+        $this->assertTrue($mailerMock->isMailSent);
+
+        $changeEmailCode = $this->userCodeRepository()->findOneBy([
+            'mainUser' => $user,
+            'type' => UserCodeTypeEnum::ChangeEmail->value
+        ]);
+
+        $this->assertNotNull($changeEmailCode);
+        $this->assertEquals([
+            'email' => 'zenek@example.com',
+        ], $changeEmailCode->getData());
+    }
+
+    /** @test */
+    public function user_can_confirm_change_of_his_email()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $user = UserFactory::createOne([
+            'email' => 'donek@example.com',
+        ]);
+
+        UserCodeFactory::createOne([
+            'user' => $user,
+            'type' => UserCodeTypeEnum::ChangeEmail->value,
+            'code' => 'some-code',
+            'data' => [
+                'email' => 'zenek@example.com'
+            ],
+            'createdAt' => CarbonImmutable::now()->subMinutes(30)
+        ]);
+
+        $this->loginAsUser($user);
+
+        $url = sprintf('/profile/confirm-change-email/some-code');
+
+        $client->request('GET', $url);
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseHasText('Email successfully changed.');
+
+        $this->assertEquals('zenek@example.com', $user->getEmail());
+    }
+
     private function userPasswordHasher(): UserPasswordHasherInterface
     {
         return $this->getService(UserPasswordHasherInterface::class);
+    }
+
+    private function userCodeRepository(): UserCodeRepository
+    {
+        return $this->getService(UserCodeRepository::class);
     }
 }

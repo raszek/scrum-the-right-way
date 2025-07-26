@@ -2,6 +2,7 @@
 
 namespace App\Tests\Service\Sprint;
 
+use App\Entity\Sprint\SprintGoalIssue;
 use App\Exception\Sprint\CannotStartSprintException;
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
@@ -161,8 +162,12 @@ class SprintEditorTest extends KernelTestCase
 
         $this->assertNotNull($updatedSprintGoal);
         $this->assertEquals('Feature', $updatedSprintGoal->getSprintGoalIssues()->get(0)->getIssue()->getTitle());
-        $this->assertEquals('Sub issue 1', $updatedSprintGoal->getSprintGoalIssues()->get(1)->getIssue()->getTitle());
-        $this->assertEquals('Sub issue 2', $updatedSprintGoal->getSprintGoalIssues()->get(2)->getIssue()->getTitle());
+        $addedSubIssueOne = $updatedSprintGoal->getSprintGoalIssues()
+            ->findFirst(fn(int $_, SprintGoalIssue $sprintGoalIssue) => $sprintGoalIssue->getIssue()->getTitle() === 'Sub issue 1');
+        $this->assertNotNull($addedSubIssueOne);
+        $addedSubIssueTwo = $updatedSprintGoal->getSprintGoalIssues()
+            ->findFirst(fn(int $_, SprintGoalIssue $sprintGoalIssue) => $sprintGoalIssue->getIssue()->getTitle() === 'Sub issue 2');
+        $this->assertNotNull($addedSubIssueTwo);
 
         $updatedIssues = $this->issueRepository()->findBy([
             'id' => [

@@ -19,6 +19,14 @@ readonly class FormWidgetFactory
         );
     }
 
+    public function emailField(): TextField
+    {
+        return new TextField(
+            twig: $this->twig,
+            type: 'email'
+        );
+    }
+
     public function passwordField(): TextField
     {
         return new TextField(

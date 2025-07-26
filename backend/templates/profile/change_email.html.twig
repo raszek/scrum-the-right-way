@@ -1,0 +1,21 @@
+{% extends 'layout/layout.html.twig' %}
+
+{% set page_title = 'Profile - change password' %}
+
+{% block content %}
+
+    {% include 'common/page_header.html.twig' %}
+
+    {{ render(path('app_user_profile_menu', {
+        currentPath: app.request.pathinfo
+    })) }}
+
+    {{ form.begin() }}
+
+    {{ form.field('email') }}
+
+    <input type="submit" value="Change email" class="btn btn-primary">
+
+    {{ form.end() }}
+
+{% endblock %}

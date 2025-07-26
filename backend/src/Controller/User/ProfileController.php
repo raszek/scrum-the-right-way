@@ -2,9 +2,12 @@
 
 namespace App\Controller\User;
 
+use App\Action\Profile\ChangeEmail;
 use App\Action\Profile\ChangePassword;
+use App\Action\Profile\ConfirmChangeEmail;
 use App\Action\Profile\UpdateProfile;
 use App\Controller\Controller;
+use App\Form\Profile\ChangeEmailForm;
 use App\Form\Profile\ChangePasswordForm;
 use App\Form\Profile\ProfileForm;
 use App\Service\Menu\Profile\ProfileMenu;
@@ -55,6 +58,35 @@ class ProfileController extends Controller
         return $this->render('profile/change_password.html.twig', [
             'form' => $form
         ]);
+    }
+
+    #[Route('/profile/change-email', 'app_user_profile_change_email')]
+    public function changeEmail(
+        ChangeEmailForm $changeEmailForm,
+        Request $request,
+        ChangeEmail $changeEmail,
+    ): Response {
+        $form = $changeEmailForm->create($this->getLoggedInUser());
+
+        if ($form->loadRequest($request) && $form->validate()) {
+            $changeEmail->execute($form->getData(), $this->getLoggedInUser());
+
+            $this->successFlash('Email sent was to your inbox. Confirm changing your email address.');
+            return $this->redirectToRoute('app_user_profile_change_email');
+        }
+
+        return $this->render('profile/change_email.html.twig', [
+            'form' => $form
+        ]);
+    }
+
+    #[Route('/profile/confirm-change-email/{activationCode}', 'app_user_profile_confirm_change_email', methods: ['GET'])]
+    public function activateEmail(string $activationCode, ConfirmChangeEmail $confirmChangeEmail): Response
+    {
+        $confirmChangeEmail->execute($activationCode, $this->getLoggedInUser());
+
+        $this->successFlash('Email successfully changed.');
+        return $this->redirectToRoute('app_user_profile_change_email');
     }
 
     #[Route('/profile/menu', 'app_user_profile_menu')]
