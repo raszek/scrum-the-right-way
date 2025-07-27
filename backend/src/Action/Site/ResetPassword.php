@@ -2,25 +2,48 @@
 
 namespace App\Action\Site;
 
-use App\Form\Site\ResetPasswordForm;
-use App\Service\Site\SiteService;
+use App\Email\Site\ResetPasswordEmail;
+use App\Entity\User\UserCode;
+use App\Enum\User\UserCodeTypeEnum;
+use App\Exception\Site\UserNotFoundException;
+use App\Form\Site\ForgotPasswordFormData;
+use App\Repository\User\UserCodeRepository;
+use App\Repository\User\UserRepository;
+use App\Service\Common\ClockInterface;
+use App\Service\Common\RandomService;
 
 readonly class ResetPassword
 {
 
     public function __construct(
-        private SiteService $siteService,
+        private UserRepository $userRepository,
+        private UserCodeRepository $userCodeRepository,
+        private RandomService $randomService,
+        private ClockInterface $clock,
+        private ResetPasswordEmail $resetPasswordEmail,
     ) {
     }
 
-    /**
-     * @param ResetPasswordForm $resetPasswordForm
-     * @return void
-     * @throws \App\Exception\Site\CannotResetPasswordException
-     */
-    public function execute(ResetPasswordForm $resetPasswordForm): void
+    public function execute(ForgotPasswordFormData $formData): void
     {
-        $this->siteService->resetPassword($resetPasswordForm);
+        $user = $this->userRepository->findOneBy([
+            'email' => $formData->email
+        ]);
+
+        if (!$user) {
+            throw new UserNotFoundException('User not found');
+        }
+
+        $userCode = new UserCode(
+            mainUser: $user,
+            type: UserCodeTypeEnum::ResetPassword,
+            code: $this->randomService->randomString(),
+            createdAt: $this->clock->now()
+        );
+
+        $this->userCodeRepository->create($userCode);
+
+        $this->resetPasswordEmail->send($userCode);
     }
 
 }

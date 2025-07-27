@@ -2,6 +2,7 @@
 
 namespace App\Entity\User;
 
+use App\Enum\User\UserCodeTypeEnum;
 use App\Repository\User\UserCodeRepository;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
@@ -28,18 +29,21 @@ class UserCode
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $data = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $usedAt = null;
+
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
     public function __construct(
-        User $user,
-        string $type,
+        User $mainUser,
+        UserCodeTypeEnum $type,
         string $code,
         DateTimeImmutable $createdAt,
         ?array $data = null
     ) {
-        $this->mainUser = $user;
-        $this->type = $type;
+        $this->mainUser = $mainUser;
+        $this->type = $type->value;
         $this->code = $code;
         $this->createdAt = $createdAt;
         $this->data = $data;
@@ -50,7 +54,7 @@ class UserCode
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getMainUser(): ?User
     {
         return $this->mainUser;
     }
@@ -73,5 +77,15 @@ class UserCode
     public function getData(): ?array
     {
         return $this->data;
+    }
+
+    public function getUsedAt(): ?DateTimeImmutable
+    {
+        return $this->usedAt;
+    }
+
+    public function setUsedAt(?DateTimeImmutable $usedAt): void
+    {
+        $this->usedAt = $usedAt;
     }
 }

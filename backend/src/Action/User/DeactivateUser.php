@@ -3,6 +3,7 @@
 namespace App\Action\User;
 
 use App\Entity\User\User;
+use App\Enum\User\UserStatusEnum;
 use App\Repository\User\UserRepository;
 
 readonly class DeactivateUser
@@ -19,9 +20,8 @@ readonly class DeactivateUser
             throw new \DomainException('User is already inactive');
         }
 
-        $user->setActivationCode(null);
-        $user->setResetPasswordCode(null);
         $user->setPasswordHash(null);
+        $user->setStatusId(UserStatusEnum::InActive);
 
         $this->userRepository->flush();
     }

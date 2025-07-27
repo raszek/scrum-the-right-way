@@ -4,6 +4,7 @@ namespace App\Factory;
 
 use App\Entity\User\User;
 use App\Enum\User\UserRoleEnum;
+use App\Enum\User\UserStatusEnum;
 use DateTimeImmutable;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -29,6 +30,16 @@ final class UserFactory extends PersistentProxyObjectFactory
         return $this->with(['roles' => [UserRoleEnum::Admin->value]]);
     }
 
+    public function withActiveStatus(): static
+    {
+        return $this->with(['statusId' => UserStatusEnum::Active]);
+    }
+
+    public function withNotActiveStatus(): static
+    {
+        return $this->with(['statusId' => UserStatusEnum::InActive]);
+    }
+
     protected function defaults(): array|callable
     {
         $createdAt = DateTimeImmutable::createFromMutable(self::faker()->dateTime());
@@ -39,7 +50,7 @@ final class UserFactory extends PersistentProxyObjectFactory
             'firstName' => self::faker()->firstName(),
             'lastName' => self::faker()->lastName(),
             'createdAt' => $createdAt,
-            'activationCodeSendDate' => $createdAt,
+            'statusId' => UserStatusEnum::Active,
         ];
     }
 

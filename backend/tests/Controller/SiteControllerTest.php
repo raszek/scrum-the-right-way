@@ -2,10 +2,17 @@
 
 namespace App\Tests\Controller;
 
+use App\Enum\User\UserCodeTypeEnum;
+use App\Enum\User\UserStatusEnum;
+use App\Factory\User\UserCodeFactory;
 use App\Factory\UserFactory;
+use App\Repository\User\UserCodeRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Common\ClockInterface;
 use Carbon\CarbonImmutable;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class SiteControllerTest extends WebTestCase
@@ -50,8 +57,13 @@ class SiteControllerTest extends WebTestCase
         $user = UserFactory::createOne([
             'email' => 'test@test.com',
             'plainPassword' => 'Password123!',
-            'resetPasswordCode' => 'some-reset-password-code',
-            'resetPasswordCodeSendDate' => CarbonImmutable::create(2010, 10, 10, 9)
+        ]);
+
+        $userCode = UserCodeFactory::createOne([
+            'mainUser' => $user,
+            'type' => UserCodeTypeEnum::ResetPassword,
+            'code' => 'some-reset-password-code',
+            'createdAt' => CarbonImmutable::create(2010, 10, 10, 9)
         ]);
 
         $crawler = $this->goToPageSafe('/reset-password/test@test.com/some-reset-password-code');
@@ -59,10 +71,10 @@ class SiteControllerTest extends WebTestCase
         $form = $crawler->selectButton('Reset')->form();
 
         $client->submit($form, [
-            'reset_password[password][first]' => 'NewPass123!',
-            'reset_password[password][second]' => 'NewPass123!',
-            'reset_password[email]' => 'test@test.com',
-            'reset_password[resetPasswordCode]' => 'some-reset-password-code',
+            'reset_password_form[password]' => 'NewPass123!',
+            'reset_password_form[repeatPassword]' => 'NewPass123!',
+            'reset_password_form[email]' => 'test@test.com',
+            'reset_password_form[resetPasswordCode]' => 'some-reset-password-code',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -75,11 +87,12 @@ class SiteControllerTest extends WebTestCase
         ]);
 
         $this->assertNotNull($updatedUser);
-        $this->assertNull($updatedUser->getResetPasswordCode());
 
         $isPasswordValid = $this->getUserPasswordHasher()->isPasswordValid($updatedUser, 'NewPass123!');
 
         $this->assertTrue($isPasswordValid);
+
+        $this->assertNotNull($userCode->getUsedAt());
     }
 
     /** @test */
@@ -99,11 +112,16 @@ class SiteControllerTest extends WebTestCase
 
         $this->mockService(ClockInterface::class, $clockMock);
 
-        UserFactory::createOne([
+        $user = UserFactory::createOne([
             'email' => 'test@test.com',
             'plainPassword' => 'Password123!',
-            'resetPasswordCode' => 'some-reset-password-code',
-            'resetPasswordCodeSendDate' => CarbonImmutable::create(2010, 10, 10, 9)
+        ]);
+
+        UserCodeFactory::createOne([
+            'mainUser' => $user,
+            'type' => UserCodeTypeEnum::ResetPassword,
+            'code' => 'some-reset-password-code',
+            'createdAt' => CarbonImmutable::create(2010, 10, 10, 9)
         ]);
 
         $crawler = $this->goToPageSafe('/reset-password/test@test.com/some-reset-password-code');
@@ -111,15 +129,15 @@ class SiteControllerTest extends WebTestCase
         $form = $crawler->selectButton('Reset')->form();
 
         $client->submit($form, [
-            'reset_password[password][first]' => 'NewPass123!',
-            'reset_password[password][second]' => 'NewPass123!',
-            'reset_password[email]' => 'test@test.com',
-            'reset_password[resetPasswordCode]' => 'some-reset-password-code'
+            'reset_password_form[password]' => 'NewPass123!',
+            'reset_password_form[repeatPassword]' => 'NewPass123!',
+            'reset_password_form[email]' => 'test@test.com',
+            'reset_password_form[resetPasswordCode]' => 'some-reset-password-code',
         ]);
 
         $this->assertResponseStatusCodeSame(400);
 
-        $this->assertResponseHasText('Reset password link is only valid for 1 hour. Reset password again.');
+        $this->assertResponseHasText('Code expired');
     }
 
     /** @test */
@@ -127,11 +145,22 @@ class SiteControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->followRedirects();
+        $client->disableReboot();
 
-        UserFactory::createOne([
+        $mailerMock = new class implements MailerInterface {
+
+            public bool $isMailSent = false;
+
+            public function send(RawMessage $message, ?Envelope $envelope = null): void
+            {
+                $this->isMailSent = true;
+            }
+        };
+        $this->mockService(MailerInterface::class, $mailerMock);
+
+        $user = UserFactory::createOne([
             'email' => 'test@test.com',
             'plainPassword' => 'Password123!',
-            'activationCode' => 'some-activation-code'
         ]);
 
         $crawler = $this->goToPageSafe('/forgot-password');
@@ -139,19 +168,21 @@ class SiteControllerTest extends WebTestCase
         $form = $crawler->selectButton('Send')->form();
 
         $client->submit($form, [
-            'forgot_password[email]' => 'test@test.com',
+            'forgot_password_form[email]' => 'test@test.com',
         ]);
 
         $this->assertResponseIsSuccessful();
 
         $this->assertResponseHasText('Email was sent to your inbox if your account exist');
 
-        $updatedUser = $this->userRepository()->findOneBy([
-            'email' => 'test@test.com'
+        $userCode = $this->userCodeRepository()->findOneBy([
+            'mainUser' => $user,
+            'type' => UserCodeTypeEnum::ResetPassword->value
         ]);
 
-        $this->assertNotNull($updatedUser);
-        $this->assertNotNull($updatedUser->getResetPasswordCode());
+        $this->assertNotNull($userCode);
+        $this->assertNull($userCode->getUsedAt());
+        $this->assertTrue($mailerMock->isMailSent);;
     }
 
     /** @test */
@@ -163,7 +194,7 @@ class SiteControllerTest extends WebTestCase
         UserFactory::createOne([
             'email' => 'test@test.com',
             'plainPassword' => 'Password123!',
-            'activationCode' => 'some-activation-code'
+            'statusId' => UserStatusEnum::InActive
         ]);
 
         $crawler = $this->goToPageSafe('/login');
@@ -188,11 +219,12 @@ class SiteControllerTest extends WebTestCase
         $client = static::createClient();
         $client->followRedirects();
 
-        UserFactory::createOne([
-            'email' => 'test@test.com',
-            'plainPassword' => 'Password123!',
-            'activationCode' => null
-        ]);
+        UserFactory::new()
+            ->withActiveStatus()
+            ->create([
+                'email' => 'test@test.com',
+                'plainPassword' => 'Password123!',
+            ]);
 
         $crawler = $this->goToPageSafe('/login');
 
@@ -224,11 +256,16 @@ class SiteControllerTest extends WebTestCase
         };
         $this->mockService(ClockInterface::class, $clockMock);
 
-        UserFactory::createOne([
+        $user = UserFactory::createOne([
             'email' => 'test@test.com',
-            'activationCode' => 'some-activation-code',
             'plainPassword' => null,
-            'activationCodeSendDate' => CarbonImmutable::create(2010, 10, 10, 10)
+        ]);
+
+        $userCode = UserCodeFactory::createOne([
+            'code' => 'some-activation-code',
+            'type' => UserCodeTypeEnum::Activation,
+            'createdAt' => CarbonImmutable::create(2010, 10, 10, 10),
+            'mainUser' => $user
         ]);
 
         $crawler = $this->goToPageSafe( '/activate-account/test@test.com/some-activation-code');
@@ -236,10 +273,10 @@ class SiteControllerTest extends WebTestCase
         $form = $crawler->selectButton('Reset')->form();
 
         $client->submit($form, [
-            'reset_password[password][first]' => 'NewPass123!',
-            'reset_password[password][second]' => 'NewPass123!',
-            'reset_password[email]' => 'test@test.com',
-            'reset_password[resetPasswordCode]' => 'some-activation-code'
+            'reset_password_form[password]' => 'NewPass123!',
+            'reset_password_form[repeatPassword]' => 'NewPass123!',
+            'reset_password_form[email]' => 'test@test.com',
+            'reset_password_form[resetPasswordCode]' => 'some-activation-code'
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -253,11 +290,12 @@ class SiteControllerTest extends WebTestCase
         ]);
 
         $this->assertNotNull($updatedUser);
-        $this->assertNull($updatedUser->getActivationCode());
+        $this->assertTrue($updatedUser->isActive());
 
         $isPasswordValid = $this->getUserPasswordHasher()->isPasswordValid($updatedUser, 'NewPass123!');
-
         $this->assertTrue($isPasswordValid);
+
+        $this->assertNotNull($userCode->getUsedAt());
     }
 
     /** @test */
@@ -276,11 +314,16 @@ class SiteControllerTest extends WebTestCase
         };
         $this->mockService(ClockInterface::class, $clockMock);
 
-        UserFactory::createOne([
+        $user = UserFactory::createOne([
             'email' => 'test@test.com',
-            'activationCode' => 'some-activation-code',
             'plainPassword' => null,
-            'activationCodeSendDate' => CarbonImmutable::create(2010, 10, 10, 9)
+        ]);
+
+        UserCodeFactory::createOne([
+            'code' => 'some-activation-code',
+            'type' => UserCodeTypeEnum::Activation,
+            'createdAt' => CarbonImmutable::create(2010, 10, 10, 9),
+            'mainUser' => $user,
         ]);
 
         $crawler = $this->goToPageSafe( '/activate-account/test@test.com/some-activation-code');
@@ -288,20 +331,25 @@ class SiteControllerTest extends WebTestCase
         $form = $crawler->selectButton('Reset')->form();
 
         $client->submit($form, [
-            'reset_password[password][first]' => 'NewPass123!',
-            'reset_password[password][second]' => 'NewPass123!',
-            'reset_password[email]' => 'test@test.com',
-            'reset_password[resetPasswordCode]' => 'some-activation-code'
+            'reset_password_form[password]' => 'NewPass123!',
+            'reset_password_form[repeatPassword]' => 'NewPass123!',
+            'reset_password_form[email]' => 'test@test.com',
+            'reset_password_form[resetPasswordCode]' => 'some-activation-code'
         ]);
 
         $this->assertResponseStatusCodeSame(400);
 
-        $this->assertResponseHasText('Activation link is only valid for 1 hour. Ask admin for another activation link.');
+        $this->assertResponseHasText('Code expired');
     }
 
     private function userRepository(): UserRepository
     {
         return $this->getService(UserRepository::class);
+    }
+
+    private function userCodeRepository(): UserCodeRepository
+    {
+        return $this->getService(UserCodeRepository::class);
     }
 
     private function getUserPasswordHasher(): UserPasswordHasherInterface

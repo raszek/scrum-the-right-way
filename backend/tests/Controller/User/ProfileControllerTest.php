@@ -167,8 +167,8 @@ class ProfileControllerTest extends WebTestCase
         ]);
 
         UserCodeFactory::createOne([
-            'user' => $user,
-            'type' => UserCodeTypeEnum::ChangeEmail->value,
+            'mainUser' => $user,
+            'type' => UserCodeTypeEnum::ChangeEmail,
             'code' => 'some-code',
             'data' => [
                 'email' => 'zenek@example.com'

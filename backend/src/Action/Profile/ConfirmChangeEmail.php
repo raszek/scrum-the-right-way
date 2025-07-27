@@ -5,34 +5,29 @@ namespace App\Action\Profile;
 use App\Entity\User\User;
 use App\Enum\User\UserCodeTypeEnum;
 use App\Exception\Profile\CannotChangeEmailException;
-use App\Repository\User\UserCodeRepository;
-use App\Service\Common\ClockInterface;
+use App\Exception\User\CannotUseCodeException;
+use App\Service\User\UserCodeService;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class ConfirmChangeEmail
 {
 
     public function __construct(
-        private UserCodeRepository $userCodeRepository,
-        private ClockInterface $clock,
+        private UserCodeService $userCodeService,
         private EntityManagerInterface $entityManager
     ) {
     }
 
     public function execute(string $activationCode, User $user): void
     {
-        $userCode = $this->userCodeRepository->findLatestCode(
-            activationCode: $activationCode,
-            type: UserCodeTypeEnum::ChangeEmail,
-            user: $user
-        );
-
-        if ($userCode === null) {
-            throw new CannotChangeEmailException('Invalid activation code');
-        }
-
-        if ($this->clock->now()->greaterThan($userCode->getCreatedAt()->addHour())) {
-            throw new CannotChangeEmailException('Cannot change email. Change email code is expired.');
+        try {
+            $userCode = $this->userCodeService->useCode(
+                code: $activationCode,
+                type: UserCodeTypeEnum::ChangeEmail,
+                user: $user
+            );
+        } catch (CannotUseCodeException $e) {
+            throw new CannotChangeEmailException($e->getMessage());
         }
 
         $user->setEmail($userCode->getData()['email']);

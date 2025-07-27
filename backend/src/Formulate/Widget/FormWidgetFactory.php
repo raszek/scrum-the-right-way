@@ -35,4 +35,22 @@ readonly class FormWidgetFactory
         );
     }
 
+    public function hiddenField(): TextField
+    {
+        return new TextField(
+            twig: $this->twig,
+            type: 'hidden',
+            template: 'formulate/widget/hidden_input.html.twig'
+        );
+    }
+
+    public function siteTextField(string $type = 'text'): TextField
+    {
+        return new TextField(
+            twig: $this->twig,
+            type: $type,
+            template: 'formulate/widget/site_text_input.html.twig'
+        );
+    }
+
 }

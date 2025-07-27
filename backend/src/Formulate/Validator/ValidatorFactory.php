@@ -21,4 +21,9 @@ class ValidatorFactory
         return new Callback($closure);
     }
 
+    public function repeat(string $fieldName): Repeat
+    {
+        return new Repeat($fieldName);
+    }
+
 }

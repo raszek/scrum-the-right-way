@@ -15,7 +15,7 @@ readonly class ChangeEmailEmail
 
     public function send(UserCode $userCode): void
     {
-        $user = $userCode->getUser();
+        $user = $userCode->getMainUser();
 
         $email = $this->mailer->createTemplatedEmail();
 

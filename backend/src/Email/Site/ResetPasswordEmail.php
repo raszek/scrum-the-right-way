@@ -1,20 +1,22 @@
 <?php
 
-namespace App\Service\Site;
+namespace App\Email\Site;
 
 use App\Entity\User\User;
+use App\Entity\User\UserCode;
 use App\Service\Common\DefaultMailer;
 
-readonly class ForgotPasswordMail
+readonly class ResetPasswordEmail
 {
     public function __construct(
         private DefaultMailer $mailer
     ) {
     }
 
-
-    public function send(User $user): void
+    public function send(UserCode $userCode): void
     {
+        $user = $userCode->getMainUser();
+
         $email = $this->mailer->createTemplatedEmail();
 
         $email
@@ -23,6 +25,7 @@ readonly class ForgotPasswordMail
             ->htmlTemplate('emails/site/forgot_password_mail.html.twig')
             ->context([
                 'user' => $user,
+                'userCode' => $userCode,
             ]);
 
         $this->mailer->sendTemplated($email);

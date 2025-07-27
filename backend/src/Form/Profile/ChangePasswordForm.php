@@ -3,22 +3,26 @@
 namespace App\Form\Profile;
 
 
+use App\Entity\User\User;
 use App\Formulate\Form;
 use App\Formulate\FormField;
 use App\Formulate\FormFieldError;
+use App\Formulate\Validator\Callback;
 use App\Formulate\Validator\ValidatorFactory;
 use App\Formulate\Widget\FormWidgetFactory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 readonly class ChangePasswordForm
 {
     public function __construct(
         private ValidatorFactory $validatorFactory,
         private FormWidgetFactory $formWidgetFactory,
+        private UserPasswordHasherInterface $userPasswordHasher,
     ) {
     }
 
 
-    public function create(): Form
+    public function create(User $user): Form
     {
         $v = $this->validatorFactory;
 
@@ -28,6 +32,7 @@ readonly class ChangePasswordForm
             name: 'currentPassword',
             validators: [
                 $v->notBlank(),
+                $this->currentPasswordValidator($user),
             ],
             widget: $this->formWidgetFactory->passwordField(),
             label: 'Current password'
@@ -37,7 +42,7 @@ readonly class ChangePasswordForm
             name: 'newPassword',
             validators: [
                 $v->notBlank(),
-                $v->callback($this->validateSamePassword(...))
+                $v->repeat('repeatPassword')
             ],
             widget: $this->formWidgetFactory->passwordField(),
             label: 'New password'
@@ -55,14 +60,16 @@ readonly class ChangePasswordForm
         return $form;
     }
 
-    private function validateSamePassword(FormField $field, Form $form): ?FormFieldError
+    private function currentPasswordValidator(User $user): Callback
     {
-        $repeatPassword = $form->findField('repeatPassword')->value();
+        return new Callback(function (FormField $field) use ($user) {
+            $isValid = $this->userPasswordHasher->isPasswordValid($user, $field->value());
 
-        if ($field->value() !== $repeatPassword) {
-            return new FormFieldError('Passwords do not match');
-        }
+            if (!$isValid) {
+                return new FormFieldError('Current password is incorrect');
+            }
 
-        return null;
+            return null;
+        });
     }
 }

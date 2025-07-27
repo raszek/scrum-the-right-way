@@ -2,11 +2,14 @@
 
 namespace App\Tests\Controller\Admin;
 
+use App\Email\Site\ActivationUserEmail;
 use App\Entity\User\User;
+use App\Entity\User\UserCode;
+use App\Enum\User\UserCodeTypeEnum;
 use App\Factory\UserFactory;
+use App\Repository\User\UserCodeRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Common\ClockInterface;
-use App\Service\Site\ActivationUserEmail;
 use App\Tests\Controller\WebTestCase;
 use Carbon\CarbonImmutable;
 use Symfony\Component\Mailer\Envelope;
@@ -63,7 +66,7 @@ class UserControllerTest extends WebTestCase
 
             public bool $isMailSent = false;
 
-            public function send(User $user): void
+            public function send(UserCode $userCode): void
             {
                 $this->isMailSent = true;
             }
@@ -92,10 +95,14 @@ class UserControllerTest extends WebTestCase
         ]);
 
         $this->assertNotNull($createdUser);
-        $this->assertNotNull($createdUser->getActivationCode());
         $this->assertTrue($activationMailMock->isMailSent);
 
-        $client->enableReboot();
+        $createdUserCode = $this->userCodeRepository()->findOneBy([
+            'mainUser' => $createdUser,
+            'type' => UserCodeTypeEnum::Activation
+        ]);
+
+        $this->assertNotNull($createdUserCode);
     }
 
     /** @test */
@@ -227,10 +234,11 @@ class UserControllerTest extends WebTestCase
                 'lastName' => 'Admin'
             ]);
 
-        $user = UserFactory::createOne([
-            'plainPassword' => 'Password123!',
-            'activationCode' => null
-        ]);
+        $user = UserFactory::new()
+            ->withActiveStatus()
+            ->create([
+                'plainPassword' => 'Password123!',
+            ]);
 
         $this->loginAsUser($admin);
 
@@ -242,7 +250,7 @@ class UserControllerTest extends WebTestCase
 
         $this->assertResponseHasText('User has been deactivated.');
 
-        $this->assertNull($user->getActivationCode());
+        $this->assertFalse($user->isActive());
         $this->assertNull($user->getPasswordHash());
     }
 
@@ -280,10 +288,11 @@ class UserControllerTest extends WebTestCase
                 'lastName' => 'Admin'
             ]);
 
-        $user = UserFactory::createOne([
-            'plainPassword' => 'Password123!',
-            'activationCode' => 'some-activation-code'
-        ]);
+        $user = UserFactory::new()
+            ->withNotActiveStatus()
+            ->create([
+                'plainPassword' => 'Password123!',
+            ]);
 
         $this->loginAsUser($admin);
 
@@ -293,13 +302,24 @@ class UserControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $this->assertNotEquals('some-activation-code', $user->getActivationCode());
-        $this->assertEquals('2010-10-10', $user->getActivationCodeSendDate()->format('Y-m-d'));;
         $this->assertTrue($mailerMock->isMailSent);
+
+        $createdUserCode = $this->userCodeRepository()->findOneBy([
+            'mainUser' => $user,
+            'type' => UserCodeTypeEnum::Activation,
+        ]);
+
+        $this->assertNotNull($createdUserCode);
+        $this->assertEquals('2010-10-10', $createdUserCode->getCreatedAt()->format('Y-m-d'));
     }
 
     private function userRepository(): UserRepository
     {
         return $this->getService(UserRepository::class);
+    }
+
+    private function userCodeRepository(): UserCodeRepository
+    {
+        return $this->getService(UserCodeRepository::class);
     }
 }

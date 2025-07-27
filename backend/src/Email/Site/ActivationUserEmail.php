@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Service\Site;
+namespace App\Email\Site;
 
 use App\Entity\User\User;
+use App\Entity\User\UserCode;
 use App\Service\Common\DefaultMailer;
 
 class ActivationUserEmail
@@ -14,8 +15,10 @@ class ActivationUserEmail
     }
 
 
-    public function send(User $user): void
+    public function send(UserCode $userCode): void
     {
+        $user = $userCode->getMainUser();
+
         $email = $this->mailer->createTemplatedEmail();
 
         $email
@@ -24,6 +27,7 @@ class ActivationUserEmail
             ->htmlTemplate('emails/site/activation_user.html.twig')
             ->context([
                 'user' => $user,
+                'userCode' => $userCode,
             ]);
 
         $this->mailer->sendTemplated($email);

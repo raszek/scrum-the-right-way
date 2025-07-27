@@ -3,6 +3,7 @@
 namespace App\Factory\User;
 
 use App\Entity\User\UserCode;
+use App\Enum\User\UserCodeTypeEnum;
 use App\Factory\UserFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
@@ -21,8 +22,8 @@ final class UserCodeFactory extends PersistentProxyObjectFactory
         return [
             'code' => self::faker()->text(255),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'user' => UserFactory::new(),
-            'type' => self::faker()->text(255),
+            'mainUser' => UserFactory::new(),
+            'type' => UserCodeTypeEnum::Activation,
         ];
     }
 

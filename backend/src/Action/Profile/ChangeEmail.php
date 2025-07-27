@@ -25,8 +25,8 @@ readonly class ChangeEmail
     public function execute(ChangeEmailFormData $formData, User $user): void
     {
         $userCode = new UserCode(
-            user: $user,
-            type: UserCodeTypeEnum::ChangeEmail->value,
+            mainUser: $user,
+            type: UserCodeTypeEnum::ChangeEmail,
             code: $this->randomService->randomString(),
             createdAt: $this->clock->now(),
             data: [

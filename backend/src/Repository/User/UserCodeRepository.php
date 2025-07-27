@@ -29,9 +29,13 @@ class UserCodeRepository extends ServiceEntityRepository
     public function findLatestCode(
         string $activationCode,
         UserCodeTypeEnum $type,
-        User $user
+        ?User $user
     ): ?UserCode
     {
+        if (!$user) {
+            return null;
+        }
+
         $queryBuilder = $this->createQueryBuilder('userCode');
 
         $queryBuilder
@@ -44,5 +48,12 @@ class UserCodeRepository extends ServiceEntityRepository
             ->orderBy('userCode.id', 'DESC');
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
+    }
+
+    public function create(UserCode $userCode): void
+    {
+        $this->getEntityManager()->persist($userCode);
+
+        $this->getEntityManager()->flush();
     }
 }

@@ -1,0 +1,14 @@
+<div class="form-outline mb-4">
+    <input type="{{ type }}"
+           name="{{ name }}"
+           class="form-control form-control-lg {{ error ? 'is-invalid' : '' }}"
+           id="{{ id }}"
+           value="{{ value }}"
+    >
+    <label for="{{ id }}" class="form-label">{{ label }}</label>
+    {% if error %}
+        <div class="invalid-feedback">
+            {{ error.message() }}
+        </div>
+    {% endif %}
+</div>

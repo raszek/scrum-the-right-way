@@ -6,6 +6,7 @@ use App\Doctrine\Sqid;
 use App\Entity\Issue\Issue;
 use App\Entity\Project\ProjectMember;
 use App\Enum\User\UserRoleEnum;
+use App\Enum\User\UserStatusEnum;
 use App\Helper\ArrayHelper;
 use App\Repository\User\UserRepository;
 use DateTimeImmutable;
@@ -41,17 +42,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $activationCode = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private ?DateTimeImmutable $activationCodeSendDate = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $resetPasswordCode = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?DateTimeImmutable $resetPasswordCodeSendDate = null;
+    #[ORM\Column(options: ['default' => UserStatusEnum::InActive->value])]
+    private int $statusId = UserStatusEnum::InActive->value;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?DateTimeImmutable $createdAt = null;
@@ -72,12 +64,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         string $firstName,
         string $lastName,
         DateTimeImmutable $createdAt,
-        ?string $activationCode = null,
     ) {
         $this->email = $email;
         $this->createdAt = $createdAt;
-        $this->activationCodeSendDate = $createdAt;
-        $this->activationCode = $activationCode;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->projectMembers = new ArrayCollection();
@@ -109,30 +98,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPasswordHash(?string $passwordHash): static
     {
         $this->passwordHash = $passwordHash;
-
-        return $this;
-    }
-
-    public function getActivationCode(): ?string
-    {
-        return $this->activationCode;
-    }
-
-    public function setActivationCode(?string $activationCode): static
-    {
-        $this->activationCode = $activationCode;
-
-        return $this;
-    }
-
-    public function getResetPasswordCode(): ?string
-    {
-        return $this->resetPasswordCode;
-    }
-
-    public function setResetPasswordCode(?string $resetPasswordCode): static
-    {
-        $this->resetPasswordCode = $resetPasswordCode;
 
         return $this;
     }
@@ -195,7 +160,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isActive(): bool
     {
-        return $this->activationCode === null && $this->passwordHash !== null;
+        return $this->passwordHash !== null && $this->statusId === UserStatusEnum::Active->value;
+    }
+
+    public function setStatusId(UserStatusEnum $statusEnum): void
+    {
+        $this->statusId = $statusEnum->value;
     }
 
     public function getFullName(): string
@@ -263,25 +233,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdmin(): bool
     {
         return ArrayHelper::inArray(UserRoleEnum::Admin->value, $this->roles);
-    }
-
-    public function getActivationCodeSendDate(): ?DateTimeImmutable
-    {
-        return $this->activationCodeSendDate;
-    }
-
-    public function setActivationCodeSendDate(?DateTimeImmutable $activationCodeSendDate): void
-    {
-        $this->activationCodeSendDate = $activationCodeSendDate;
-    }
-
-    public function getResetPasswordCodeSendDate(): ?DateTimeImmutable
-    {
-        return $this->resetPasswordCodeSendDate;
-    }
-
-    public function setResetPasswordCodeSendDate(?DateTimeImmutable $resetPasswordCodeSendDate): void
-    {
-        $this->resetPasswordCodeSendDate = $resetPasswordCodeSendDate;
     }
 }

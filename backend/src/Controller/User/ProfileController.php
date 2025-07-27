@@ -7,11 +7,13 @@ use App\Action\Profile\ChangePassword;
 use App\Action\Profile\ConfirmChangeEmail;
 use App\Action\Profile\UpdateProfile;
 use App\Controller\Controller;
+use App\Exception\Profile\CannotChangeEmailException;
 use App\Form\Profile\ChangeEmailForm;
 use App\Form\Profile\ChangePasswordForm;
 use App\Form\Profile\ProfileForm;
 use App\Service\Menu\Profile\ProfileMenu;
 use Exception;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -46,7 +48,7 @@ class ProfileController extends Controller
         Request $request,
         ChangePassword $changePassword
     ): Response {
-        $form = $changePasswordForm->create();
+        $form = $changePasswordForm->create($this->getLoggedInUser());
 
         if ($form->loadRequest($request) && $form->validate()) {
             $changePassword->execute($form->getData(), $this->getLoggedInUser());
@@ -81,9 +83,13 @@ class ProfileController extends Controller
     }
 
     #[Route('/profile/confirm-change-email/{activationCode}', 'app_user_profile_confirm_change_email', methods: ['GET'])]
-    public function activateEmail(string $activationCode, ConfirmChangeEmail $confirmChangeEmail): Response
+    public function confirmChangeEmail(string $activationCode, ConfirmChangeEmail $confirmChangeEmail): Response
     {
-        $confirmChangeEmail->execute($activationCode, $this->getLoggedInUser());
+        try {
+            $confirmChangeEmail->execute($activationCode, $this->getLoggedInUser());
+        } catch (CannotChangeEmailException $e) {
+            throw new BadRequestException($e->getMessage());
+        }
 
         $this->successFlash('Email successfully changed.');
         return $this->redirectToRoute('app_user_profile_change_email');
