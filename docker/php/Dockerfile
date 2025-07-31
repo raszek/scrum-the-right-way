@@ -3,6 +3,8 @@ FROM php:8.4-apache
 RUN apt-get update
 RUN apt-get install -y \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     libpq-dev \
     libxml2-dev \
     wget \
@@ -19,6 +21,7 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
+RUN docker-php-ext-configure gd --with-jpeg
 RUN docker-php-ext-install gd zip bcmath intl
 
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
