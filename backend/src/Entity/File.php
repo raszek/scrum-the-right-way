@@ -33,6 +33,23 @@ class File
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
+
+    public static function fromFile(
+        File $file,
+        string $directory,
+        DateTimeImmutable $createdAt,
+        string $name
+    ): static {
+        return new static(
+            name: $name,
+            directory: $directory,
+            mime: $file->getMime(),
+            extension: $file->getExtension(),
+            size: $file->getSize(),
+            createdAt: $createdAt
+        );
+    }
+
     public static function fromUploadedFile(
         UploadedFile $uploadedFile,
         string $directory,

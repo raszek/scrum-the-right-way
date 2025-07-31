@@ -5,6 +5,7 @@ namespace App\Formulate;
 use App\Formulate\FormData\ArrayFormData;
 use App\Formulate\FormData\FormDataInterface;
 use App\Formulate\FormData\ObjectFormData;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Twig\Markup;
 
@@ -23,7 +24,7 @@ class Form
     private bool $isSubmitted = false;
 
     public function __construct(
-        private readonly string $name,
+        private readonly ?string $name = null,
         mixed $data = null,
     ) {
         $this->loadData($data);
@@ -78,16 +79,12 @@ class Form
             return false;
         }
 
-        $submittedFields = $request->get($this->name);
+        $submittedFields = $this->getSubmittedFields($request);
         if (empty($submittedFields)) {
             return false;
         }
 
         foreach ($submittedFields as $fieldKey => $value) {
-            if (!isset($this->fields[$fieldKey])) {
-                continue;
-            }
-
             $this->fields[$fieldKey]->load($value);
         }
 
@@ -114,11 +111,19 @@ class Form
 
     public function generateFieldName(FormField $field): string
     {
+        if ($this->name === null) {
+            return $field->name;
+        }
+
         return sprintf('%s[%s]', $this->name, $field->name);
     }
 
     public function generateFieldId(FormField $field): string
     {
+        if ($this->name === null) {
+            return $field->name;
+        }
+
         return sprintf('%s_%s', $this->name, $field->name);
     }
 
@@ -157,4 +162,20 @@ class Form
         }
     }
 
+    private function getSubmittedFields(Request $request): array
+    {
+        $submittedData = $this->name === null ? $request->request->all() : $request->get($this->name);
+        $submittedFiles = $this->name === null ? $request->files->all() : $request->files->get($this->name);
+
+        $submittedFields = [];
+        foreach ($this->fields as $field) {
+            $submittedValue = $submittedData[$field->name] ?? $submittedFiles[$field->name] ?? null;
+
+            if ($submittedValue) {
+                $submittedFields[$field->name] = $submittedValue;
+            }
+        }
+
+        return $submittedFields;
+    }
 }

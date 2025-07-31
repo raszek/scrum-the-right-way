@@ -3,15 +3,14 @@
 namespace App\Action\User;
 
 use App\Email\Site\ActivationUserEmail;
+use App\Entity\Profile\Profile;
 use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;
 use App\Form\User\UserFormData;
-use App\Repository\User\UserRepository;
 use App\Service\Common\ClockInterface;
 use App\Service\Common\RandomService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\String\ByteString;
 
 readonly class CreateUser
 {
@@ -26,10 +25,13 @@ readonly class CreateUser
 
     public function execute(UserFormData $form): User
     {
+        $profile = new Profile();
+
         $user = new User(
             email: $form->email,
             firstName: $form->firstName,
             lastName: $form->lastName,
+            profile: $profile,
             createdAt: $this->clock->now(),
         );
 
@@ -40,6 +42,7 @@ readonly class CreateUser
             createdAt: $this->clock->now()
         );
 
+        $this->entityManager->persist($profile);
         $this->entityManager->persist($user);
         $this->entityManager->persist($userCode);
 

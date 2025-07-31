@@ -32,8 +32,6 @@ final class UserCodeFactory extends PersistentProxyObjectFactory
      */
     protected function initialize(): static
     {
-        return $this
-            // ->afterInstantiate(function(UserCode $userCode): void {})
-        ;
+        return $this;
     }
 }

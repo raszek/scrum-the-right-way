@@ -5,6 +5,7 @@ namespace App\Factory;
 use App\Entity\User\User;
 use App\Enum\User\UserRoleEnum;
 use App\Enum\User\UserStatusEnum;
+use App\Factory\Profile\ProfileFactory;
 use DateTimeImmutable;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -51,6 +52,7 @@ final class UserFactory extends PersistentProxyObjectFactory
             'lastName' => self::faker()->lastName(),
             'createdAt' => $createdAt,
             'statusId' => UserStatusEnum::Active,
+            'profile' => ProfileFactory::new(),
         ];
     }
 

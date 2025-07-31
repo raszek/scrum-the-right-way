@@ -17,12 +17,9 @@ use App\Repository\FileRepository;
 use App\Repository\Issue\AttachmentRepository;
 use App\Service\File\FileService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Zenstruck\Foundry\Test\Factories;
 
 class AttachmentControllerTest extends WebTestCase
 {
-
-
 
     /** @test */
     public function developer_can_add_attachments_to_issue()

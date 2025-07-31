@@ -2,20 +2,28 @@
 
 namespace App\Controller\User;
 
+use App\Action\Profile\ChangeAvatar;
 use App\Action\Profile\ChangeEmail;
 use App\Action\Profile\ChangePassword;
 use App\Action\Profile\ConfirmChangeEmail;
 use App\Action\Profile\UpdateProfile;
 use App\Controller\Controller;
+use App\Entity\User\User;
 use App\Exception\Profile\CannotChangeEmailException;
+use App\Form\Profile\AvatarForm;
 use App\Form\Profile\ChangeEmailForm;
 use App\Form\Profile\ChangePasswordForm;
 use App\Form\Profile\ProfileForm;
+use App\Service\File\FileService;
 use App\Service\Menu\Profile\ProfileMenu;
 use Exception;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -93,6 +101,41 @@ class ProfileController extends Controller
 
         $this->successFlash('Email successfully changed.');
         return $this->redirectToRoute('app_user_profile_change_email');
+    }
+
+    #[Route('/profile/avatar', 'app_user_profile_change_avatar', methods: ['POST'])]
+    public function changeAvatar(
+        AvatarForm $avatarForm,
+        Request $request,
+        ChangeAvatar $changeAvatar,
+    ): Response {
+        $form = $avatarForm->create();
+
+        if (!$form->loadRequest($request)) {
+            throw new BadRequestException('Form cannot be loaded');
+        }
+
+        if (!$form->validate()) {
+            throw new UnprocessableEntityHttpException('Form cannot be validated');
+        }
+
+        $result = $changeAvatar->execute($form->getData(), $this->getLoggedInUser());
+
+        return new JsonResponse($result);
+    }
+
+    #[Route('/users/{id}/avatar', 'app_user_profile_show_avatar', methods: ['GET'])]
+    public function showAvatar(User $user, FileService $fileService): BinaryFileResponse
+    {
+        $avatar = $user->getProfile()->getAvatar();
+
+        if (!$avatar) {
+            throw new NotFoundHttpException('Avatar not found');
+        }
+
+        $avatar = $fileService->getFilePath($avatar);
+
+        return new BinaryFileResponse($avatar);
     }
 
     #[Route('/profile/menu', 'app_user_profile_menu')]

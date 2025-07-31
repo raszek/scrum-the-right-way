@@ -4,6 +4,7 @@ namespace App\Entity\User;
 
 use App\Doctrine\Sqid;
 use App\Entity\Issue\Issue;
+use App\Entity\Profile\Profile;
 use App\Entity\Project\ProjectMember;
 use App\Enum\User\UserRoleEnum;
 use App\Enum\User\UserStatusEnum;
@@ -57,12 +58,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(targetEntity: UserNotification::class, mappedBy: 'forUser')] private Collection $notifications;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(unique: true, nullable: false)]
+    private ?Profile $profile = null;
+
     private ?string $plainPassword = null;
+
 
     public function __construct(
         string $email,
         string $firstName,
         string $lastName,
+        Profile $profile,
         DateTimeImmutable $createdAt,
     ) {
         $this->email = $email;
@@ -71,6 +78,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->lastName = $lastName;
         $this->projectMembers = new ArrayCollection();
         $this->notifications = new ArrayCollection();
+        $this->profile = $profile;
     }
 
     public function getId(): ?Sqid
@@ -233,5 +241,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdmin(): bool
     {
         return ArrayHelper::inArray(UserRoleEnum::Admin->value, $this->roles);
+    }
+
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
     }
 }

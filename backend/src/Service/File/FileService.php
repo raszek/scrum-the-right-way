@@ -7,6 +7,7 @@ use App\Service\Common\ClockInterface;
 use App\Service\Common\ProjectDirectory;
 use App\Service\Common\RandomService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 readonly class FileService
@@ -37,6 +38,28 @@ readonly class FileService
         $this->entityManager->persist($file);
 
         return $file;
+    }
+
+    public function copyFile(File $file, ?string $rename = null): File
+    {
+        $directory = $this->generateDirectory();
+
+        $directoryPath = $this->generateDirectoryPath($directory);
+
+        $copiedFile = File::fromFile(
+            file: $file,
+            directory: $directoryPath,
+            createdAt: $this->clock->now(),
+            name: $rename ?? $file->getName()
+        );
+
+        $filesystem = new Filesystem();
+
+        $filesystem->copy($this->getFilePath($file), $this->getFilePath($copiedFile));
+
+        $this->entityManager->persist($copiedFile);
+
+        return $copiedFile;
     }
 
     public function removeFile(File $file): void

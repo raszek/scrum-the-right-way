@@ -8,6 +8,7 @@ use App\Factory\UserFactory;
 use App\Repository\User\UserCodeRepository;
 use App\Tests\Controller\WebTestCase;
 use Carbon\CarbonImmutable;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\RawMessage;
@@ -187,6 +188,43 @@ class ProfileControllerTest extends WebTestCase
         $this->assertResponseHasText('Email successfully changed.');
 
         $this->assertEquals('zenek@example.com', $user->getEmail());
+    }
+
+    /** @test */
+    public function user_can_set_his_avatar()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $user = UserFactory::createOne();
+
+        $fileName = 'cat.jpg';
+        $imagePath = $this->temporaryFromDataFile($fileName);
+
+        $uploadedFile = new UploadedFile($imagePath, $fileName);
+
+        $this->loginAsUser($user);
+
+        $client->request('POST', 'profile/avatar', files: [
+            'avatar' => $uploadedFile
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $profile = $user->getProfile();
+
+        $this->assertNotNull($profile->getAvatar());
+        $this->assertNotNull($profile->getAvatarThumb());
+
+        $this->assertEquals('cat.jpg', $profile->getAvatar()->getName());
+        $this->assertEquals('cat_thumb.jpg', $profile->getAvatarThumb()->getName());
+    }
+
+    protected function tearDown(): void
+    {
+        $this->cleanUploadDirectory();
+
+        parent::tearDown();
     }
 
     private function userPasswordHasher(): UserPasswordHasherInterface

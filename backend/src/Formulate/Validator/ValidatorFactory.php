@@ -26,4 +26,14 @@ class ValidatorFactory
         return new Repeat($fieldName);
     }
 
+    public function fileExtension(array $extensions): FileExtension
+    {
+        return new FileExtension($extensions);
+    }
+
+    public function fileSize(int $maxBytes): MaxFileSize
+    {
+        return new MaxFileSize($maxBytes);
+    }
+
 }
