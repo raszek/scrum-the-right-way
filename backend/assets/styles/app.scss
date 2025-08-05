@@ -140,3 +140,25 @@ dialog[data-dialog-target='dialog'][closing] {
 .strw-dragover {
     border: 3px dotted red;
 }
+
+// Profile
+.strw-avatar-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed black;
+    width: 100%;
+    aspect-ratio: 1/1;
+}
+
+.strw-avatar-hover-content {
+    transition: 0.5s ease;
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    z-index: 12;
+}
+
+.strw-avatar-box:hover .strw-avatar-hover-content {
+    opacity: 1;
+}

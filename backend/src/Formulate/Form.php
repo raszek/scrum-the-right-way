@@ -5,7 +5,6 @@ namespace App\Formulate;
 use App\Formulate\FormData\ArrayFormData;
 use App\Formulate\FormData\FormDataInterface;
 use App\Formulate\FormData\ObjectFormData;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Twig\Markup;
 
@@ -95,6 +94,18 @@ class Form
     public function hasErrors(): bool
     {
         return array_any($this->fields, fn($field) => $field->error);
+    }
+
+    public function getErrors(): array
+    {
+        $errors = [];
+        foreach ($this->fields as $field) {
+            if ($field->error) {
+                $errors[$field->name] = $field->error->message();
+            }
+        }
+
+        return $errors;
     }
 
     public function validate(): bool

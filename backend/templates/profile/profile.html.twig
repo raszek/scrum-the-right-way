@@ -10,13 +10,93 @@
         currentPath: app.request.pathinfo
     })) }}
 
-    {{ form.begin() }}
+    <div class="row">
+        <div class="col-md-6">
 
-    {{ form.field('firstName') }}
-    {{ form.field('lastName') }}
+            {{ form.begin() }}
 
-    <input type="submit" value="Save" class="btn btn-primary">
+            {{ form.field('firstName') }}
+            {{ form.field('lastName') }}
 
-    {{ form.end() }}
+            <input type="submit" value="Save" class="btn btn-primary">
+
+            {{ form.end() }}
+        </div>
+
+        <div class="col-md-2"
+             data-controller="profile--avatar"
+             data-profile--avatar-url-value="{{ path('app_user_profile_change_avatar') }}"
+             data-profile--avatar-image-url-value="{{ path('app_user_profile_show_avatar') }}"
+        >
+            <div data-profile--avatar-target="dropzone"
+                 class="strw-avatar-box"
+            >
+                <p data-profile--avatar-target="text"
+                   class="{{ profile.avatar ? 'd-none' : '' }}"
+                >
+                    Drop image file here
+                </p>
+
+                <img src="{{ profile.avatar ? path('app_user_profile_show_avatar') : '' }}"
+                     data-profile--avatar-target="image"
+                     class="w-100 {{ profile.avatar ? '' : 'd-none' }}"
+                     alt="Avatar image"
+                />
+
+                <div class="spinner-border d-none"
+                     role="status"
+                     data-profile--avatar-target="loader"
+                >
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+
+                <div class="strw-avatar-hover-content">
+                    <button class="btn btn-info"
+                            data-action="profile--avatar#showFilePicker"
+                    >
+                        <i class="bi bi-upload"></i>
+                    </button>
+                    <button class="btn btn-danger">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+
+
+                <input type="file"
+                       class="d-none"
+                       data-profile--avatar-target="fileInput"
+                       accept="image/jpeg, image/png"
+                >
+            </div>
+
+            <div data-profile--avatar-target="modal" class="modal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Crop avatar</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img data-profile--avatar-target="cropper"
+                                 class="strw-cropper-image w-100"
+                                 src=""
+                                 alt="Avatar image"
+                            >
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button"
+                                    class="btn btn-primary"
+                                    data-action="profile--avatar#upload"
+                            >
+                                Upload
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}

@@ -9,11 +9,12 @@ use App\Formulate\Validator\ValidatorFactory;
 
 readonly class AvatarForm
 {
+    public const int AVATAR_MAX_SIZE = 1024 * 1024 * 10;
+
     public function __construct(
         private ValidatorFactory $validatorFactory,
     ) {
     }
-
 
     public function create(): Form
     {
@@ -26,8 +27,8 @@ readonly class AvatarForm
         $form->addField(new FormField(
             name: 'avatar',
             validators: [
-                $v->fileExtension(['png', 'jpg']),
-                $v->fileSize(1024 * 1024 * 10),
+                $v->fileExtension(['png']),
+                $v->fileSize(self::AVATAR_MAX_SIZE),
             ],
         ));
 

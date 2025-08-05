@@ -26,8 +26,8 @@ readonly class FileExtension implements FieldValidator
         if (!$value instanceof UploadedFile) {
             throw new RuntimeException('Field value must be an instance of UploadedFile');
         }
-
-        if (!in_array($value->getExtension(), $this->extensions)) {
+        
+        if (!in_array($value->getClientOriginalExtension(), $this->extensions)) {
             return new FormFieldError(
                 sprintf('%s must be a file with one of the following extensions: %s',
                 $field->label(),
@@ -35,9 +35,9 @@ readonly class FileExtension implements FieldValidator
             );
         }
 
-        $extensionMimeType = $this->getExtensionMimeType($value->getExtension());
+        $extensionMimeType = $this->getExtensionMimeType($value->getClientOriginalExtension());
 
-        if ($value->getMimeType() !== $extensionMimeType) {
+        if ($value->getClientMimeType() !== $extensionMimeType) {
             return new FormFieldError(sprintf('Invalid mime type. Extension suggests %s mimetype', $extensionMimeType));
         }
 

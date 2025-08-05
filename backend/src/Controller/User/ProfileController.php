@@ -14,6 +14,7 @@ use App\Form\Profile\AvatarForm;
 use App\Form\Profile\ChangeEmailForm;
 use App\Form\Profile\ChangePasswordForm;
 use App\Form\Profile\ProfileForm;
+use App\Formulate\CannotValidateFormException;
 use App\Service\File\FileService;
 use App\Service\Menu\Profile\ProfileMenu;
 use Exception;
@@ -23,7 +24,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -36,6 +36,8 @@ class ProfileController extends Controller
     {
         $profileForm = $form->create($this->getLoggedInUser());
 
+        $profile = $this->getLoggedInUser()->getProfile();
+
         if ($profileForm->loadRequest($request) && $profileForm->validate()) {
 
             $updateProfile->execute($profileForm->getData(), $this->getLoggedInUser());
@@ -45,7 +47,8 @@ class ProfileController extends Controller
         }
 
         return $this->render('profile/profile.html.twig', [
-            'form' => $profileForm
+            'form' => $profileForm,
+            'profile' => $profile,
         ]);
     }
 
@@ -116,7 +119,7 @@ class ProfileController extends Controller
         }
 
         if (!$form->validate()) {
-            throw new UnprocessableEntityHttpException('Form cannot be validated');
+            throw new CannotValidateFormException($form);
         }
 
         $result = $changeAvatar->execute($form->getData(), $this->getLoggedInUser());
@@ -124,10 +127,10 @@ class ProfileController extends Controller
         return new JsonResponse($result);
     }
 
-    #[Route('/users/{id}/avatar', 'app_user_profile_show_avatar', methods: ['GET'])]
-    public function showAvatar(User $user, FileService $fileService): BinaryFileResponse
+    #[Route('/profile/avatar', 'app_user_profile_show_avatar', methods: ['GET'])]
+    public function showAvatar(FileService $fileService): BinaryFileResponse
     {
-        $avatar = $user->getProfile()->getAvatar();
+        $avatar = $this->getLoggedInUser()->getProfile()->getAvatar();
 
         if (!$avatar) {
             throw new NotFoundHttpException('Avatar not found');

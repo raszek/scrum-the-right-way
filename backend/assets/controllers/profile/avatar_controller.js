@@ -1,0 +1,155 @@
+import {Controller} from '@hotwired/stimulus';
+import Cropper from 'cropperjs';
+import {Modal} from 'bootstrap';
+import {dataURItoBlob, post} from 'util';
+
+export default class extends Controller {
+
+    static targets = [
+        'text',
+        'cropper',
+        'fileInput',
+        'dropzone',
+        'modal',
+        'loader',
+        'image'
+    ];
+
+    static values = {
+        url: String,
+        imageUrl: String,
+    };
+
+    connect() {
+        this.dropzoneTarget.addEventListener('drop', this.cropImage.bind(this));
+        this.dropzoneTarget.addEventListener('dragover', this.dragover.bind(this));
+
+        this.fileInputTarget.addEventListener('change', this.changeFile.bind(this));
+
+
+        this.cropper = new Cropper(this.cropperTarget, {
+            template: this.cropperTemplate(),
+        });
+        this.modal = new Modal(this.modalTarget);
+    }
+
+    async upload(event) {
+        event.preventDefault();
+
+        const canvas = await this.cropper.getCropperSelection().$toCanvas();
+
+        const dataURL = canvas.toDataURL();
+        const blob = dataURItoBlob(dataURL, 'image/png');
+
+        const fileToSend = new File([blob], 'avatar.png', {
+            type: 'image/png',
+        });
+
+        const formData = new FormData();
+        formData.append('avatar', fileToSend);
+
+        this.hideText();
+        this.showLoader();
+        this.hideImage();
+        try {
+            await post(this.urlValue, formData);
+            this.showImage();
+            this.hideLoader();
+            this.reloadImage();
+        } catch (e) {
+            this.showText();
+            this.hideLoader();
+        }
+
+        this.modal.hide();
+    }
+
+    reloadImage() {
+        this.imageTarget.src = `${this.imageUrlValue}#${new Date().getTime()}`;
+    }
+
+    showImage() {
+        this.imageTarget.classList.remove('d-none');
+    }
+
+    hideImage() {
+        this.imageTarget.classList.add('d-none');
+    }
+
+    showLoader() {
+        this.loaderTarget.classList.remove('d-none');
+    }
+
+    hideLoader() {
+        this.loaderTarget.classList.add('d-none');
+    }
+
+    showText() {
+        this.textTarget.classList.remove('d-none');
+    }
+
+    hideText() {
+        this.textTarget.classList.add('d-none');
+    }
+
+    showFilePicker() {
+        this.fileInputTarget.click();
+    }
+
+    changeFile(event) {
+        this.cropImage(event.target.files[0]);
+    }
+
+    dragover(event) {
+        event.preventDefault();
+    }
+
+    dropFile(event) {
+        event.preventDefault();
+
+        const files = event.dataTransfer.files;
+
+        if (files.length < 1) {
+            return;
+        }
+
+        this.cropImage(files[0]);
+    }
+
+    cropImage(file) {
+        if (!file.type.match('image/jpeg|image/png')) {
+            this.textTarget.textContent = 'Please upload a JPG or PNG image file';
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            this.textTarget.textContent = 'File size should not exceed 10MB';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = this.showCropper.bind(this);
+        reader.readAsDataURL(file);
+    }
+
+    showCropper(e) {
+        this.cropper.getCropperImage().src = e.target.result;
+
+        this.modal.show();
+    }
+
+    cropperTemplate() {
+        return `
+        <cropper-canvas 
+            background 
+            style="height: 400px;"
+        >
+          <cropper-image src="" alt="Picture" rotatable scalable skewable translatable>
+          </cropper-image>
+          <cropper-selection width="200" height="200" movable>
+            <cropper-handle action="move"></cropper-handle>
+          </cropper-selection>
+        </cropper-canvas>
+        `;
+    }
+}
