@@ -2,31 +2,29 @@
 
 namespace App\Action\Profile;
 
+use App\Entity\Profile\Profile;
 use App\Entity\User\User;
 use App\Form\Profile\AvatarFormData;
 use App\Service\File\FileService;
 use App\Service\Image\ImageEditorFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class ChangeAvatar
 {
-
     public function __construct(
         private FileService $fileService,
         private EntityManagerInterface $entityManager,
-        private UrlGeneratorInterface $urlGenerator,
         private ImageEditorFactory $imageEditorFactory,
     ) {
     }
 
-    public function execute(AvatarFormData $formData, User $user): array
+    public function execute(AvatarFormData $formData, User $user): Profile
     {
         $this->updateAvatar($formData, $user);
 
         $this->entityManager->flush();
-        
-        return $this->getResult($user);
+
+        return $user->getProfile();
     }
 
     private function updateAvatar(AvatarFormData $formData, User $user): void
@@ -65,19 +63,5 @@ readonly class ChangeAvatar
         $extension = array_pop($parts);
 
         return implode('.', $parts) . '_thumb.' . $extension;
-    }
-
-    private function getResult(User $user): ?array
-    {
-        $avatar = $user->getProfile()->getAvatar();
-
-        if (!$avatar) {
-            return null;
-        }
-
-        return [
-            'id' => $avatar->getId(),
-            'url' => $this->urlGenerator->generate('app_user_profile_show_avatar', ['id' => $user->getId()]),
-        ];
     }
 }

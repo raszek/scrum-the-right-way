@@ -122,9 +122,11 @@ class ProfileController extends Controller
             throw new CannotValidateFormException($form);
         }
 
-        $result = $changeAvatar->execute($form->getData(), $this->getLoggedInUser());
+        $profile = $changeAvatar->execute($form->getData(), $this->getLoggedInUser());
 
-        return new JsonResponse($result);
+        return $this->render('profile/avatar.html.twig', [
+            'profile' => $profile,
+        ]);
     }
 
     #[Route('/profile/avatar', 'app_user_profile_show_avatar', methods: ['GET'])]

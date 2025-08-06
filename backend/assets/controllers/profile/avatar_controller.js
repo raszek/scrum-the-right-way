@@ -12,12 +12,14 @@ export default class extends Controller {
         'dropzone',
         'modal',
         'loader',
-        'image'
+        'image',
+        'removeButton'
     ];
 
     static values = {
         url: String,
         imageUrl: String,
+        uploaded: Boolean,
     };
 
     connect() {
@@ -25,7 +27,6 @@ export default class extends Controller {
         this.dropzoneTarget.addEventListener('dragover', this.dragover.bind(this));
 
         this.fileInputTarget.addEventListener('change', this.changeFile.bind(this));
-
 
         this.cropper = new Cropper(this.cropperTarget, {
             template: this.cropperTemplate(),
@@ -48,28 +49,31 @@ export default class extends Controller {
         const formData = new FormData();
         formData.append('avatar', fileToSend);
 
-        this.hideText();
-        this.showLoader();
-        this.hideImage();
-        try {
-            await post(this.urlValue, formData);
-            this.showImage();
-            this.hideLoader();
-            this.reloadImage();
-        } catch (e) {
-            this.showText();
-            this.hideLoader();
-        }
+        this.avatarUploading();
+        this.dropzoneTarget.innerHTML = await post(this.urlValue, formData);
 
         this.modal.hide();
     }
 
-    reloadImage() {
-        this.imageTarget.src = `${this.imageUrlValue}#${new Date().getTime()}`;
+    async removeAvatar(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('file', null);
+
+        this.avatarUploading();
+        this.dropzoneTarget.innerHTML = await post(this.urlValue, formData);
     }
 
-    showImage() {
-        this.imageTarget.classList.remove('d-none');
+    avatarUploading() {
+        this.showLoader();
+        this.hideText();
+        this.hideImage();
+        this.hideRemoveButton();
+    }
+
+    hideRemoveButton() {
+        this.removeButtonTarget.classList.add('d-none');
     }
 
     hideImage() {
@@ -78,14 +82,6 @@ export default class extends Controller {
 
     showLoader() {
         this.loaderTarget.classList.remove('d-none');
-    }
-
-    hideLoader() {
-        this.loaderTarget.classList.add('d-none');
-    }
-
-    showText() {
-        this.textTarget.classList.remove('d-none');
     }
 
     hideText() {
@@ -133,6 +129,7 @@ export default class extends Controller {
     }
 
     showCropper(e) {
+        console.log('dziala');
         this.cropper.getCropperImage().src = e.target.result;
 
         this.modal.show();

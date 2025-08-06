@@ -24,51 +24,26 @@
         </div>
 
         <div class="col-md-2"
-             data-controller="profile--avatar"
+             data-controller="profile--avatar confirm-modal"
              data-profile--avatar-url-value="{{ path('app_user_profile_change_avatar') }}"
              data-profile--avatar-image-url-value="{{ path('app_user_profile_show_avatar') }}"
+             data-profile--avatar-uploaded-value="{{ profile.avatar ? 'true' : 'false' }}"
         >
             <div data-profile--avatar-target="dropzone"
                  class="strw-avatar-box"
             >
-                <p data-profile--avatar-target="text"
-                   class="{{ profile.avatar ? 'd-none' : '' }}"
-                >
-                    Drop image file here
-                </p>
-
-                <img src="{{ profile.avatar ? path('app_user_profile_show_avatar') : '' }}"
-                     data-profile--avatar-target="image"
-                     class="w-100 {{ profile.avatar ? '' : 'd-none' }}"
-                     alt="Avatar image"
-                />
-
-                <div class="spinner-border d-none"
-                     role="status"
-                     data-profile--avatar-target="loader"
-                >
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-
-                <div class="strw-avatar-hover-content">
-                    <button class="btn btn-info"
-                            data-action="profile--avatar#showFilePicker"
-                    >
-                        <i class="bi bi-upload"></i>
-                    </button>
-                    <button class="btn btn-danger">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-
-
-                <input type="file"
-                       class="d-none"
-                       data-profile--avatar-target="fileInput"
-                       accept="image/jpeg, image/png"
-                >
+                {% include 'profile/avatar.html.twig' %}
             </div>
 
+            <input type="file"
+                   class="d-none"
+                   data-profile--avatar-target="fileInput"
+                   accept="image/jpeg, image/png"
+            >
+
+            {% include 'common/confirm_modal.html.twig' with {
+                dialogText: 'Are you sure to remove avatar?'
+            } %}
             <div data-profile--avatar-target="modal" class="modal" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">

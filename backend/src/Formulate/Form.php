@@ -182,9 +182,7 @@ class Form
         foreach ($this->fields as $field) {
             $submittedValue = $submittedData[$field->name] ?? $submittedFiles[$field->name] ?? null;
 
-            if ($submittedValue) {
-                $submittedFields[$field->name] = $submittedValue;
-            }
+            $submittedFields[$field->name] = $submittedValue;
         }
 
         return $submittedFields;

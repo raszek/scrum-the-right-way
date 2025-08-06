@@ -1,0 +1,33 @@
+<p data-profile--avatar-target="text"
+   class="{{ profile.avatar ? 'd-none' : '' }}"
+>
+    Drop image file here
+</p>
+
+<img src="{{ profile.avatar ? path('app_user_profile_show_avatar') ~ '#' ~ date().timestamp : '' }}"
+     data-profile--avatar-target="image"
+     class="w-100 {{ profile.avatar ? '' : 'd-none' }}"
+     alt="Avatar image"
+/>
+
+<div class="spinner-border d-none"
+     role="status"
+     data-profile--avatar-target="loader"
+>
+    <span class="visually-hidden">Loading...</span>
+</div>
+
+<div class="strw-avatar-hover-content">
+    <button class="btn btn-info"
+            data-action="profile--avatar#showFilePicker"
+    >
+        <i class="bi bi-upload"></i>
+    </button>
+    <button class="btn btn-danger {{ profile.avatar ? '' : 'd-none' }}"
+            data-profile--avatar-target="removeButton"
+            data-action="confirm-modal#open"
+            data-confirm-modal-callback-param="profile--avatar#removeAvatar"
+    >
+        <i class="bi bi-trash"></i>
+    </button>
+</div>

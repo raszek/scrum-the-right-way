@@ -41,8 +41,10 @@ export default class extends Controller {
             form.setAttribute('method', 'post');
         } else if (params.callback) {
             form.setAttribute('data-action', 'confirm-modal#close ' + params.callback);
-            form.setAttribute(params.callbackAttribute, params.callbackValue);
             form.setAttribute('data-confirm-modal-id-param', modalIdentifier);
+            if (params.callbackAttribute) {
+                form.setAttribute(params.callbackAttribute, params.callbackValue || '');
+            }
         } else {
             throw new Error('No url or callback set');
         }
