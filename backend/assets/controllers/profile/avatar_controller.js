@@ -129,7 +129,6 @@ export default class extends Controller {
     }
 
     showCropper(e) {
-        console.log('dziala');
         this.cropper.getCropperImage().src = e.target.result;
 
         this.modal.show();

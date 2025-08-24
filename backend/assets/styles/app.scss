@@ -57,11 +57,24 @@ dialog[data-dialog-target='dialog'][closing] {
 }
 
 .top-menu {
-    height: 6vh;
+    height: 7vh;
+}
+
+.strw-top-menu-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.strw-top-menu-right {
+    display: flex;
+    align-items: center;
+    height: 7vh;
 }
 
 .sidebar {
-    min-height: 94vh;
+    min-height: 93vh;
 }
 
 .backlog-metric {

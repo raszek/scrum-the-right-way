@@ -143,6 +143,20 @@ class ProfileController extends Controller
         return new BinaryFileResponse($avatar);
     }
 
+    #[Route('/profile/avatar-thumb', 'app_user_profile_show_avatar_thumb', methods: ['GET'])]
+    public function showAvatarThumb(FileService $fileService): BinaryFileResponse
+    {
+        $avatar = $this->getLoggedInUser()->getProfile()->getAvatarThumb();
+
+        if (!$avatar) {
+            throw new NotFoundHttpException('Avatar thumb not found');
+        }
+
+        $avatar = $fileService->getFilePath($avatar);
+
+        return new BinaryFileResponse($avatar);
+    }
+
     #[Route('/profile/menu', 'app_user_profile_menu')]
     public function profileMenu(ProfileMenu $profileMenu, Request $request): Response
     {
