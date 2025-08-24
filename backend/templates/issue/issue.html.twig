@@ -1,5 +1,5 @@
 <div class="row mb-3">
-    <div class="col-md-9">
+    <div class="col-md-8">
         {% include 'issue/title.html.twig' %}
         {% include 'issue/description.html.twig' %}
         {% if issue.hasEnabledSubIssues %}
@@ -10,7 +10,7 @@
         {% include 'issue/issue_thread_messages.html.twig' %}
         {% include 'issue/activities.html.twig' %}
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         {% include 'issue/select_assignee.html.twig' %}
         {% include 'issue/select_story_points.html.twig' %}
         {% include 'issue/select_tags.html.twig' %}

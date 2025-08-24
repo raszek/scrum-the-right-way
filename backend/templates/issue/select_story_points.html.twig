@@ -1,3 +1,13 @@
+{% if isPreviousStoryPointsVisible %}
+<div class="card mb-3">
+    <div class="card-header">
+        Previous story points
+    </div>
+    <div class="card-body">
+        {{ issue.previousStoryPoints }}
+    </div>
+</div>
+{% endif %}
 <div data-controller="story-points"
      data-story-points-issue-events-outlet="#issue-events"
      data-story-points-url-value="{{ path('app_project_issue_story_points_set', {

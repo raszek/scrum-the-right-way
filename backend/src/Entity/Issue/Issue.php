@@ -18,6 +18,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use DomainException;
 use RuntimeException;
 
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
@@ -358,7 +359,7 @@ class Issue implements Positionable
     public function setPreviousStoryPoints(?int $previousStoryPoints): void
     {
         if ($this->isFeature()) {
-            return;
+            throw new DomainException('Cannot set story points for feature');
         }
 
         $this->previousStoryPoints = $previousStoryPoints;

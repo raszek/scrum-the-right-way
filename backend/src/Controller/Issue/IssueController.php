@@ -2,23 +2,14 @@
 
 namespace App\Controller\Issue;
 
-use App\Entity\Issue\Issue;
+use App\Action\Issue\GetIssueData;
 use App\Entity\Project\Project;
-use App\Entity\Project\ProjectTag;
 use App\Form\Issue\CreateIssueType;
 use App\Form\Issue\IssueSearchForm;
 use App\Form\Issue\IssueSearchType;
-use App\Repository\Issue\AttachmentRepository;
-use App\Repository\Issue\IssueDependencyRepository;
 use App\Repository\Issue\IssueRepository;
-use App\Repository\Issue\IssueThreadMessageRepository;
-use App\Repository\Project\ProjectMemberRepository;
-use App\Repository\Project\ProjectTagRepository;
 use App\Security\Voter\IssueVoter;
-use App\Service\Issue\IssueEditor\IssueEditorFactory;
 use App\Service\Issue\ProjectIssueEditorFactory;
-use App\Service\Issue\StoryPointService;
-use App\Service\Session\Issue\IssueSessionSettings;
 use App\Table\Issue\IssueTable;
 use App\Table\QueryParams;
 use Knp\Component\Pager\PaginatorInterface;
@@ -34,14 +25,6 @@ class IssueController extends CommonIssueController
         private readonly IssueRepository $issueRepository,
         private readonly PaginatorInterface $paginator,
         private readonly ProjectIssueEditorFactory $projectIssueEditorFactory,
-        private readonly ProjectMemberRepository $projectMemberRepository,
-        private readonly StoryPointService $storyPointService,
-        private readonly AttachmentRepository $attachmentRepository,
-        private readonly IssueThreadMessageRepository $issueThreadMessageRepository,
-        private readonly IssueSessionSettings $issueSessionSettings,
-        private readonly ProjectTagRepository $projectTagRepository,
-        private readonly IssueDependencyRepository $issueDependencyRepository,
-        private readonly IssueEditorFactory $issueEditorFactory,
     ) {
         parent::__construct($this->issueRepository);
     }
@@ -116,6 +99,7 @@ class IssueController extends CommonIssueController
         Project $project,
         string $issueCode,
         Request $request,
+        GetIssueData $getIssueData,
     ): Response
     {
         $this->denyAccessUnlessGranted(IssueVoter::VIEW_ISSUE, $project);
@@ -124,7 +108,7 @@ class IssueController extends CommonIssueController
 
         return $this->render('issue/view.html.twig', [
             'previousSite' => $this->getPreviousSite($request),
-            ...$this->getIssueData($issue)
+            ...$getIssueData->execute($issue, $this->getLoggedInUser())
         ]);
     }
 
@@ -132,50 +116,14 @@ class IssueController extends CommonIssueController
     public function viewAjax(
         Project $project,
         string $issueCode,
+        GetIssueData $getIssueData,
     ): Response
     {
         $this->denyAccessUnlessGranted(IssueVoter::VIEW_ISSUE, $project);
 
         $issue = $this->findIssue($issueCode, $project);
 
-        return $this->render('issue/issue.html.twig', $this->getIssueData($issue));
-    }
-
-    private function getIssueData(Issue $issue): array
-    {
-        $assignees = $this->projectMemberRepository->issueAssignees($issue);
-
-        $attachments = $this->attachmentRepository->issueAttachments($issue);
-
-        $dependencies = $this->issueDependencyRepository->issueDependencies($issue);
-
-        $subIssues = $this->issueRepository->featureSubIssues($issue);
-
-        $loggedInMember = $issue->getProject()->member($this->getLoggedInUser());
-
-        $issueEditor = $this->issueEditorFactory->create($issue, $this->getLoggedInUser());
-
-        return [
-            'project' => $issue->getProject(),
-            'issue' => $issue,
-            'loggedInMember' => $loggedInMember,
-            'titleMaxLength' => Issue::TITLE_LENGTH,
-            'assignees' => $assignees,
-            'storyPoints' => $this->storyPointService->recommendedStoryPoints(),
-            'attachments' => $attachments,
-            'observers' => $issue->getObservers()->toArray(),
-            'isObservedByLoggedIn' => $issue->isObservedBy($loggedInMember),
-            'tagInfo' => [
-                'maxLength' => ProjectTag::NAME_MAX_LENGTH,
-                'maxItems' => Issue::MAX_TAG_COUNT
-            ],
-            'projectTags' => $this->projectTagRepository->selectedTags($issue->getProject(), $issue),
-            'messages' => $this->issueThreadMessageRepository->getIssueMessages($issue),
-            'dependencies' => $dependencies,
-            'isActivitiesVisible' => $this->issueSessionSettings->isActivitiesVisible() ? 'true' : 'false',
-            'subIssues' => $subIssues,
-            'isIssueEditable' => $issueEditor->isIssueEditable()
-        ];
+        return $this->render('issue/issue.html.twig', $getIssueData->execute($issue, $this->getLoggedInUser()));
     }
 
     private function getPreviousSite(Request $request): string
