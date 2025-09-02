@@ -9,12 +9,12 @@
                 {{ column.name }}
             </h4>
             <hr>
-            <div class="d-flex flex-column"
+            <div class="strw-kanban-column"
                  data-kanban--move-target="column"
                  data-kanban--move-column-key-param="{{ column.key }}"
             >
                 {% for issue in column.items %}
-                    <div class="card w-100 mb-1"
+                    <div class="card mb-1 strw-kanban-issue"
                          data-kanban--move-target="issue"
                          data-kanban--move-id-param="{{ issue.id }}"
                          data-kanban--move-issue-url-param="{{ path('app_project_issue_view', {

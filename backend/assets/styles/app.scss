@@ -175,3 +175,18 @@ dialog[data-dialog-target='dialog'][closing] {
 .strw-avatar-box:hover .strw-avatar-hover-content {
     opacity: 1;
 }
+
+// Kanban
+
+.strw-kanban-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.strw-kanban-column:not(:has(.strw-kanban-issue)) {
+    height: 400px;
+}
+
+.strw-kanban-issue {
+    width: 100%;
+}
