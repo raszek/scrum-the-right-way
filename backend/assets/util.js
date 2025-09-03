@@ -1,3 +1,5 @@
+import {DateTime} from './js/date/date.js';
+
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 export function randomString(length) {
@@ -130,3 +132,5 @@ export const post = async (url, data = undefined) => {
         console.log(e);
     }
 };
+
+export {DateTime};
