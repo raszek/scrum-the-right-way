@@ -23,6 +23,7 @@
                         <div>
                             <div data-controller="sprint--end-date"
                                  data-sprint--end-date-title-value="Estimated sprint end date"
+                                 data-sprint--end-date-current-value="{{ sprint.estimatedEndDate | date('Y-m-d') }}"
                             >
                                 <button class="btn btn-primary"
                                         data-sprint--end-date-target="button"
@@ -36,7 +37,6 @@
                                                class="form-control"
                                                data-sprint--end-date-target="input"
                                                min="{{ 'now' | date('Y-m-d') }}"
-                                               value="{{ sprint.estimatedEndDate | date('Y-m-d') }}"
                                         >
                                         <button class="btn btn-primary">
                                             <i class="bi bi-save"></i>
@@ -49,6 +49,8 @@
                     <div class="card-body">
                         <canvas data-controller="sprint--burndown-chart"
                                 data-sprint--burndown-chart-records-value="{{ chartRecords }}"
+                                data-sprint--burndown-chart-start-date-value="{{ sprint.startedAt | date('Y-m-d') }}"
+                                data-action="sprint--end-date:modified@window->sprint--burndown-chart#sprintEstimatedEndDateChanged"
                         >
                         </canvas>
                     </div>

@@ -169,4 +169,7 @@ return [
     '@cropper/element-viewer' => [
         'version' => '2.0.1',
     ],
+    'date-fns' => [
+        'version' => '4.1.0',
+    ],
 ];

@@ -1,10 +1,12 @@
 import { Controller } from '@hotwired/stimulus';
 import {Chart} from 'chart.js';
+import {format, eachDayOfInterval} from 'date-fns';
 
 export default class extends Controller {
 
     static values = {
-        records: Array
+        records: Array,
+        startDate: String,
     };
 
     connect() {
@@ -27,11 +29,33 @@ export default class extends Controller {
             }
         };
 
-        new Chart(this.element, {
+        this.chart = new Chart(this.element, {
             type: 'line',
             data,
             options
         });
+    }
+
+    sprintEstimatedEndDateChanged(event) {
+        const newSprintEndDate = event.detail.content;
+
+        this.chart.data.labels = this.generateLabels(newSprintEndDate);
+
+        this.chart.update();
+    }
+
+    generateLabels(newSprintEndDate) {
+        const dates = eachDayOfInterval({
+            start: this.startDateValue,
+            end: newSprintEndDate
+        })
+
+        const labels = ['Start'];
+        for (const date of dates) {
+            labels.push(format(date, 'dd.MM'));
+        }
+
+        return labels;
     }
 
     getLabels() {

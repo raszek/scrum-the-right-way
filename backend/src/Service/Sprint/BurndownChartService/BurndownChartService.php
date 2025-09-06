@@ -5,6 +5,7 @@ namespace App\Service\Sprint\BurndownChartService;
 use App\Entity\Sprint\Sprint;
 use App\Repository\Sprint\SprintGoalIssueRepository;
 use App\Service\Common\ClockInterface;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
 use DateTimeImmutable;
 
@@ -25,7 +26,7 @@ readonly class BurndownChartService
     {
         $sprintEndDate = $this->getSprintEndDate($sprint);
 
-        $period = CarbonPeriod::create($sprint->getStartedAt(), '1 day', $sprintEndDate);
+        $period = CarbonPeriod::create($sprint->getStartedAt(), '1 day', $sprintEndDate->addDay());
 
         $now = $this->clock->now();
 
@@ -65,16 +66,16 @@ readonly class BurndownChartService
         return $chartData;
     }
 
-    private function getSprintEndDate(Sprint $sprint): DateTimeImmutable
+    private function getSprintEndDate(Sprint $sprint): CarbonImmutable
     {
         if ($sprint->isFinished()) {
-            return $sprint->getEndedAt();
+            return CarbonImmutable::instance($sprint->getEndedAt());
         }
 
         $now = $this->clock->now();
 
         return $now->greaterThan($sprint->getEstimatedEndDate())
             ? $now
-            : $sprint->getEstimatedEndDate();
+            : CarbonImmutable::instance($sprint->getEstimatedEndDate());
     }
 }

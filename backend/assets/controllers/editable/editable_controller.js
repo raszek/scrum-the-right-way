@@ -6,7 +6,8 @@ export default class extends Controller {
 
     static values = {
         title: String,
-        url: String
+        url: String,
+        current: String
     };
 
     static targets = ['button', 'template'];
@@ -16,7 +17,7 @@ export default class extends Controller {
             title: this.titleValue,
             html: true,
             placement: 'bottom',
-            allowList: this.getAllowList()
+            allowList: this.getAllowList(),
         });
 
         this.buttonTarget.addEventListener('show.bs.popover', this.onShow.bind(this));
@@ -37,6 +38,8 @@ export default class extends Controller {
             throw new Error('Input not found');
         }
 
+        input.value = this.currentValue;
+
         button.addEventListener('click', this.save(input).bind(this));
 
         this.popover.setContent({
@@ -53,13 +56,17 @@ export default class extends Controller {
         const that = this;
 
         return async function () {
-            this.buttonTarget.innerText = that.formatValue(input.value);
+            const value = input.value;
 
-            this.popover.hide();
+            that.buttonTarget.innerText = that.formatValue(value);
 
-            await that.request(input.value);
+            that.currentValue = value;
 
-            that.afterRequestAction();
+            that.popover.hide();
+
+            await that.request(value);
+
+            that.afterRequestAction(value);
         };
     }
 
@@ -71,7 +78,7 @@ export default class extends Controller {
         return post(this.urlValue, formData);
     }
 
-    afterRequestAction() {
+    afterRequestAction(value) {
 
     }
 

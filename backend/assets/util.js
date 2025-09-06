@@ -1,4 +1,6 @@
-import {DateTime} from './js/date/date.js';
+export function defaultDateFormat () {
+    return 'yyyy-MM-dd';
+}
 
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -132,5 +134,3 @@ export const post = async (url, data = undefined) => {
         console.log(e);
     }
 };
-
-export {DateTime};
