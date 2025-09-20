@@ -53,7 +53,7 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function getSprintStoryPoints(Sprint $sprint): int
+    public function getCurrentSprintStoryPoints(Sprint $sprint): int
     {
         $queryBuilder = $this->createQueryBuilder('sprintGoalIssue');
 
@@ -69,7 +69,23 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
         return $queryBuilder->getQuery()->getSingleScalarResult() ?? 0;
     }
 
-    public function getGroupedStoryPoints(Sprint $sprint, DateTimeImmutable $endDate): array
+    public function getHistorySprintStoryPoints(Sprint $sprint): int
+    {
+        $queryBuilder = $this->createQueryBuilder('sprintGoalIssue');
+
+        $queryBuilder
+            ->select('sum(sprintGoalIssue.storyPoints)')
+            ->join('sprintGoalIssue.issue', 'issue')
+            ->join('sprintGoalIssue.sprintGoal', 'sprintGoal')
+            ->where('sprintGoal.sprint = :sprint')
+            ->sqidParameter('sprint', $sprint->getId())
+            ->andWhere('issue.type in (:issueTypeIds)')
+            ->setParameter('issueTypeIds', [IssueTypeEnum::Issue->value, IssueTypeEnum::SubIssue->value]);
+
+        return $queryBuilder->getQuery()->getSingleScalarResult() ?? 0;
+    }
+
+    public function getCurrentSprintGroupedStoryPoints(Sprint $sprint, DateTimeImmutable $endDate): array
     {
         $queryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -84,6 +100,30 @@ class SprintGoalIssueRepository extends ServiceEntityRepository implements Reord
             ->setParameter('startDate', $sprint->getStartedAt()->format('Y-m-d'))
             ->andWhere('sgi.finished_at <= :endDate')
             ->setParameter('endDate', $endDate->format('Y-m-d'))
+            ->andWhere('i.type_id in (:typeIds)')
+            ->setParameter('typeIds', [IssueTypeEnum::Issue->value, IssueTypeEnum::SubIssue->value], ArrayParameterType::INTEGER)
+            ->groupBy('finishedDay')
+            ->orderBy('finishedDay', 'ASC')
+        ;
+
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
+    }
+
+    public function getHistorySprintGroupedStoryPoints(Sprint $sprint): array
+    {
+        $queryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $queryBuilder
+            ->select('sum(sgi.story_points) as storyPoints', "date(sgi.finished_at) as finishedDay")
+            ->from('sprint_goal_issue', 'sgi')
+            ->innerJoin('sgi', 'sprint_goal', 'sg', 'sg.id = sgi.sprint_goal_id')
+            ->innerJoin('sgi', 'issue', 'i', 'i.id = sgi.issue_id')
+            ->where('sg.sprint_id = :sprintId')
+            ->setParameter('sprintId', $sprint->getId()->integerId())
+            ->andWhere('sgi.finished_at >= :startDate')
+            ->setParameter('startDate', $sprint->getStartedAt()->format('Y-m-d'))
+            ->andWhere('sgi.finished_at <= :endDate')
+            ->setParameter('endDate', $sprint->getEndedAt()->format('Y-m-d'))
             ->andWhere('i.type_id in (:typeIds)')
             ->setParameter('typeIds', [IssueTypeEnum::Issue->value, IssueTypeEnum::SubIssue->value], ArrayParameterType::INTEGER)
             ->groupBy('finishedDay')

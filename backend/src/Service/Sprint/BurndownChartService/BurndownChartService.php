@@ -8,6 +8,7 @@ use App\Service\Common\ClockInterface;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
 use DateTimeImmutable;
+use RuntimeException;
 
 readonly class BurndownChartService
 {
@@ -22,32 +23,24 @@ readonly class BurndownChartService
      * @param Sprint $sprint
      * @return BurndownChartRecord[]
      */
-    public function getChartData(Sprint $sprint): array
+    public function getCurrentSprintChartData(Sprint $sprint): array
     {
-        $sprintEndDate = $this->getSprintEndDate($sprint);
+        $sprintEndDate = $this->clock->now()->greaterThan($sprint->getEstimatedEndDate())
+            ? $this->clock->now()
+            : CarbonImmutable::instance($sprint->getEstimatedEndDate());
 
-        $period = CarbonPeriod::create($sprint->getStartedAt(), '1 day', $sprintEndDate->addDay());
-
-        $now = $this->clock->now();
-
-        $records = [];
-        foreach ($period as $date) {
-            $records[$date->format('Y-m-d')] = [
-                'date' => $date->format('d.m'),
-                'storyPoints' => $date->greaterThan($now) ? null : 0,
-            ];
-        }
-
-        $databaseRecords = $this->sprintGoalIssueRepository->getGroupedStoryPoints(
+        $databaseRecords = $this->sprintGoalIssueRepository->getCurrentSprintGroupedStoryPoints(
             $sprint,
             $sprintEndDate
         );
+
+        $records = $this->getSprintDates($sprint->getStartedAt(), $sprintEndDate->addDay());
 
         foreach ($databaseRecords as $databaseRecord) {
             $records[$databaseRecord['finishedday']]['storyPoints'] = $databaseRecord['storypoints'];
         }
 
-        $sprintStoryPoints = $this->sprintGoalIssueRepository->getSprintStoryPoints($sprint);
+        $sprintStoryPoints = $this->sprintGoalIssueRepository->getCurrentSprintStoryPoints($sprint);
 
         $chartData = [
             new BurndownChartRecord(date: 'Start', storyPoints: $sprintStoryPoints),
@@ -66,16 +59,51 @@ readonly class BurndownChartService
         return $chartData;
     }
 
-    private function getSprintEndDate(Sprint $sprint): CarbonImmutable
+    public function getHistorySprintChartData(Sprint $sprint): array
     {
-        if ($sprint->isFinished()) {
-            return CarbonImmutable::instance($sprint->getEndedAt());
+        $sprintEndDate = $sprint->getEndedAt();
+        if (!$sprintEndDate) {
+            throw new RuntimeException('Sprint has not ended yet');
         }
+
+        $databaseRecords = $this->sprintGoalIssueRepository->getHistorySprintGroupedStoryPoints($sprint);
+
+        $records = $this->getSprintDates($sprint->getStartedAt(), $sprintEndDate);
+
+        foreach ($databaseRecords as $databaseRecord) {
+            $records[$databaseRecord['finishedday']]['storyPoints'] = $databaseRecord['storypoints'];
+        }
+
+        $sprintStoryPoints = $this->sprintGoalIssueRepository->getHistorySprintStoryPoints($sprint);
+
+        $chartData = [];
+        foreach ($records as $record) {
+            $sprintStoryPoints -= $record['storyPoints'];
+            $chartData[] = new BurndownChartRecord(
+                date: $record['date'],
+                storyPoints: isset($record['storyPoints'])
+                    ? $sprintStoryPoints
+                    : null,
+            );
+        }
+
+        return $chartData;
+    }
+
+    private function getSprintDates(DateTimeImmutable $startDate, DateTimeImmutable $endDate): array
+    {
+        $period = CarbonPeriod::create($startDate, '1 day', $endDate);
 
         $now = $this->clock->now();
 
-        return $now->greaterThan($sprint->getEstimatedEndDate())
-            ? $now
-            : CarbonImmutable::instance($sprint->getEstimatedEndDate());
+        $records = [];
+        foreach ($period as $date) {
+            $records[$date->format('Y-m-d')] = [
+                'date' => $date->format('d.m'),
+                'storyPoints' => $date->greaterThan($now) ? null : 0,
+            ];
+        }
+
+        return $records;
     }
 }

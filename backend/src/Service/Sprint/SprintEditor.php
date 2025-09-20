@@ -198,14 +198,24 @@ readonly class SprintEditor
 
         foreach ($sprintGoalIssues as $sprintGoalIssue) {
             $issue = $sprintGoalIssue->getIssue();
+            $sprintGoalIssue->setStoryPoints($issue->getStoryPoints());
             if ($sprintGoalIssue->getFinishedAt() !== null) {
                 $issue->setIssueColumn($this->issueColumnRepository->finishedColumn());
             } else {
-                $issue->setPreviousStoryPoints($issue->getStoryPoints());
+                $this->setPreviousStoryPoints($issue);
                 $issue->setIssueColumn($this->issueColumnRepository->backlogColumn());
                 $issue->setStoryPoints(null);
             }
         }
+    }
+
+    private function setPreviousStoryPoints(Issue $issue): void
+    {
+        if ($issue->isFeature()) {
+            return;
+        }
+
+        $issue->setPreviousStoryPoints($issue->getStoryPoints());
     }
 
 }

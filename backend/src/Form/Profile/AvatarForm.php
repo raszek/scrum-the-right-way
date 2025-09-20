@@ -27,7 +27,7 @@ readonly class AvatarForm
         $form->addField(new FormField(
             name: 'avatar',
             validators: [
-                $v->fileExtension(['png']),
+                $v->fileExtension(['jpg', 'png']),
                 $v->fileSize(self::AVATAR_MAX_SIZE),
             ],
         ));

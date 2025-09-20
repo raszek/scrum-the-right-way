@@ -38,7 +38,7 @@ readonly class FileExtension implements FieldValidator
         $extensionMimeType = $this->getExtensionMimeType($value->getClientOriginalExtension());
 
         if ($value->getClientMimeType() !== $extensionMimeType) {
-            return new FormFieldError(sprintf('Invalid mime type. Extension suggests %s mimetype', $extensionMimeType));
+            return new FormFieldError(sprintf('Invalid mime type %s. Extension suggests %s mimetype', $value->getClientMimeType(), $extensionMimeType));
         }
 
         return null;

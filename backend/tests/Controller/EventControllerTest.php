@@ -183,6 +183,6 @@ class EventControllerTest extends WebTestCase
         $table = $this->readTable('table');
 
         $this->assertEquals('Bob Smith has closed thread first thread', $table[1][0]);
-        $this->assertEquals('December 12, 2012 12:12', $table[1][1]);
+        $this->assertEquals('12.12.2012 12:12', $table[1][1]);
     }
 }

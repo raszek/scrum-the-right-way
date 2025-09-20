@@ -201,7 +201,7 @@ class ProfileControllerTest extends WebTestCase
         $fileName = 'cat.jpg';
         $imagePath = $this->temporaryFromDataFile($fileName);
 
-        $uploadedFile = new UploadedFile($imagePath, $fileName);
+        $uploadedFile = new UploadedFile($imagePath, $fileName, mimeType: 'image/jpeg');
 
         $this->loginAsUser($user);
 

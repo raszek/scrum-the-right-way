@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Factory\UserFactory;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,11 +30,11 @@ class CreateAdminCommand extends Command
         $email = $io->ask('Enter email');
         $firstName = $io->ask('Enter first name');
         $lastName = $io->ask('Enter last name');
-        $password = $io->askHidden('Enter password');
-        $passwordConfirm = $io->askHidden('Confirm password');
 
-        if ($password !== $passwordConfirm) {
-            $io->error('Passwords do not match');
+        try {
+            $password = $this->getPassword($io);
+        } catch (RuntimeException $e) {
+            $io->error($e->getMessage());
             return Command::FAILURE;
         }
 
@@ -49,5 +50,22 @@ class CreateAdminCommand extends Command
         $io->success('Admin user created.');
 
         return Command::SUCCESS;
+    }
+
+    private function getPassword(SymfonyStyle $io, int $retry = 1): string
+    {
+        if ($retry > 3) {
+            throw new RuntimeException('Too many retries');
+        }
+
+        $password = $io->askHidden('Enter password');
+        $passwordConfirm = $io->askHidden('Confirm password');
+
+        if ($password !== $passwordConfirm) {
+            $io->error('Passwords do not match');
+            return $this->getPassword($io, $retry + 1);
+        }
+
+        return $password;
     }
 }

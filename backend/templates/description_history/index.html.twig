@@ -38,7 +38,7 @@
                             historyId: change.id
                         }) }}"
                     >
-                        {{ change.createdAt | date }}
+                        {{ change.createdAt | date('d.m.Y H:i') }}
                     </li>
                 {% endfor %}
             </ul>

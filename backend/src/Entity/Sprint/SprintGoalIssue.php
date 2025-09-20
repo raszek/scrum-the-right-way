@@ -23,6 +23,9 @@ class SprintGoalIssue implements Positionable
     #[ORM\Column(nullable: true)]
     private ?int $goalOrder = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $storyPoints = null;
+
     #[ORM\ManyToOne(inversedBy: 'sprintGoalIssues')]
     #[ORM\JoinColumn(nullable: false)]
     private ?SprintGoal $sprintGoal;
@@ -96,5 +99,15 @@ class SprintGoalIssue implements Positionable
     public function setFinishedAt(?DateTimeImmutable $finishedAt): void
     {
         $this->finishedAt = $finishedAt;
+    }
+
+    public function setStoryPoints(?int $storyPoints): void
+    {
+        $this->storyPoints = $storyPoints;
+    }
+
+    public function getStoryPoints(): ?int
+    {
+        return $this->storyPoints;
     }
 }

@@ -76,8 +76,8 @@ class DescriptionHistoryControllerTest extends WebTestCase
         });
 
         $expectations = [
-            'December 12, 2012 12:12',
-            'October 10, 2010 10:10',
+            '12.12.2012 12:12',
+            '10.10.2010 10:10',
         ];
 
         $this->assertEquals($expectations, $results);

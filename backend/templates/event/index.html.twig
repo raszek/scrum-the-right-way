@@ -50,7 +50,7 @@
                 {% for event in events %}
                     <tr>
                         <td>{{ event.content | raw }}</td>
-                        <td>{{ event.createdAt | date }}</td>
+                        <td>{{ event.createdAt | date('d.m.Y H:i') }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

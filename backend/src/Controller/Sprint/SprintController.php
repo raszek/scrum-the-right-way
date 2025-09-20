@@ -142,7 +142,7 @@ class SprintController extends CommonIssueController
 
         $sprint = $this->findSprint($sprintId, $project);
 
-        $chartRecords = $this->burndownChartService->getChartData($sprint);
+        $chartRecords = $this->burndownChartService->getHistorySprintChartData($sprint);
 
         $sprintWithIssues = $this->sprintRepository->getSprintIssues($sprint);
 
@@ -155,7 +155,7 @@ class SprintController extends CommonIssueController
 
     private function overview(Sprint $currentSprint, Project $project): Response
     {
-        $chartRecords = $this->burndownChartService->getChartData($currentSprint);
+        $chartRecords = $this->burndownChartService->getCurrentSprintChartData($currentSprint);
 
         return $this->render('sprint/overview.html.twig', [
             'project' => $project,

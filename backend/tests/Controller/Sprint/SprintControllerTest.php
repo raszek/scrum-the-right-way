@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller\Sprint;
 
+use App\Entity\Sprint\SprintGoalIssue;
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
@@ -508,6 +509,22 @@ class SprintControllerTest extends WebTestCase
         ]);
 
         $this->assertCount(4, $doneIssues);
+
+        $sprintHistoryStoryPoints = $sprint->getSprintGoals()
+            ->get(0)
+            ->getSprintGoalIssues()
+            ->map(fn(SprintGoalIssue $sprintGoalIssue) => $sprintGoalIssue->getStoryPoints())
+            ->toArray();
+
+        $this->assertEquals([
+            3,
+            5,
+            5,
+            5,
+            8,
+            3,
+            5
+        ], $sprintHistoryStoryPoints);
     }
 
     /** @test */
