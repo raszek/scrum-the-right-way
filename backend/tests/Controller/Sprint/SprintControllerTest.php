@@ -528,6 +528,63 @@ class SprintControllerTest extends WebTestCase
     }
 
     /** @test */
+    public function developer_can_change_estimated_end_date_of_sprint()
+    {
+        $client = static::createClient();
+        $client->followRedirects();
+
+        $clockMock = new class implements ClockInterface {
+
+            public function now(): CarbonImmutable
+            {
+                return CarbonImmutable::create(2012, 12, 14);
+            }
+        };
+        $this->mockService(ClockInterface::class, $clockMock);
+
+        $developer = UserFactory::createOne();
+
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $memberDeveloper = ProjectMemberFactory::createOne([
+            'user' => $developer,
+            'project' => $project
+        ]);
+
+        $developerRole = ProjectRoleFactory::developerRole();
+
+        ProjectMemberRoleFactory::createOne([
+            'projectMember' => $memberDeveloper,
+            'role' => $developerRole
+        ]);
+
+        $sprint = SprintFactory::createOne([
+            'project' => $project,
+            'isCurrent' => true,
+            'number' => 1,
+            'startedAt' => CarbonImmutable::create(2012, 12, 12),
+            'estimatedEndDate' => CarbonImmutable::create(2012, 12, 19),
+        ]);
+
+        $this->loginAsUser($developer);
+
+        $uri = sprintf(
+            '/projects/%s/sprints/current/update-estimated-end-date',
+            $project->getId(),
+        );
+
+        $client->request('POST', $uri, [
+            'value' => CarbonImmutable::create(2012, 12, 20)->format('Y-m-d')
+        ]);
+
+        $this->assertResponseStatusCodeSame(204);
+
+        $this->assertEquals('2012-12-20', $sprint->getEstimatedEndDate()->format('Y-m-d'));
+    }
+
+    /** @test */
     public function project_member_can_view_list_of_sprints()
     {
         $client = static::createClient();

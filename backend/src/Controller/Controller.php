@@ -4,8 +4,12 @@ namespace App\Controller;
 
 use App\Entity\User\User;
 use App\Formulate\Form;
+use App\Helper\JsonHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class Controller extends AbstractController
 {
@@ -22,6 +26,21 @@ class Controller extends AbstractController
     public function successFlash(string $message): void
     {
         $this->addFlash('success', $message);
+    }
+
+    public function validate(Form $form, Request $request): void
+    {
+        if (!$form->loadRequest($request)) {
+            throw new BadRequestException('Form cannot be loaded');
+        }
+
+        if ($form->validate()) {
+            return;
+        }
+
+        $errors = JsonHelper::encode($form->getErrors());
+
+        throw new UnprocessableEntityHttpException($errors);
     }
 
     protected function render(string $view, array $parameters = [], ?Response $response = null): Response

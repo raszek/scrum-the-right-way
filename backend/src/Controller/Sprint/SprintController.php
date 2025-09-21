@@ -2,13 +2,16 @@
 
 namespace App\Controller\Sprint;
 
+use App\Action\Sprint\UpdateEstimatedEndDate;
 use App\Controller\Issue\CommonIssueController;
 use App\Entity\Project\Project;
 use App\Entity\Sprint\Sprint;
 use App\Exception\Sprint\CannotStartSprintException;
+use App\Exception\Sprint\CannotUpdateEstimatedEndDateException;
 use App\Form\Sprint\SprintGoalFormType;
 use App\Form\Sprint\StartSprintForm;
 use App\Form\Sprint\StartSprintType;
+use App\Form\Sprint\UpdateEstimatedEndDateForm;
 use App\Helper\StimulusHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\Sprint\SprintRepository;
@@ -20,6 +23,7 @@ use App\Table\QueryParams;
 use App\Table\Sprint\SprintTable;
 use Carbon\CarbonImmutable;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -98,6 +102,32 @@ class SprintController extends CommonIssueController
             'sprintGoalForm' => $sprintGoalForm,
             'startSprintForm' => $startSprintForm,
         ]);
+    }
+
+    #[Route('/sprints/current/update-estimated-end-date', 'app_project_sprint_update_estimated_end_date', methods: ['POST'])]
+    public function updateEstimatedEndDate(
+        Project $project,
+        UpdateEstimatedEndDateForm $factoryForm,
+        Request $request,
+        UpdateEstimatedEndDate $updateEstimatedEndDate,
+    ): Response {
+        $this->denyAccessUnlessGranted(SprintVoter::UPDATE_ESTIMATED_END_DATE_CURRENT_SPRINT, $project);
+
+        $form = $factoryForm->create();
+
+        $this->validate($form, $request);
+
+        $currentSprint = $this->getCurrentSprint($project);
+
+        $newEstimatedEndDate = new CarbonImmutable($form->getData()->value);
+
+        try {
+            $updateEstimatedEndDate->execute($currentSprint, $newEstimatedEndDate);
+        } catch (CannotUpdateEstimatedEndDateException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
+
+        return new Response(status: 204);
     }
 
     #[Route('/sprints/current/finish', 'app_project_sprint_current_finish')]

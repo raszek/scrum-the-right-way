@@ -9,29 +9,31 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class SprintVoter extends Voter
 {
-    public const SPRINT_HOME = 'SPRINT_HOME';
+    public const string SPRINT_HOME = 'SPRINT_HOME';
 
-    public const SPRINT_LIST = 'SPRINT_LIST';
+    public const string SPRINT_LIST = 'SPRINT_LIST';
 
-    public const VIEW_SPRINT = 'VIEW_SPRINT';
+    public const string VIEW_SPRINT = 'VIEW_SPRINT';
 
-    public const ADD_CURRENT_SPRINT_ISSUE = 'ADD_CURRENT_SPRINT_ISSUE';
+    public const string ADD_CURRENT_SPRINT_ISSUE = 'ADD_CURRENT_SPRINT_ISSUE';
 
-    public const REMOVE_CURRENT_SPRINT_ISSUE = 'REMOVE_CURRENT_SPRINT_ISSUE';
+    public const string REMOVE_CURRENT_SPRINT_ISSUE = 'REMOVE_CURRENT_SPRINT_ISSUE';
 
-    public const MOVE_CURRENT_SPRINT_ISSUE = 'MOVE_CURRENT_SPRINT_ISSUE';
+    public const string MOVE_CURRENT_SPRINT_ISSUE = 'MOVE_CURRENT_SPRINT_ISSUE';
 
-    public const REMOVE_CURRENT_SPRINT_GOAL = 'REMOVE_CURRENT_SPRINT_GOAL';
+    public const string REMOVE_CURRENT_SPRINT_GOAL = 'REMOVE_CURRENT_SPRINT_GOAL';
 
-    public const EDIT_SPRINT_GOAL = 'EDIT_SPRINT_GOAL';
+    public const string EDIT_SPRINT_GOAL = 'EDIT_SPRINT_GOAL';
 
-    public const SORT_SPRINT_GOAL = 'SORT_SPRINT_GOAL';
+    public const string SORT_SPRINT_GOAL = 'SORT_SPRINT_GOAL';
 
-    public const PLAN_CURRENT_SPRINT = 'VIEW_CURRENT_SPRINT';
+    public const string PLAN_CURRENT_SPRINT = 'VIEW_CURRENT_SPRINT';
 
-    public const START_CURRENT_SPRINT = 'START_CURRENT_SPRINT';
+    public const string START_CURRENT_SPRINT = 'START_CURRENT_SPRINT';
 
-    public const FINISH_CURRENT_SPRINT = 'FINISH_CURRENT_SPRINT';
+    public const string FINISH_CURRENT_SPRINT = 'FINISH_CURRENT_SPRINT';
+
+    public const string UPDATE_ESTIMATED_END_DATE_CURRENT_SPRINT = 'UPDATE_ESTIMATED_END_DATE_CURRENT_SPRINT';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -48,6 +50,7 @@ class SprintVoter extends Voter
             self::FINISH_CURRENT_SPRINT,
             self::SPRINT_LIST,
             self::VIEW_SPRINT,
+            self::UPDATE_ESTIMATED_END_DATE_CURRENT_SPRINT
         ];
 
         return in_array($attribute, $attributes) && $subject instanceof Project;
@@ -97,6 +100,7 @@ class SprintVoter extends Voter
             self::SORT_SPRINT_GOAL,
             self::START_CURRENT_SPRINT,
             self::FINISH_CURRENT_SPRINT,
+            self::UPDATE_ESTIMATED_END_DATE_CURRENT_SPRINT,
         ];
     }
 }

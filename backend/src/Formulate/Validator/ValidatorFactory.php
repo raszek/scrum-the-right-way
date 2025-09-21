@@ -11,6 +11,11 @@ class ValidatorFactory
         return new NotBlank();
     }
 
+    public function date(?string $format = null): Date
+    {
+        return $format ? new Date($format) : new Date();
+    }
+
     public function email(): Email
     {
         return new Email();

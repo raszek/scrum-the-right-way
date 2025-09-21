@@ -1,5 +1,5 @@
 export function defaultDateFormat () {
-    return 'yyyy-MM-dd';
+    return 'dd.MM.yyyy';
 }
 
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

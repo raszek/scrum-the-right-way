@@ -24,6 +24,9 @@
                             <div data-controller="sprint--end-date"
                                  data-sprint--end-date-title-value="Estimated sprint end date"
                                  data-sprint--end-date-current-value="{{ sprint.estimatedEndDate | date('Y-m-d') }}"
+                                 data-sprint--end-date-url-value="{{ path('app_project_sprint_update_estimated_end_date', {
+                                     id: project.id
+                                 }) }}"
                             >
                                 <button class="btn btn-primary"
                                         data-sprint--end-date-target="button"

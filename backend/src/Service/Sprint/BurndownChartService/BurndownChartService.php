@@ -34,7 +34,7 @@ readonly class BurndownChartService
             $sprintEndDate
         );
 
-        $records = $this->getSprintDates($sprint->getStartedAt(), $sprintEndDate->addDay());
+        $records = $this->getSprintDates($sprint->getStartedAt(), $sprintEndDate);
 
         foreach ($databaseRecords as $databaseRecord) {
             $records[$databaseRecord['finishedday']]['storyPoints'] = $databaseRecord['storypoints'];
