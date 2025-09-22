@@ -53,7 +53,7 @@ readonly class ChangeAvatar
         $profile->setAvatarThumb($avatarThumbFile);
 
         $imageEditor = $this->imageEditorFactory->create($this->fileService->getFilePath($avatarThumbFile));
-        $imageEditor->resize(height: 64);
+        $imageEditor->resize(width: 64, height: 64);
     }
 
     private function suffixThumb(string $filename): string

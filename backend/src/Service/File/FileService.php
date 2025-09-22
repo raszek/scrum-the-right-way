@@ -44,11 +44,9 @@ readonly class FileService
     {
         $directory = $this->generateDirectory();
 
-        $directoryPath = $this->generateDirectoryPath($directory);
-
         $copiedFile = File::fromFile(
             file: $file,
-            directory: $directoryPath,
+            directory: $directory,
             createdAt: $this->clock->now(),
             name: $rename ?? $file->getName()
         );
