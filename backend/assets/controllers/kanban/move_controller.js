@@ -20,6 +20,7 @@ export default class extends Controller {
 
     connect() {
         this.makeColumnSortable();
+        this.equalizeColumns();
 
         this.modal = new Modal(this.modalTarget);
         this.moveBackBinded = this.moveBack.bind(this);
@@ -37,7 +38,43 @@ export default class extends Controller {
                 animation: 150,
                 onUpdate: this.dragIssue.bind(this),
                 onAdd: this.dragIssue.bind(this),
+                onMove: this.highlightColumn.bind(this),
+                onEnd: this.onDrop.bind(this),
             });
+        }
+    }
+
+    equalizeColumns() {
+        const maxHeight = this.columnsMaxHeight();
+
+        for (const columnTarget of this.columnTargets) {
+            columnTarget.style.height = maxHeight + 'px';
+        }
+
+    }
+
+    columnsMaxHeight() {
+        const heights = this.columnTargets.map((columnTarget) => {
+            return columnTarget.offsetHeight;
+        });
+
+        return Math.max(...heights);
+    }
+
+    highlightColumn(event) {
+        this.clearColumns();
+
+        event.to.classList.add('strw-kanban-target-column');
+    }
+
+    onDrop() {
+        this.clearColumns();
+        this.equalizeColumns();
+    }
+
+    clearColumns() {
+        for (const columnTarget of this.columnTargets) {
+            columnTarget.classList.remove('strw-kanban-target-column');
         }
     }
 
@@ -112,6 +149,8 @@ export default class extends Controller {
     }
 
     dragIssue(event) {
+        this.equalizeColumns();
+
         const targetColumn = event.to.getAttribute('data-kanban--move-column-key-param');
         const draggedIssueId = event.item.getAttribute('data-kanban--move-id-param');
         const moveUrl = event.item.getAttribute('data-kanban--move-url-param')

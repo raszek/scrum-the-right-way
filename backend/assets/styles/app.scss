@@ -183,10 +183,10 @@ dialog[data-dialog-target='dialog'][closing] {
     flex-direction: column;
 }
 
-.strw-kanban-column:not(:has(.strw-kanban-issue)) {
-    height: 400px;
-}
-
 .strw-kanban-issue {
     width: 100%;
+}
+
+.strw-kanban-target-column {
+    background-color: var(--lt-color-gray-100);
 }
