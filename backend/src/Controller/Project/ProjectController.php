@@ -2,11 +2,11 @@
 
 namespace App\Controller\Project;
 
+use App\Action\Project\CreateProject;
 use App\Controller\Controller;
 use App\Entity\Project\Project;
-use App\Form\Project\ProjectFormType;
+use App\Form\Project\ProjectForm;
 use App\Repository\Project\ProjectRepository;
-use App\Service\Project\ProjectService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -20,7 +20,6 @@ class ProjectController extends Controller
 
     public function __construct(
         private readonly ProjectRepository $projectRepository,
-        private readonly ProjectService $projectService
     ) {
     }
 
@@ -35,21 +34,24 @@ class ProjectController extends Controller
     }
 
     #[Route('/create', name: 'app_project_create')]
-    public function create(Request $request): Response
-    {
-        $form = $this->createForm(ProjectFormType::class);
+    public function create(
+        Request $request,
+        ProjectForm $projectForm,
+        CreateProject $createProject
+    ): Response {
+        $form = $projectForm->create();
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->loadRequest($request) && $form->validate()) {
 
-            $createdProject = $this->projectService->create($form->getData(), $this->getLoggedInUser());
+            $createdProject = $createProject->execute($form->getData(), $this->getLoggedInUser());
 
             $this->addFlash('success', sprintf('Project "%s" successfully created.', $createdProject->getName()));
             return $this->redirectToRoute('app_project_list');
         }
 
         return $this->render('project/create.html.twig', [
-            'form' => $form
+            'form' => $form,
+
         ]);
     }
 

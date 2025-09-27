@@ -2,9 +2,12 @@
     <label for="{{ id }}" class="form-label">{{ label }}</label>
     <input type="{{ type }}"
            name="{{ name }}"
-           class="form-control {{ error ? 'is-invalid' : '' }}"
+           class="form-control {{ error ? 'is-invalid' : '' }} {{ class }}"
            id="{{ id }}"
            value="{{ value }}"
+           {% for key, attribute_value in attributes %}
+           {{ key }}="{{ attribute_value }}"
+           {% endfor %}
     >
     {% if error %}
         <div class="invalid-feedback">

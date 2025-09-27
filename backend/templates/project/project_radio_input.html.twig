@@ -1,0 +1,29 @@
+<div class="row mt-3">
+    {% for option in options %}
+        <div class="d-flex justify-content-center">
+            <input
+                    type="radio"
+                    class="btn-check {{ option.class }}"
+                    id="{{ option.id }}"
+                    name="{{ option.name }}"
+                    value="{{ option.value }}"
+                    {% if loop.first %}
+                    checked
+                    {% endif %}
+            >
+            <label class="btn btn-secondary w-25 d-flex flex-column align-items-center h1" for="{{ option.id }}">
+                {% if option.label == 'Kanban'  %}
+                    <i class="iconoir-kanban-board display-2"></i>
+                {% else %}
+                    <i class="iconoir-agile display-2"></i>
+                {% endif %}
+                {{ option.label }}
+            </label>
+        </div>
+    {% endfor %}
+</div>
+{% if error %}
+    <div class="alert alert-danger">
+        {{ error.message() }}
+    </div>
+{% endif %}

@@ -1,0 +1,17 @@
+{% for option in options %}
+    <div class="form-check">
+        <input type="radio"
+               class="form-check-input {{ error ? 'is-invalid' : '' }} {{ option.class }}"
+               id="{{ option.id }}"
+               name="{{ option.name }}"
+        >
+        <label class="form-check-label"
+               for="{{ option.id }}"
+        >
+            {{ option.label }}
+        </label>
+        {% if error and loop.last %}
+            <div class="invalid-feedback">{{ error.message() }}</div>
+        {% endif %}
+    </div>
+{% endfor %}

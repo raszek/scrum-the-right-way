@@ -41,4 +41,18 @@ class ValidatorFactory
         return new MaxFileSize($maxBytes);
     }
 
+    public function regex(string $regex): Regex
+    {
+        return new Regex($regex);
+    }
+
+    /**
+     * @param string[] $choices
+     * @return Choice
+     */
+    public function choice(array $choices): Choice
+    {
+        return new Choice($choices);
+    }
+
 }

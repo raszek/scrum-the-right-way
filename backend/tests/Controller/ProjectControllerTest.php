@@ -10,7 +10,6 @@ use App\Factory\Project\ProjectRoleFactory;
 use App\Factory\Project\ProjectTypeFactory;
 use App\Factory\UserFactory;
 use App\Repository\Project\ProjectRepository;
-use App\Repository\Project\ProjectTypeRepository;
 
 class ProjectControllerTest extends WebTestCase
 {
@@ -36,7 +35,7 @@ class ProjectControllerTest extends WebTestCase
         $client->submit($form, [
             'project_form[name]' => 'new project name',
             'project_form[code]' => 'NPN',
-            'project_form[type]' => $this->projectTypeRepository()->scrumType()->getId(),
+            'project_form[type]' => ProjectTypeEnum::Scrum->key(),
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -111,10 +110,5 @@ class ProjectControllerTest extends WebTestCase
     private function projectRepository(): ProjectRepository
     {
         return $this->getService(ProjectRepository::class);
-    }
-
-    private function projectTypeRepository(): ProjectTypeRepository
-    {
-        return $this->getService(ProjectTypeRepository::class);
     }
 }

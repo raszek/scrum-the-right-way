@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Project
 {
 
-    const CODE_REGEX = '/^[A-Z]{3}$/';
+    const string CODE_REGEX = '/^[A-Z]{3}$/';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

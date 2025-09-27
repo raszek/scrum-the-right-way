@@ -12,10 +12,12 @@ readonly class FormWidgetFactory
     ) {
     }
 
-    public function textField(): TextField
-    {
+    public function textField(
+        array $attributes = [],
+    ): TextField {
         return new TextField(
             twig: $this->twig,
+            attributes: $attributes,
         );
     }
 
@@ -23,7 +25,9 @@ readonly class FormWidgetFactory
     {
         return new TextField(
             twig: $this->twig,
-            type: 'email'
+            attributes: [
+                'type' => 'email',
+            ]
         );
     }
 
@@ -31,7 +35,9 @@ readonly class FormWidgetFactory
     {
         return new TextField(
             twig: $this->twig,
-            type: 'password'
+            attributes: [
+                'type' => 'password',
+            ]
         );
     }
 
@@ -39,8 +45,21 @@ readonly class FormWidgetFactory
     {
         return new TextField(
             twig: $this->twig,
-            type: 'hidden',
-            template: 'formulate/widget/hidden_input.html.twig'
+            template: 'formulate/widget/hidden_input.html.twig',
+            attributes: [
+                'type' => 'hidden'
+            ]
+        );
+    }
+
+    public function radioField(
+        array $options,
+        string $template = 'formulate/widget/radio_input.html.twig'
+    ): RadioInputField {
+        return new RadioInputField(
+            twig: $this->twig,
+            options: $options,
+            template: $template,
         );
     }
 
@@ -48,8 +67,10 @@ readonly class FormWidgetFactory
     {
         return new TextField(
             twig: $this->twig,
-            type: $type,
-            template: 'formulate/widget/site_text_input.html.twig'
+            template: 'formulate/widget/site_text_input.html.twig',
+            attributes: [
+                'type' => $type,
+            ]
         );
     }
 
