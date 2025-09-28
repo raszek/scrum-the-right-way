@@ -3,7 +3,7 @@
 {% set page_title = 'Sprint ' ~ sprint.number %}
 
 {% block content %}
-    <div data-controller="confirm-modal sprint--sort sprint--edit-goal">
+    <div data-controller="confirm-modal sprint--sort sprint--edit-goal issue--modal">
         <div class="row">
             <div class="col-12">
                 {% include 'common/project_page_header.html.twig' %}
@@ -73,22 +73,9 @@
                                         }) }}"
                                         class="list-group-item d-flex justify-content-between align-items-center"
                                     >
-                                        <div>
-                                            <p class="mb-0">
-                                                <a href="{{ path('app_project_issue_view', {
-                                                    id: project.id,
-                                                    issueCode: goalIssue.issue.code
-                                                }) }}">
-                                                    {{ goalIssue.issue.fullText }}
-                                                </a>
-                                                &nbsp;
-                                                <span class="{{ goalIssue.issue.isEstimated ? 'text-success' : 'text-danger' }}"
-                                                      title="{{ goalIssue.issue.countEstimated }} issues estimated"
-                                                >
-                                                    [{{ goalIssue.issue.storyPoints ? goalIssue.issue.storyPoints ~ ' story points' : 'not estimated' }}]
-                                                </span>
-                                            </p>
-                                        </div>
+                                        {% include 'issue/issue_item.html.twig' with {
+                                            issue: goalIssue.issue
+                                        } %}
                                         {% if is_granted('REMOVE_CURRENT_SPRINT_ISSUE', project) %}
                                             <button type="submit"
                                                     class="btn btn-danger"
@@ -135,5 +122,6 @@
             dialogText: 'Are you sure to remove this goal from sprint?',
             id: 'remove-goal'
         } %}
+        {% include 'issue/issue_modal.html.twig' %}
     </div>
 {% endblock %}

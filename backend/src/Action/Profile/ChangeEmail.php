@@ -2,7 +2,7 @@
 
 namespace App\Action\Profile;
 
-use App\Email\Profile\ChangeEmailEmail;
+use App\Email\Profile\ChangeEmailMessage;
 use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;
@@ -15,7 +15,7 @@ readonly class ChangeEmail
 {
 
     public function __construct(
-        private ChangeEmailEmail $changeEmailEmail,
+        private ChangeEmailMessage $changeEmailEmail,
         private EntityManagerInterface $entityManager,
         private ClockInterface $clock,
         private RandomService $randomService,

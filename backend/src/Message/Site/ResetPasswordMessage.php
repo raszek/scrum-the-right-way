@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Email\Profile;
+namespace App\Message\Site;
 
 use App\Entity\User\UserCode;
 use App\Service\Common\DefaultMailer;
 
-readonly class ChangeEmailEmail
+readonly class ResetPasswordMessage
 {
-
     public function __construct(
         private DefaultMailer $mailer
     ) {
@@ -21,14 +20,13 @@ readonly class ChangeEmailEmail
 
         $email
             ->to($user->getEmail())
-            ->subject(sprintf('Change email %s', $user->getFullName()))
-            ->htmlTemplate('emails/profile/change_email.html.twig')
+            ->subject('Here is your reset password link')
+            ->htmlTemplate('emails/site/forgot_password_mail.html.twig')
             ->context([
                 'user' => $user,
-                'changeEmailCode' => $userCode->getCode(),
+                'userCode' => $userCode,
             ]);
 
         $this->mailer->sendTemplated($email);
     }
-
 }

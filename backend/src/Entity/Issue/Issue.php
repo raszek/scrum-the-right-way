@@ -26,11 +26,11 @@ use RuntimeException;
 class Issue implements Positionable
 {
 
-    const DEFAULT_ORDER_SPACE = 1024;
+    const int DEFAULT_ORDER_SPACE = 1024;
 
-    const TITLE_LENGTH = 2048;
+    const int TITLE_LENGTH = 2048;
 
-    const MAX_TAG_COUNT = 20;
+    const int MAX_TAG_COUNT = 20;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -2,7 +2,7 @@
 
 namespace App\Action\Site;
 
-use App\Email\Site\ResetPasswordEmail;
+use App\Email\Site\ResetPasswordMessage;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;
 use App\Exception\Site\UserNotFoundException;
@@ -20,7 +20,7 @@ readonly class ResetPassword
         private UserCodeRepository $userCodeRepository,
         private RandomService $randomService,
         private ClockInterface $clock,
-        private ResetPasswordEmail $resetPasswordEmail,
+        private ResetPasswordMessage $resetPasswordEmail,
     ) {
     }
 

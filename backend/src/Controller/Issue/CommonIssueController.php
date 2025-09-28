@@ -15,6 +15,17 @@ class CommonIssueController extends Controller
     ) {
     }
 
+    protected function findById(string $issueId, Project $project): Issue
+    {
+        $issue = $this->issueRepository->findById($issueId, $project);
+
+        if (!$issue) {
+            throw new NotFoundHttpException('Issue not found');
+        }
+
+        return $issue;
+    }
+
     protected function findIssue(string $issueCode, Project $project): Issue
     {
         $issue = $this->issueRepository->findByCode($issueCode, $project);

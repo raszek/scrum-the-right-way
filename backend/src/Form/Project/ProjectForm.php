@@ -67,7 +67,7 @@ readonly class ProjectForm
                 name: 'type',
                 validators: [
                     $v->notBlank(),
-                    $v->choice(ProjectTypeEnum::keys())
+                    $v->choice(array_keys($this->projectTypeOptions()))
                 ],
                 widget: $this->formWidgetFactory->radioField(
                     options: $this->projectTypeOptions(),

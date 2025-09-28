@@ -54,6 +54,14 @@ class IssueRepository extends ServiceEntityRepository implements ReorderService
         ]);
     }
 
+    public function findById(string $id, Project $project): ?Issue
+    {
+        return $this->findOneBy([
+            'project' => $project,
+            'id' => $id,
+        ]);
+    }
+
     /**
      * @return Issue[]
      */

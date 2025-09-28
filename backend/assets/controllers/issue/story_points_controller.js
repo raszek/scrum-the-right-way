@@ -3,12 +3,18 @@ import TomSelect from 'tom-select';
 
 export default class extends Controller {
 
-    static targets = ['select', 'selectContainer', 'textContainer', 'button'];
+    static targets = [
+        'select',
+        'selectContainer',
+        'textContainer',
+        'button'
+    ];
 
     static outlets = ['issue-events'];
 
     static values = {
-        url: String
+        url: String,
+        issueId: String
     }
 
     connect() {
@@ -30,6 +36,18 @@ export default class extends Controller {
         this.hideEdit();
 
         await this.setStoryPoints(storyPoints);
+
+        this.storyPointsChanged(storyPoints);
+    }
+
+    storyPointsChanged(storyPoints) {
+
+        this.dispatch('story-points-changed', {
+            detail: {
+                issueId: this.issueIdValue,
+                storyPoints
+            }
+        });
 
         this.renderEvents();
     }

@@ -126,6 +126,19 @@ class IssueController extends CommonIssueController
         return $this->render('issue/issue.html.twig', $getIssueData->execute($issue, $this->getLoggedInUser()));
     }
 
+    #[Route(['/issues/{issueId}/issue-item'], name: 'app_project_issue_view_item')]
+    public function issueItem(Project $project, string $issueId): Response
+    {
+        $this->denyAccessUnlessGranted(IssueVoter::VIEW_ISSUE, $project);
+
+        $issue = $this->findById($issueId, $project);
+
+        return $this->render('issue/issue_item.html.twig', [
+            'issue' => $issue,
+            'project' => $project
+        ]);
+    }
+
     private function getPreviousSite(Request $request): string
     {
         $pathInfo = $request->getPathInfo();

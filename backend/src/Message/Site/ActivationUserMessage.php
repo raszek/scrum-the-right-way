@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Email\Site;
+namespace App\Message\Site;
 
-use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Service\Common\DefaultMailer;
 
-readonly class ResetPasswordEmail
+readonly class ActivationUserMessage
 {
+
     public function __construct(
         private DefaultMailer $mailer
     ) {
     }
+
 
     public function send(UserCode $userCode): void
     {
@@ -21,8 +22,8 @@ readonly class ResetPasswordEmail
 
         $email
             ->to($user->getEmail())
-            ->subject('Here is your reset password link')
-            ->htmlTemplate('emails/site/forgot_password_mail.html.twig')
+            ->subject(sprintf('Account activation %s', $user->getFullName()))
+            ->htmlTemplate('emails/site/activation_user.html.twig')
             ->context([
                 'user' => $user,
                 'userCode' => $userCode,

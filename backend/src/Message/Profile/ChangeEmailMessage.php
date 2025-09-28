@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Email\Site;
+namespace App\Message\Profile;
 
-use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Service\Common\DefaultMailer;
 
-class ActivationUserEmail
+readonly class ChangeEmailMessage
 {
 
     public function __construct(
-        private readonly DefaultMailer $mailer
+        private DefaultMailer $mailer
     ) {
     }
-
 
     public function send(UserCode $userCode): void
     {
@@ -23,13 +21,14 @@ class ActivationUserEmail
 
         $email
             ->to($user->getEmail())
-            ->subject(sprintf('Account activation %s', $user->getFullName()))
-            ->htmlTemplate('emails/site/activation_user.html.twig')
+            ->subject(sprintf('Change email %s', $user->getFullName()))
+            ->htmlTemplate('emails/profile/change_email.html.twig')
             ->context([
                 'user' => $user,
-                'userCode' => $userCode,
+                'changeEmailCode' => $userCode->getCode(),
             ]);
 
         $this->mailer->sendTemplated($email);
     }
+
 }

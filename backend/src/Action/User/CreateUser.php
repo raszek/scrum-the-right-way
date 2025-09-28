@@ -2,7 +2,7 @@
 
 namespace App\Action\User;
 
-use App\Email\Site\ActivationUserEmail;
+use App\Email\Site\ActivationUserMessage;
 use App\Entity\Profile\Profile;
 use App\Entity\User\User;
 use App\Entity\User\UserCode;
@@ -17,7 +17,7 @@ readonly class CreateUser
 
     public function __construct(
         private ClockInterface $clock,
-        private ActivationUserEmail $registerMail,
+        private ActivationUserMessage $registerMail,
         private EntityManagerInterface $entityManager,
         private RandomService $randomService
     ) {

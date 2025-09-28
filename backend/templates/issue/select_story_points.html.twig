@@ -8,9 +8,10 @@
     </div>
 </div>
 {% endif %}
-<div data-controller="story-points"
-     data-story-points-issue-events-outlet="#issue-events"
-     data-story-points-url-value="{{ path('app_project_issue_story_points_set', {
+<div data-controller="issue--story-points"
+     data-issue--story-points-issue-id-value="{{ issue.id }}"
+     data-issue--story-points-issue-events-outlet="#issue-events"
+     data-issue--story-points-url-value="{{ path('app_project_issue_story_points_set', {
          id: project.id,
          issueCode: issue.code
      }) }}"
@@ -20,23 +21,23 @@
         Story points
         {% if isIssueEditable and issue.canEditStoryPoints and is_granted('STORY_POINTS_SET', project) %}
             <button class="btn btn-primary"
-                    data-story-points-target="button"
-                    data-action="story-points#toggle"
+                    data-issue--story-points-target="button"
+                    data-action="issue--story-points#toggle"
             >
                 <i class="bi bi-pencil"></i>
             </button>
         {% endif %}
     </div>
     <div class="card-body">
-        <p data-story-points-target="textContainer" class="mb-0">
+        <p data-issue--story-points-target="textContainer" class="mb-0">
             {% if issue.storyPoints %}
                 {{ issue.storyPoints }}
             {% else %}
                 None
             {% endif %}
         </p>
-        <div data-story-points-target="selectContainer" style="display: none;">
-            <select data-story-points-target="select">
+        <div data-issue--story-points-target="selectContainer" style="display: none;">
+            <select data-issue--story-points-target="select">
                 <option value="none">None</option>
                 {% for storyPoint in storyPoints %}
                     <option value="{{ storyPoint }}">

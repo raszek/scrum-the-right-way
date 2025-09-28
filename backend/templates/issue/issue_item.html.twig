@@ -1,0 +1,24 @@
+<div class="d-flex flex-column"
+     data-controller="issue--item"
+     data-issue--item-id-value="{{ issue.id }}"
+     data-issue--item-url-value="{{ path('app_project_issue_view_item', {id: project.id, issueId: issue.id}) }}"
+     data-action="issue--story-points:story-points-changed@window->issue--item#update issue--title:title-changed@window->issue--item#update"
+>
+    <a href="javascript:void(0);"
+       data-action="issue--modal#show"
+       data-issue--modal-url-param="{{ path('app_project_issue_view_ajax', {
+           id: project.id,
+           issueCode: issue.code
+       }) }}"
+       data-issue--modal-code-param="{{ issue.code }}"
+    >
+        {{ issue.title }}
+    </a>
+
+    <div class="d-flex">
+        <p class="mb-0 me-1">[{{ issue.code }}]</p>
+        <span class="{{ issue.isEstimated ? 'text-success' : 'text-danger' }}">
+            [{{ issue.storyPoints ? issue.storyPoints ~ ' story points' : 'not estimated' }}]
+        </span>
+    </div>
+</div>

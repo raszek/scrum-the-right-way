@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import { post } from 'util';
 
 export default class extends Controller {
 
@@ -6,7 +7,8 @@ export default class extends Controller {
 
     static values = {
         url: String,
-        maxLength: Number
+        maxLength: Number,
+        issueId: String
     }
 
     initialize() {
@@ -31,9 +33,9 @@ export default class extends Controller {
         const textarea = document.createElement('textarea');
         textarea.classList.add('form-control');
         textarea.classList.add('strw-update-title-textarea');
-        textarea.setAttribute('data-action', 'keydown.enter->textarea-update#toggle')
+        textarea.setAttribute('data-action', 'keydown.enter->issue--title#toggle')
         textarea.setAttribute('maxlength', this.maxLengthValue);
-        textarea.setAttribute('data-textarea-update-target', 'textarea');
+        textarea.setAttribute('data-issue--title-target', 'textarea');
         textarea.addEventListener('input', function () {
             this.style.height = '';
             this.style.height = this.scrollHeight + 'px';
@@ -47,7 +49,7 @@ export default class extends Controller {
         textarea.style.height = textarea.scrollHeight + 'px';
     }
 
-    save() {
+    async save() {
         const text = this.textareaTarget.value.trim();
 
         if (!text) {
@@ -59,9 +61,13 @@ export default class extends Controller {
         const formData = new FormData();
         formData.append('title', text);
 
-        fetch(this.urlValue, {
-            method: 'POST',
-            body: formData
-        })
+        await post(this.urlValue, formData);
+
+        this.dispatch('title-changed', {
+            detail: {
+                issueId: this.issueIdValue,
+                title: text
+            }
+        });
     }
 }

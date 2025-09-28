@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller\Admin;
 
-use App\Email\Site\ActivationUserEmail;
+use App\Email\Site\ActivationUserMessage;
 use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;
@@ -58,7 +58,7 @@ class UserControllerTest extends WebTestCase
             ->withAdminRole()
             ->create();
 
-        $activationMailMock = new class extends ActivationUserEmail
+        $activationMailMock = new class extends ActivationUserMessage
         {
             public function __construct()
             {
@@ -72,7 +72,7 @@ class UserControllerTest extends WebTestCase
             }
         };
 
-        $this->mockService(ActivationUserEmail::class, $activationMailMock);
+        $this->mockService(ActivationUserMessage::class, $activationMailMock);
 
         $this->loginAsUser($admin);
 

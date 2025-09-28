@@ -2,7 +2,7 @@
 
 namespace App\Action\User;
 
-use App\Email\Site\ActivationUserEmail;
+use App\Email\Site\ActivationUserMessage;
 use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;
@@ -18,7 +18,7 @@ readonly class SendActivationLink
         private EntityManagerInterface $entityManager,
         private RandomService $randomService,
         private ClockInterface $clock,
-        private ActivationUserEmail $activationMail,
+        private ActivationUserMessage $activationMail,
     ) {
     }
 
