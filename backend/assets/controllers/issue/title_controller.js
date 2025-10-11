@@ -20,7 +20,7 @@ export default class extends Controller {
             this.buttonTarget.innerHTML = '<i class="bi bi-pencil"></i>'
             this.save();
         } else {
-            this.buttonTarget.innerHTML = '<i class="bi bi-save"></i>'
+            this.buttonTarget.innerHTML = '<i class="bi bi-floppy"></i>'
             this.createTextarea();
         }
 

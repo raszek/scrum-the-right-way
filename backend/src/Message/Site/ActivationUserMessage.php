@@ -13,7 +13,6 @@ readonly class ActivationUserMessage
     ) {
     }
 
-
     public function send(UserCode $userCode): void
     {
         $user = $userCode->getMainUser();
