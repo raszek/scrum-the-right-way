@@ -7,6 +7,7 @@ use App\Entity\User\User;
 use App\Repository\Thread\ThreadMessageRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\UniqueConstraint(columns: ['id', 'number'])]
@@ -93,6 +94,11 @@ class ThreadMessage
     public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getTimeAgo(): string
+    {
+        return CarbonImmutable::instance($this->createdAt)->diffForHumans();
     }
 
     public function getUpdatedAt(): ?DateTimeImmutable

@@ -33,14 +33,31 @@
         <div id="{{ message.number }}" class="card mt-3">
             <div class="card-header d-flex justify-content-between bg-primary text-white">
                 <span>
-                    [#{{ message.number }}] {{ message.createdBy.fullname }}
+                    [#{{ message.number }}]
                 </span>
                 <span>
-                    {{ message.createdAt | date }}
+                    {{ message.timeAgo }}
                 </span>
             </div>
-            <div data-controller="markdown" class="card-body">
-                {{ message.content | nl2br }}
+            <div class="card-body">
+                <div class="row">
+                    <div data-controller="markdown" class="col-lg-10 col-md-9">
+                        {{ message.content | nl2br }}
+                    </div>
+                    <div class="col-lg-2 col-md-3 d-flex flex-column align-items-center gap-2">
+                        {% if message.createdBy.profile.avatarThumb %}
+                            <img src="{{ path('app_user_show_avatar_thumb', {
+                                id: message.createdBy.id
+                            }) }}" class="strw-thread-message-avatar">
+                        {% else %}
+                            <i class="strw-thread-message-avatar-icon bi bi-person-circle"></i>
+                        {% endif %}
+                        <span>
+                            {{ message.createdBy.fullname }}
+                        </span>
+                    </div>
+                </div>
+
             </div>
         </div>
     {% endfor %}

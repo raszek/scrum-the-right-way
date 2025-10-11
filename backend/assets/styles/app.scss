@@ -194,3 +194,16 @@ dialog[data-dialog-target='dialog'][closing] {
 .strw-kanban-target-column {
     background-color: var(--lt-color-gray-100);
 }
+
+// Threads
+
+.strw-thread-message-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.strw-thread-message-avatar-icon {
+    font-size: 64px;
+}

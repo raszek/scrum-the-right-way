@@ -14,6 +14,7 @@ use App\Form\Profile\ChangeEmailForm;
 use App\Form\Profile\ChangePasswordForm;
 use App\Form\Profile\ProfileForm;
 use App\Formulate\CannotValidateFormException;
+use App\Repository\User\UserRepository;
 use App\Service\File\FileService;
 use App\Service\Menu\Profile\ProfileMenu;
 use Exception;
@@ -145,6 +146,31 @@ class ProfileController extends Controller
     public function showAvatarThumb(FileService $fileService): BinaryFileResponse
     {
         $avatar = $this->getLoggedInUser()->getProfile()->getAvatarThumb();
+
+        if (!$avatar) {
+            throw new NotFoundHttpException('Avatar thumb not found');
+        }
+
+        $avatar = $fileService->getFilePath($avatar);
+
+        return new BinaryFileResponse($avatar);
+    }
+
+    #[Route('/avatars/{id}/thumb', 'app_user_show_avatar_thumb', methods: ['GET'])]
+    public function showUserAvatarThumb(
+        FileService $fileService,
+        UserRepository $userRepository,
+        string $id,
+    ): BinaryFileResponse {
+        $user = $userRepository->findOneBy([
+            'id' => $id,
+        ]);
+
+        if (!$user) {
+            throw new NotFoundHttpException('User not found');
+        }
+
+        $avatar = $user->getProfile()->getAvatarThumb();
 
         if (!$avatar) {
             throw new NotFoundHttpException('Avatar thumb not found');
