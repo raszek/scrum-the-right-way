@@ -30,7 +30,7 @@
     <div class="card-body">
         <div data-editor-update-target="viewer">
             {% if not issue.description %}
-                Add more detailed description
+                {{ 'Add more detailed description' | nl2br }}
             {% else %}
                 {{ issue.description | nl2br }}
             {% endif %}
