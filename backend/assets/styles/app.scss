@@ -115,8 +115,12 @@ dialog[data-dialog-target='dialog'][closing] {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%;
     border: black solid .1rem;
+
+    > img {
+        width: 100%;
+        max-height: 10vh;
+    }
 }
 
 .strw-dropzone-item:hover .strw-dropzone-item-content {

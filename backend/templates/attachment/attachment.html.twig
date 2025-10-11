@@ -10,7 +10,7 @@
     attachmentId: attachment.id
 }) %}
 
-<div class="col-lg-2 col-md-4 mt-3"
+<div class="col-lg-3 col-md-4 mt-3"
      data-dropzone-target="item"
      data-dropzone-item-id-param="{{ attachment.id }}"
      data-dropzone-item-remove-url-param="{{ removeUrl }}"
@@ -23,7 +23,6 @@
                  data-lightbox-extension-param="{{ attachment.file.extension }}"
                  data-lightbox-id-param="{{ attachment.id }}"
                  alt="{{ attachment.file.name }}"
-                 style="max-height: 10vh;"
             >
         {% else %}
             <span class="strw-dropzone-icon">
