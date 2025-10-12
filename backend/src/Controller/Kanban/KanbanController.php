@@ -2,21 +2,22 @@
 
 namespace App\Controller\Kanban;
 
+use App\Action\Kanban\MoveKanbanIssueAction;
+use App\Action\Kanban\MoveKanbanIssueActionData;
 use App\Controller\Issue\CommonIssueController;
 use App\Entity\Project\Project;
-use App\Enum\Issue\IssueColumnEnum;
 use App\Enum\Kanban\KanbanFilterEnum;
 use App\Form\Kanban\MoveIssueForm;
-use App\Helper\JsonHelper;
+use App\Formulate\CannotLoadFormException;
+use App\Formulate\CannotValidateFormException;
 use App\Helper\StimulusHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Security\Voter\KanbanVoter;
-use App\Service\Issue\IssueEditor\IssueEditorFactory;
 use App\Service\Kanban\KanbanAccess;
 use App\Service\Kanban\KanbanService;
 use App\Service\Kanban\KanbanSession;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -88,19 +89,35 @@ class KanbanController extends CommonIssueController
     public function moveIssue(
         Project $project,
         string $issueCode,
-        #[MapRequestPayload] MoveIssueForm $form,
-        IssueEditorFactory $factory,
+        MoveIssueForm $moveIssueForm,
+        MoveKanbanIssueAction $moveKanbanIssueAction,
+        Request $request
     ): Response
     {
         $this->denyAccessUnlessGranted(KanbanVoter::KANBAN_MOVE_ISSUE, $project);
 
+        $form = $moveIssueForm->create();
+
+        if (!$form->loadRequest($request)) {
+            throw new CannotLoadFormException();
+        }
+
+        if (!$form->validate()) {
+            throw new CannotValidateFormException($form);
+        }
+
         $issue = $this->findIssue($issueCode, $project);
 
-        $issueEditor = $factory->create($issue, $this->getLoggedInUser());
+        $data = $form->getData();
 
-        $column = IssueColumnEnum::fromKey($form->column);
-
-        $issueEditor->changeKanbanColumn($column, $form->position);
+        $moveKanbanIssueAction->execute(
+            new MoveKanbanIssueActionData(
+                issue: $issue,
+                user: $this->getLoggedInUser(),
+                position: $data->position,
+                column: $data->column,
+            )
+        );
 
         return new Response(status: 204);
     }

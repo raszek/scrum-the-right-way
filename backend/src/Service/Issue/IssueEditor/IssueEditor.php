@@ -187,6 +187,7 @@ readonly class IssueEditor
         if (!$inProgressIssue) {
             if ($column->isInProgress() || $column->isInTests()) {
                 $this->user->setInProgressIssue($this->issue);
+                $this->entityManager->flush();
             }
             return;
         }

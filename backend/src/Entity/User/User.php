@@ -49,14 +49,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?DateTimeImmutable $createdAt = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Issue $inProgressIssue = null;
-
     #[ORM\OneToMany(targetEntity: ProjectMember::class, mappedBy: 'user')]
     private Collection $projectMembers;
 
     #[ORM\OneToMany(targetEntity: UserNotification::class, mappedBy: 'forUser')] private Collection $notifications;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Issue $inProgressIssue = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(unique: true, nullable: false)]

@@ -11,6 +11,16 @@ class ValidatorFactory
         return new NotBlank();
     }
 
+    public function integer(): IntegerValidator
+    {
+        return new IntegerValidator();
+    }
+
+    public function greaterThan(int $value): GreaterThan
+    {
+        return new GreaterThan($value);
+    }
+
     public function date(?string $format = null): Date
     {
         return $format ? new Date($format) : new Date();

@@ -355,6 +355,35 @@ class IssueEditorTest extends KernelTestCase
     }
 
     /** @test */
+    public function developer_when_move_issue_to_in_progress_column_marks_it_as_his_in_progress_issue()
+    {
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
+        ]);
+
+        $toDoColumn = IssueColumnFactory::todoColumn();
+        IssueColumnFactory::inProgressColumn();
+
+        $user = UserFactory::createOne([
+            'inProgressIssue' => null
+        ]);
+
+        $issueMovedToInProgress = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $toDoColumn,
+            'number' => 1,
+        ]);
+
+        $issueEditor = $this->getIssueEditor($issueMovedToInProgress->_real(), $user->_real());
+
+        $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress, 1);
+
+        $this->assertEquals(IssueColumnEnum::InProgress->value, $issueMovedToInProgress->getIssueColumn()->getId());
+
+        $this->assertEquals($issueMovedToInProgress->getId()->integerId(), $user->getInProgressIssue()->getId()->integerId());
+    }
+
+    /** @test */
     public function developer_cannot_do_2_issues_in_progress()
     {
         $project = ProjectFactory::createOne([
@@ -383,12 +412,7 @@ class IssueEditorTest extends KernelTestCase
 
         $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress, 1);
 
-        $updatedIssue = $this->issueRepository()->findOneBy([
-            'id' => $issueMovedToInProgress->getId()
-        ]);
-
-        $this->assertNotNull($updatedIssue);
-        $this->assertEquals(IssueColumnEnum::InProgress->value, $updatedIssue->getIssueColumn()->getId());
+        $this->assertEquals(IssueColumnEnum::InProgress->value, $issueMovedToInProgress->getIssueColumn()->getId());
 
         $updatedInProgressIssue = $this->issueRepository()->findOneBy([
             'id' => $inProgressIssue->getId()

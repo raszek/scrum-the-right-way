@@ -3,38 +3,48 @@
 namespace App\Form\Kanban;
 
 use App\Enum\Issue\IssueColumnEnum;
-use App\Helper\ArrayHelper;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\GreaterThan;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Type;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use App\Formulate\Form;
+use App\Formulate\FormField;
+use App\Formulate\Validator\ValidatorFactory;
 
 readonly class MoveIssueForm
 {
 
     public function __construct(
-        #[NotBlank]
-        #[GreaterThan(0)]
-        #[Type('integer')]
-        public int $position,
-        #[NotBlank]
-        public string $column
+        private ValidatorFactory $validatorFactory,
     ) {
     }
 
-    #[Callback]
-    public function validate(ExecutionContextInterface $context): void
+    public function create(): Form
     {
-        $kanbanColumns = IssueColumnEnum::kanbanColumns();
+        $v = $this->validatorFactory;
 
-        $kanbanKeys = ArrayHelper::map($kanbanColumns, fn(IssueColumnEnum $kanbanColumn) => $kanbanColumn->key());
+        $form = new Form(
+            data: new MoveIssueFormData()
+        );
 
-        if (!in_array($this->column, $kanbanKeys)) {
-            $context->buildViolation('This is not kanban column.')
-                ->atPath('column')
-                ->addViolation();
-        }
+        $form->addField(
+            new FormField(
+                name: 'position',
+                validators: [
+                    $v->notBlank(),
+                    $v->integer(),
+                    $v->greaterThan(0)
+                ]
+            )
+        );
+
+        $form->addField(
+            new FormField(
+                name: 'column',
+                validators: [
+                    $v->notBlank(),
+                    $v->choice(IssueColumnEnum::kanbanColumnKeys())
+                ]
+            )
+        );
+
+        return $form;
     }
 
 }

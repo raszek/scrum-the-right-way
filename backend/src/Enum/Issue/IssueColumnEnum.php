@@ -2,6 +2,8 @@
 
 namespace App\Enum\Issue;
 
+use App\Helper\ArrayHelper;
+
 enum IssueColumnEnum: int
 {
     case Archived = 0;
@@ -79,6 +81,14 @@ enum IssueColumnEnum: int
             IssueColumnEnum::InTests,
             IssueColumnEnum::Done,
         ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function kanbanColumnKeys(): array
+    {
+        return ArrayHelper::map(self::kanbanColumns(), fn(IssueColumnEnum $column) => $column->key());
     }
 
     public function isInProgress(): bool
