@@ -2,11 +2,10 @@
 
 namespace App\Tests\Controller\Admin;
 
-use App\Email\Site\ActivationUserMessage;
-use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;
 use App\Factory\UserFactory;
+use App\Message\Site\ActivationUserMessage;
 use App\Repository\User\UserCodeRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Common\ClockInterface;

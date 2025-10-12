@@ -2,7 +2,7 @@
 
 namespace App\Action\User;
 
-use App\Email\Site\ActivationUserMessage;
+use App\Message\Site\ActivationUserMessage;
 use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;

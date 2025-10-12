@@ -2,7 +2,7 @@
 
 namespace App\Action\Profile;
 
-use App\Email\Profile\ChangeEmailMessage;
+use App\Message\Profile\ChangeEmailMessage;
 use App\Entity\User\User;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;

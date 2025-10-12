@@ -11,8 +11,6 @@ use App\Exception\Site\UserNotFoundException;
 use App\Form\Site\ForgotPasswordForm;
 use App\Form\Site\ResetPasswordFormData;
 use App\Form\Site\ResetPasswordForm;
-use App\Repository\User\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

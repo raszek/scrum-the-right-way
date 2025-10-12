@@ -5,7 +5,7 @@ namespace App\Message\Site;
 use App\Entity\User\UserCode;
 use App\Service\Common\DefaultMailer;
 
-readonly class ActivationUserMessage
+class ActivationUserMessage
 {
 
     public function __construct(

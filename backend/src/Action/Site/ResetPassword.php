@@ -2,7 +2,7 @@
 
 namespace App\Action\Site;
 
-use App\Email\Site\ResetPasswordMessage;
+use App\Message\Site\ResetPasswordMessage;
 use App\Entity\User\UserCode;
 use App\Enum\User\UserCodeTypeEnum;
 use App\Exception\Site\UserNotFoundException;

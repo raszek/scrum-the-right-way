@@ -35,7 +35,7 @@
                 <span>
                     [#{{ message.number }}]
                 </span>
-                <span>
+                <span title="{{ message.createdAt | date('d/m/Y H:i:s') }}">
                     {{ message.timeAgo }}
                 </span>
             </div>
