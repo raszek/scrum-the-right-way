@@ -8,6 +8,7 @@ use App\Exception\Issue\CannotSetIssueTitleException;
 use App\Exception\Issue\CannotSetStoryPointsException;
 use App\Exception\Issue\OutOfBoundPositionException;
 use App\Form\Issue\SortIssueForm;
+use App\Form\Issue\SortIssueFormData;
 use App\Form\Tag\TagsForm;
 use App\Helper\IntegerHelper;
 use App\Repository\Issue\IssueRepository;
@@ -99,17 +100,22 @@ class SingleIssueController extends CommonIssueController
     public function sort(
         Project $project,
         string $issueCode,
-        #[MapRequestPayload] SortIssueForm $moveIssueForm
+        SortIssueForm $sortIssueForm,
+        Request $request
     ): Response
     {
         $this->denyAccessUnlessGranted(SingleIssueVoter::SORT_ISSUE, $project);
+
+        $form = $sortIssueForm->create();
+
+        $this->validate($form, $request);
 
         $issue = $this->findIssue($issueCode, $project);
         $issueEditor = $this->issueEditorFactory->create($issue, $this->getLoggedInUser());
 
         try {
             $issueEditor->sort(
-                position: $moveIssueForm->position
+                position: $form->getData()->position
             );
         } catch (OutOfBoundPositionException $e) {
             throw new BadRequestException($e->getMessage());

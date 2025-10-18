@@ -13,7 +13,6 @@ use App\Form\Profile\AvatarForm;
 use App\Form\Profile\ChangeEmailForm;
 use App\Form\Profile\ChangePasswordForm;
 use App\Form\Profile\ProfileForm;
-use App\Formulate\CannotValidateFormException;
 use App\Repository\User\UserRepository;
 use App\Service\File\FileService;
 use App\Service\Menu\Profile\ProfileMenu;
@@ -113,13 +112,7 @@ class ProfileController extends Controller
     ): Response {
         $form = $avatarForm->create();
 
-        if (!$form->loadRequest($request)) {
-            throw new BadRequestException('Form cannot be loaded');
-        }
-
-        if (!$form->validate()) {
-            throw new CannotValidateFormException($form);
-        }
+        $this->validate($form, $request);
 
         $profile = $changeAvatar->execute($form->getData(), $this->getLoggedInUser());
 

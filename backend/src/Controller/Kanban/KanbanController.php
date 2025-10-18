@@ -98,13 +98,7 @@ class KanbanController extends CommonIssueController
 
         $form = $moveIssueForm->create();
 
-        if (!$form->loadRequest($request)) {
-            throw new CannotLoadFormException();
-        }
-
-        if (!$form->validate()) {
-            throw new CannotValidateFormException($form);
-        }
+        $this->validate($form, $request);
 
         $issue = $this->findIssue($issueCode, $project);
 

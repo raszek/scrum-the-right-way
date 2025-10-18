@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User\User;
+use App\Formulate\CannotLoadFormException;
+use App\Formulate\CannotValidateFormException;
 use App\Formulate\Form;
 use App\Helper\JsonHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,16 +33,14 @@ class Controller extends AbstractController
     public function validate(Form $form, Request $request): void
     {
         if (!$form->loadRequest($request)) {
-            throw new BadRequestException('Form cannot be loaded');
+            throw new CannotLoadFormException();
         }
 
         if ($form->validate()) {
             return;
         }
 
-        $errors = JsonHelper::encode($form->getErrors());
-
-        throw new UnprocessableEntityHttpException($errors);
+        throw new CannotValidateFormException($form);
     }
 
     protected function render(string $view, array $parameters = [], ?Response $response = null): Response

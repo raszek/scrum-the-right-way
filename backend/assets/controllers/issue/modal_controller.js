@@ -20,6 +20,7 @@ export default class extends Controller {
         this.showLoader();
 
         this.contentTarget.innerHTML = await get(params.url);
+        console.log(this.contentTarget.innerHTML);
 
         this.hideLoader();
     }

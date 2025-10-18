@@ -28,14 +28,7 @@
         
     </div>
     <div class="card-body">
-        <div data-editor-update-target="viewer">
-            {% if not issue.description %}
-                {{ 'Add more detailed description' | nl2br }}
-            {% else %}
-                {{ issue.description | nl2br }}
-            {% endif %}
-        </div>
-        <div data-editor-update-target="editor">
-        </div>
+        <div data-editor-update-target="viewer">{{ issue.description ?? 'Add more detailed description' | nl2br }}</div>
+        <div data-editor-update-target="editor"></div>
     </div>
 </div>
