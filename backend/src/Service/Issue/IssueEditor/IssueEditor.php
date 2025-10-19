@@ -11,6 +11,7 @@ use App\Event\Issue\Event\SetIssueStoryPointsEvent;
 use App\Exception\Issue\CannotSetIssueTitleException;
 use App\Exception\Issue\CannotSetStoryPointsException;
 use App\Exception\Issue\OutOfBoundPositionException;
+use App\Exception\Kanban\CannotChangeKanbanColumnException;
 use App\Helper\JsonHelper;
 use App\Helper\StringHelper;
 use App\Repository\Issue\IssueColumnRepository;
@@ -40,6 +41,13 @@ readonly class IssueEditor
     ) {
     }
 
+    /**
+     * @param IssueColumnEnum $column
+     * @param int $position
+     * @return void
+     * @throws CannotChangeKanbanColumnException
+     * @throws OutOfBoundPositionException
+     */
     public function changeKanbanColumn(IssueColumnEnum $column, int $position): void
     {
         if ($this->issue->getIssueColumn()->getId() === $column->value) {
@@ -50,9 +58,7 @@ readonly class IssueEditor
             throw new RuntimeException('Cannot move features on kanban.');
         }
 
-        if (!in_array($column, IssueColumnEnum::kanbanColumns())) {
-            throw new RuntimeException('Invalid column. This method can only change columns in kanban.');
-        }
+        $this->guardChangeColumn($column);
 
         $this->projectIssueEditorStrategy->changeKanbanColumn($column);
 
@@ -234,5 +240,27 @@ readonly class IssueEditor
         if ($issueEditableError) {
             throw new RuntimeException($issueEditableError);
         }
+    }
+
+    private function guardChangeColumn(IssueColumnEnum $column): void
+    {
+        if ($this->issue->getIssueColumn()->isEnded()) {
+            throw new CannotChangeKanbanColumnException('Cannot move issue when it is finished.');
+        }
+
+        if (!in_array($column, $this->workingColumns())) {
+            throw new CannotChangeKanbanColumnException('Invalid column. This method can only change columns in kanban.');
+        }
+    }
+
+    private function workingColumns(): array
+    {
+        return [
+            IssueColumnEnum::ToDo,
+            IssueColumnEnum::InProgress,
+            IssueColumnEnum::Test,
+            IssueColumnEnum::InTests,
+            IssueColumnEnum::Done,
+        ];
     }
 }

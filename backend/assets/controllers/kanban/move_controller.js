@@ -7,7 +7,6 @@ export default class extends Controller {
 
     static values = {
         currentIssue: Object,
-        disabled: Boolean,
     }
 
     static targets = [
@@ -32,9 +31,11 @@ export default class extends Controller {
     makeColumnSortable() {
         for (const columnTarget of this.columnTargets) {
 
+            const isDisabled = columnTarget.getAttribute('data-kanban--move-column-disabled-param');
+
             new Sortable(columnTarget, {
                 group: 'issue',
-                disabled: this.disabledValue,
+                disabled: isDisabled,
                 animation: 150,
                 onUpdate: this.dragIssue.bind(this),
                 onAdd: this.dragIssue.bind(this),

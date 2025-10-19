@@ -80,6 +80,7 @@ enum IssueColumnEnum: int
             IssueColumnEnum::Test,
             IssueColumnEnum::InTests,
             IssueColumnEnum::Done,
+            IssueColumnEnum::Finished,
         ];
     }
 

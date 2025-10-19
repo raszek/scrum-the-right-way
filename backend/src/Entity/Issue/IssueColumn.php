@@ -64,6 +64,11 @@ class IssueColumn
         return $this->isColumn(IssueColumnEnum::Finished);
     }
 
+    public function isEnded(): bool
+    {
+        return $this->isFinished() || $this->isClosed();
+    }
+
     public function isInProgress(): bool
     {
         return $this->isColumn(IssueColumnEnum::InProgress);
@@ -77,6 +82,11 @@ class IssueColumn
     public function isTested(): bool
     {
         return $this->isColumn(IssueColumnEnum::InTests);
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->isColumn(IssueColumnEnum::Closed);
     }
 
     public function isColumn(IssueColumnEnum $issueColumnEnum): bool

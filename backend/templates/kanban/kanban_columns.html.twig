@@ -1,6 +1,5 @@
 <div data-controller="kanban--move issue--modal"
      data-kanban--move-current-issue-value="{{ currentIssue }}"
-     data-kanban--move-disabled-value="{{ disabledSort }}"
      class="row"
 >
     {% for column in columns %}
@@ -12,6 +11,7 @@
             <div class="strw-kanban-column"
                  data-kanban--move-target="column"
                  data-kanban--move-column-key-param="{{ column.key }}"
+                 data-kanban--move-column-disabled-param="{{ column.disabled }}"
             >
                 {% for issue in column.items %}
                     <div class="card mb-1 strw-kanban-issue"

@@ -13,7 +13,8 @@ readonly class KanbanColumn
         /**
          * @var Issue[]
          */
-        public array $items
+        public array $items,
+        public string $disabled
     ) {
     }
 

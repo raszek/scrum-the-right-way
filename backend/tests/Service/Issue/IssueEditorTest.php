@@ -6,6 +6,7 @@ use App\Entity\Issue\Issue;
 use App\Entity\User\User;
 use App\Enum\Issue\IssueColumnEnum;
 use App\Exception\Issue\CannotSetStoryPointsException;
+use App\Exception\Kanban\CannotChangeKanbanColumnException;
 use App\Factory\Issue\IssueColumnFactory;
 use App\Factory\Issue\IssueFactory;
 use App\Factory\Issue\IssueTypeFactory;
@@ -487,28 +488,49 @@ class IssueEditorTest extends KernelTestCase
             'inProgressIssue' => null
         ]);
 
-        $issueId = $issue->getId();
-
-        $userId = $user->getId();
-
         $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
 
         $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress, 1);
 
-        $updatedIssue = $this->issueRepository()->findOneBy([
-            'id' => $issueId
+        $this->assertEquals(IssueColumnEnum::InProgress->value, $issue->getIssueColumn()->getId());
+
+        $this->assertNotNull($user);
+        $this->assertNotNull($user->getInProgressIssue());
+        $this->assertEquals($issue->getId(), $user->getInProgressIssue()->getId());
+    }
+
+    /** @test */
+    public function finished_issues_cannot_be_moved_back()
+    {
+        $project = ProjectFactory::createOne([
+            'code' => 'SCP'
         ]);
 
-        $this->assertNotNull($updatedIssue);
-        $this->assertEquals(IssueColumnEnum::InProgress->value, $updatedIssue->getIssueColumn()->getId());
+        $finishedColumn = IssueColumnFactory::finishedColumn();
+        IssueColumnFactory::inProgressColumn();
 
-        $updatedUser = $this->userRepository()->findOneBy([
-            'id' => $userId
+        $issue = IssueFactory::createOne([
+            'project' => $project,
+            'issueColumn' => $finishedColumn,
+            'number' => 1,
+            'issueOrder' => 1024
         ]);
 
-        $this->assertNotNull($updatedUser);
-        $this->assertNotNull($updatedUser->getInProgressIssue());
-        $this->assertEquals($issue->getId(), $updatedUser->getInProgressIssue()->getId());
+        $user = UserFactory::createOne([
+            'inProgressIssue' => null
+        ]);
+
+        $issueEditor = $this->getIssueEditor($issue->_real(), $user->_real());
+
+        $error = null;
+        try {
+            $issueEditor->changeKanbanColumn(IssueColumnEnum::InProgress, 1);
+        } catch (CannotChangeKanbanColumnException $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertNotNull($error);
+        $this->assertEquals('Cannot move issue when it is finished.', $error);
     }
 
     /** @test */

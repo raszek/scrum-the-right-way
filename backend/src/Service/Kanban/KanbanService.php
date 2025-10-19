@@ -6,6 +6,7 @@ use App\Entity\Issue\IssueColumn;
 use App\Entity\Project\Project;
 use App\Enum\Issue\IssueColumnEnum;
 use App\Enum\Kanban\KanbanFilterEnum;
+use App\Helper\StimulusHelper;
 use App\Repository\Issue\IssueColumnRepository;
 use App\Repository\Issue\IssueRepository;
 use App\Repository\QueryBuilder\QueryBuilder;
@@ -38,6 +39,7 @@ readonly class KanbanService
                 name: $issueColumn->label(),
                 key: $issueColumn->key(),
                 items: $query->getQuery()->getResult(),
+                disabled: $this->isColumnDisabled($filter, $issueColumn),
             );
         }
 
@@ -51,6 +53,15 @@ readonly class KanbanService
         }
 
         return $this->issueRepository->smallColumnQuery($project, $column);
+    }
+
+    private function isColumnDisabled(KanbanFilterEnum $filterEnum, IssueColumnEnum $column): bool
+    {
+        if ($filterEnum === KanbanFilterEnum::Big) {
+            return true;
+        }
+
+        return $column === IssueColumnEnum::Finished;
     }
 
 }

@@ -7,6 +7,7 @@ use App\Action\Kanban\MoveKanbanIssueActionData;
 use App\Controller\Issue\CommonIssueController;
 use App\Entity\Project\Project;
 use App\Enum\Kanban\KanbanFilterEnum;
+use App\Exception\Kanban\CannotChangeKanbanColumnException;
 use App\Form\Kanban\MoveIssueForm;
 use App\Helper\StimulusHelper;
 use App\Repository\Issue\IssueRepository;
@@ -102,14 +103,18 @@ class KanbanController extends CommonIssueController
 
         $data = $form->getData();
 
-        $moveKanbanIssueAction->execute(
-            new MoveKanbanIssueActionData(
-                issue: $issue,
-                user: $this->getLoggedInUser(),
-                position: $data->position,
-                column: $data->column,
-            )
-        );
+        try {
+            $moveKanbanIssueAction->execute(
+                new MoveKanbanIssueActionData(
+                    issue: $issue,
+                    user: $this->getLoggedInUser(),
+                    position: $data->position,
+                    column: $data->column,
+                )
+            );
+        } catch (CannotChangeKanbanColumnException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
 
         return new Response(status: 204);
     }
