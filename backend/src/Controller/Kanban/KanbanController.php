@@ -8,8 +8,6 @@ use App\Controller\Issue\CommonIssueController;
 use App\Entity\Project\Project;
 use App\Enum\Kanban\KanbanFilterEnum;
 use App\Form\Kanban\MoveIssueForm;
-use App\Formulate\CannotLoadFormException;
-use App\Formulate\CannotValidateFormException;
 use App\Helper\StimulusHelper;
 use App\Repository\Issue\IssueRepository;
 use App\Security\Voter\KanbanVoter;

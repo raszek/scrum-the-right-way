@@ -4,7 +4,13 @@ import {get} from 'util';
 
 export default class extends Controller {
 
-    static targets = ['modal', 'content', 'loader', 'title'];
+    static targets = [
+        'modal',
+        'content',
+        'loader',
+        'title',
+        'issueLink'
+    ];
 
     connect() {
         this.modal = new Modal(this.modalTarget);
@@ -14,13 +20,13 @@ export default class extends Controller {
         const params = e.params;
 
         this.titleTarget.innerText = params.code;
+        this.issueLinkTarget.setAttribute('href', params.link);
 
         this.modal.show();
 
         this.showLoader();
 
         this.contentTarget.innerHTML = await get(params.url);
-        console.log(this.contentTarget.innerHTML);
 
         this.hideLoader();
     }

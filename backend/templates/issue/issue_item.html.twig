@@ -10,6 +10,7 @@
            id: project.id,
            issueCode: issue.code
        }) }}"
+       data-issue--modal-link-param="{{ path('app_project_issue_view', {id: project.id, issueCode: issue.code}) }}"
        data-issue--modal-code-param="{{ issue.code }}"
     >
         {{ issue.title }}
