@@ -244,16 +244,19 @@ readonly class IssueEditor
 
     private function guardChangeColumn(IssueColumnEnum $column): void
     {
-        if ($this->issue->getIssueColumn()->isEnded()) {
-            throw new CannotChangeKanbanColumnException('Cannot move issue when it is finished.');
+        if (!in_array($this->issue->getIssueColumn()->getEnum(), $this->kanbanTargetColumns())) {
+            throw new CannotChangeKanbanColumnException('Invalid source column');
         }
 
-        if (!in_array($column, $this->workingColumns())) {
-            throw new CannotChangeKanbanColumnException('Invalid column. This method can only change columns in kanban.');
+        if (!in_array($column, $this->kanbanTargetColumns())) {
+            throw new CannotChangeKanbanColumnException('Invalid target column. This method can only change columns in kanban.');
         }
     }
 
-    private function workingColumns(): array
+    /**
+     * @return IssueColumnEnum[]
+     */
+    private function kanbanTargetColumns(): array
     {
         return [
             IssueColumnEnum::ToDo,

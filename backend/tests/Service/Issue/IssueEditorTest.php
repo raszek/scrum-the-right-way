@@ -530,7 +530,7 @@ class IssueEditorTest extends KernelTestCase
         }
 
         $this->assertNotNull($error);
-        $this->assertEquals('Cannot move issue when it is finished.', $error);
+        $this->assertEquals('Invalid source column', $error);
     }
 
     /** @test */

@@ -75,6 +75,10 @@ readonly class BurndownChartService
         $records = $this->getSprintDates($sprint->getStartedAt(), $sprintEndDate);
 
         foreach ($databaseRecords as $databaseRecord) {
+            if ($databaseRecord['finishedday'] === null) {
+                continue;
+            }
+
             $records[$databaseRecord['finishedday']]['storyPoints'] = $databaseRecord['storypoints'];
         }
 

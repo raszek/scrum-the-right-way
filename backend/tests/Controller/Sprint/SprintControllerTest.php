@@ -686,6 +686,7 @@ class SprintControllerTest extends WebTestCase
             'sprintGoal' => $sprintGoalOne,
             'finishedAt' => CarbonImmutable::create(2012, 12, 14),
             'goalOrder' => 128,
+            'storyPoints' => 5
         ]);
 
         $backlogColumn = IssueColumnFactory::backlogColumn();
@@ -717,12 +718,16 @@ class SprintControllerTest extends WebTestCase
             'issue' => $feature,
             'sprintGoal' => $sprintGoalTwo,
             'goalOrder' => 128,
+            'storyPoints' => 3,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 15),
         ]);
 
         SprintGoalIssueFactory::createOne([
             'issue' => $subIssue,
             'sprintGoal' => $sprintGoalTwo,
             'goalOrder' => 256,
+            'storyPoints' => 3,
+            'finishedAt' => CarbonImmutable::create(2012, 12, 15),
         ]);
 
         $this->loginAsUser($user);
