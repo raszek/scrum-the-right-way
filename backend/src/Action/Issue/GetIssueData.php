@@ -11,7 +11,6 @@ use App\Repository\Issue\IssueRepository;
 use App\Repository\Issue\IssueThreadMessageRepository;
 use App\Repository\Project\ProjectMemberRepository;
 use App\Repository\Project\ProjectTagRepository;
-use App\Repository\Sprint\SprintRepository;
 use App\Service\Issue\IssueEditor\IssueEditorFactory;
 use App\Service\Issue\StoryPointService;
 use App\Service\Session\Issue\IssueSessionSettings;
@@ -29,7 +28,6 @@ readonly class GetIssueData
         private IssueDependencyRepository $issueDependencyRepository,
         private IssueEditorFactory $issueEditorFactory,
         private IssueRepository $issueRepository,
-        private SprintRepository $sprintRepository,
     ) {
     }
 

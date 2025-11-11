@@ -5,6 +5,7 @@
         {% if issue.hasEnabledSubIssues %}
             {% include 'issue/sub_issues.html.twig' %}
         {% endif %}
+        {% include 'issue/todo_list.html.twig' %}
         {% include 'attachment/attachments.html.twig' %}
         {% include 'issue/issue_dependencies.html.twig' %}
         {% include 'issue/issue_thread_messages.html.twig' %}
